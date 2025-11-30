@@ -3015,12 +3015,12 @@ def export_pdf():
     # ---------- 1) שליפת snapshot ----------
     # תמיד לקחת מ-LAST_EXPORT (הכי עדכני)
     u = current_user()
-    plan = (u["plan"] if (u is not None and "plan" in u.keys()) else "free")
+    plan = get_effective_plan(u) if u else "free"
     
     # DEBUG
     print(f"📄 PDF Export: plan={plan}, LAST_EXPORT plots count={len(LAST_EXPORT.get('plots', []))}")
     
-    if plan != "pro":
+    if plan not in ("pro", "premium", "admin"):
         return render_template("upgrade_required.html", 
                                feature="הורדת PDF עם המלצות",
                                title="שדרוג נדרש"), 403

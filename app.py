@@ -370,6 +370,35 @@ def ensure_subscription_columns():
             agreed_at TIMESTAMP
         )
     """)
+    
+    # יצירת טבלת password_resets
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS password_resets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            expires_at TEXT NOT NULL,
+            used INTEGER DEFAULT 0,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    """)
+    
+    # יצירת טבלת reports
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            period_type TEXT DEFAULT 'month',
+            period_start DATE,
+            period_end DATE,
+            encrypted_data BLOB NOT NULL,
+            summary_json TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    """)
+    
     conn.commit()
 
     # השג רשימת עמודות קיימות

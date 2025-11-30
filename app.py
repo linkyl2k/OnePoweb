@@ -436,6 +436,10 @@ def ensure_subscription_columns():
         c.execute("ALTER TABLE users ADD COLUMN trial_until TEXT NULL")
     if "trial_used" not in columns:
         c.execute("ALTER TABLE users ADD COLUMN trial_used INTEGER DEFAULT 0")
+    
+    # עמודת הנחת רפרל (50% חד-פעמי)
+    if "referral_discount" not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN referral_discount INTEGER DEFAULT 0")
 
     conn.commit()
     conn.close()
@@ -3380,24 +3384,31 @@ def subscribe():
     u = current_user()
     ensure_user_ref_code(u["id"])
 
-    # Calculate price with credits
+    # Calculate price with referral discount (50% off, one time)
     base_price_ils = PLAN_PRICES[plan]["ils"]
     base_price_usd = PLAN_PRICES[plan]["usd"]
     
-    credit = int(u["credit_balance"] or 0)
-    # Convert credit to USD (roughly 1 USD = 4 ILS)
-    credit_usd = min(credit // 4, 13, base_price_usd)  # Max ~$13 discount
-    discount_ils = credit_usd * 4
+    # Check for referral discount (50% off next month)
+    referral_discount = int(u["referral_discount"] or 0) if "referral_discount" in u.keys() else 0
     
-    net_price_usd = base_price_usd - credit_usd
+    if referral_discount > 0:
+        # 50% discount on current plan
+        discount_percent = min(referral_discount, 50)
+        discount_usd = int(base_price_usd * discount_percent / 100)
+        discount_ils = int(base_price_ils * discount_percent / 100)
+    else:
+        discount_usd = 0
+        discount_ils = 0
+    
+    net_price_usd = base_price_usd - discount_usd
     net_price_ils = base_price_ils - discount_ils
 
     return render_template("checkout.html",
         plan=plan,
         base_price_ils=base_price_ils,
         base_price_usd=base_price_usd,
-        credit=credit,
-        credit_usd=credit_usd,
+        referral_discount=referral_discount,
+        discount_usd=discount_usd,
         discount_ils=discount_ils,
         net_price_usd=net_price_usd,
         net_price_ils=net_price_ils,
@@ -3419,15 +3430,21 @@ def paypal_create_order():
         
         u = current_user()
         
-        # Calculate price
+        # Calculate price with referral discount
         base_price_usd = PLAN_PRICES[plan]["usd"]
-        credit = int(u["credit_balance"] or 0)
-        credit_usd = min(credit // 4, 13, base_price_usd)
-        net_price_usd = base_price_usd - credit_usd
+        referral_discount = int(u["referral_discount"] or 0) if "referral_discount" in u.keys() else 0
         
-        # If price is 0 (fully covered by credits), activate immediately
+        if referral_discount > 0:
+            discount_percent = min(referral_discount, 50)
+            discount_usd = int(base_price_usd * discount_percent / 100)
+        else:
+            discount_usd = 0
+        
+        net_price_usd = base_price_usd - discount_usd
+        
+        # If price is 0 (fully covered by discount), activate immediately
         if net_price_usd <= 0:
-            return activate_subscription(u["id"], plan, 0)
+            return activate_subscription(u["id"], plan, referral_discount)
         
         access_token = get_paypal_access_token()
         if not access_token:
@@ -3522,29 +3539,26 @@ def paypal_capture_order():
     return jsonify({"error": "Payment not completed"}), 400
 
 
-def activate_subscription(user_id, plan, credit_used):
+def activate_subscription(user_id, plan, discount_used):
     """Activate subscription after successful payment"""
     db = get_db()
     u = db.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
     
-    # Calculate new credit balance
-    current_credit = int(u["credit_balance"] or 0)
-    new_credit = max(0, current_credit - credit_used)
-    
-    # Update user plan
+    # Update user plan and reset referral discount (one-time use)
     db.execute("""
         UPDATE users 
-        SET plan=?, credit_balance=?, cancelled_at=NULL 
+        SET plan=?, referral_discount=0, cancelled_at=NULL 
         WHERE id=?
-    """, (plan, new_credit, user_id))
+    """, (plan, user_id))
     db.commit()
     
-    # Grant referral bonus to referrer (one-time)
+    # Grant referral bonus to referrer (one-time 50% discount on next month)
     referrer_id = u["referred_by"]
     already_granted = int(u["ref_bonus_granted"] or 0)
     if referrer_id and not already_granted and int(referrer_id) != int(user_id):
         try:
-            db.execute("UPDATE users SET credit_balance=credit_balance+50 WHERE id=?", (referrer_id,))
+            # Give referrer 50% discount on next payment (one time only)
+            db.execute("UPDATE users SET referral_discount=50 WHERE id=? AND (referral_discount IS NULL OR referral_discount=0)", (referrer_id,))
             db.execute("UPDATE users SET ref_bonus_granted=1 WHERE id=?", (user_id,))
             db.commit()
         except Exception:
@@ -3654,6 +3668,12 @@ def referrals():
 
     # קישור ההפניה המלא
     ref_link = url_for("signup", ref=user["ref_code"], _external=True)
+    
+    # הנחת רפרל (50% חד-פעמי)
+    try:
+        referral_discount = int(user["referral_discount"] or 0) if "referral_discount" in user.keys() else 0
+    except Exception:
+        referral_discount = 0
 
     return render_template(
         "referrals.html",
@@ -3661,6 +3681,7 @@ def referrals():
         ref_link=ref_link,
         credit_balance=credit_balance,
         referred_count=referred_count,
+        referral_discount=referral_discount,
         title="הפניות (Referral)"
     )
 

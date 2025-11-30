@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h3>שגיאה {{ code }}</h3>
+    <p class="mb-3">{{ msg }}</p>
+    <a class="btn btn-primary" href="{{ url_for('index') }}">חזרה לדף הראשי</a>
+  </div>
+</div>
+{% endblock %}

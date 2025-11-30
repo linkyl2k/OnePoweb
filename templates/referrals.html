@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5" style="max-width: 900px;">
+  
+  <!-- Header -->
+  <div class="text-center mb-5">
+    <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(16,185,129,0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+      <i class="bi bi-people-fill" style="font-size: 1.75rem; color: #1abc9c;"></i>
+    </div>
+    <h2 style="color: #fff; margin-bottom: 0.5rem;">תוכנית ההפניות</h2>
+    <p class="text-muted">הזמן חברים והרוויח זיכוי על כל אחד שמצטרף</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-12 col-md-6">
+      <div class="card h-100" style="border: none; background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.05) 100%), var(--bg-soft);">
+        <div class="card-body text-center py-4">
+          <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 8px 24px rgba(16,185,129,0.3);">
+            <i class="bi bi-wallet2" style="font-size: 1.5rem; color: #fff;"></i>
+          </div>
+          <div style="font-size: 2.5rem; font-weight: bold; color: #34d399; line-height: 1;">
+            ₪{{ credit_balance }}
+          </div>
+          <div class="text-muted mt-2">יתרת זיכוי נוכחית</div>
+          <p class="small text-muted mt-3 mb-0" style="line-height: 1.5;">
+            הזיכוי ינוכה אוטומטית בחיוב הבא<br>
+            (עד ₪50 לכל חיוב)
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 col-md-6">
+      <div class="card h-100" style="border: none; background: linear-gradient(135deg, rgba(46,160,255,0.12) 0%, rgba(46,160,255,0.05) 100%), var(--bg-soft);">
+        <div class="card-body text-center py-4">
+          <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 8px 24px rgba(46,160,255,0.3);">
+            <i class="bi bi-person-plus-fill" style="font-size: 1.5rem; color: #fff;"></i>
+          </div>
+          <div style="font-size: 2.5rem; font-weight: bold; color: #34c3ff; line-height: 1;">
+            {{ referred_count }}
+          </div>
+          <div class="text-muted mt-2">חברים שהצטרפו</div>
+          <p class="small text-muted mt-3 mb-0" style="line-height: 1.5;">
+            נרשמו דרך הלינק האישי שלך<br>
+            ושילמו על מנוי
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Referral Link Card -->
+  <div class="card mb-4">
+    <div class="card-body py-4">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(16,185,129,0.15)); display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-link-45deg" style="font-size: 1.25rem; color: #1abc9c;"></i>
+        </div>
+        <div>
+          <h5 class="mb-0">הלינק האישי שלך</h5>
+          <span class="text-muted small">שתף את הלינק וקבל זיכוי</span>
+        </div>
+      </div>
+      
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" readonly value="{{ ref_link }}" id="refLink" style="font-size: 0.9rem; padding: 14px 16px; border-radius: 12px 0 0 12px;">
+        <button class="btn" type="button" onclick="copyRefLink()" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); color: #fff; border: none; border-radius: 0 12px 12px 0; padding: 0 24px; font-weight: 600;">
+          <i class="bi bi-clipboard me-2"></i> העתק
+        </button>
+      </div>
+
+      <!-- Share Buttons -->
+      <div class="d-flex flex-wrap gap-2">
+        <a href="https://wa.me/?text={{ 'הצטרף ל-OnePoweb - ' ~ ref_link | urlencode }}" target="_blank" class="btn" style="background: rgba(37,211,102,0.15); color: #25d366; border: 1px solid rgba(37,211,102,0.25); border-radius: 10px;">
+          <i class="bi bi-whatsapp me-1"></i> WhatsApp
+        </a>
+        <a href="https://t.me/share/url?url={{ ref_link | urlencode }}&text={{ 'הצטרף ל-OnePoweb' | urlencode }}" target="_blank" class="btn" style="background: rgba(0,136,204,0.15); color: #0088cc; border: 1px solid rgba(0,136,204,0.25); border-radius: 10px;">
+          <i class="bi bi-telegram me-1"></i> Telegram
+        </a>
+        <button onclick="shareNative()" class="btn" style="background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;">
+          <i class="bi bi-share me-1"></i> שיתוף
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it Works -->
+  <div class="card">
+    <div class="card-body py-4">
+      <h5 class="mb-4">
+        <i class="bi bi-question-circle me-2" style="color: #2ea0ff;"></i>
+        איך זה עובד?
+      </h5>
+      
+      <div class="row g-4">
+        <div class="col-12 col-md-4">
+          <div class="text-center p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, rgba(46,160,255,0.2), rgba(46,160,255,0.1)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.25rem; color: #2ea0ff; font-weight: bold;">
+              1
+            </div>
+            <h6 style="color: #fff;">שתף את הלינק</h6>
+            <p class="small text-muted mb-0">שלח לחברים שעובדים עם קופה רושמת</p>
+          </div>
+        </div>
+        
+        <div class="col-12 col-md-4">
+          <div class="text-center p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(26,188,156,0.1)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.25rem; color: #1abc9c; font-weight: bold;">
+              2
+            </div>
+            <h6 style="color: #fff;">הם מצטרפים</h6>
+            <p class="small text-muted mb-0">נרשמים דרך הלינק ומשלמים על מנוי</p>
+          </div>
+        </div>
+        
+        <div class="col-12 col-md-4">
+          <div class="text-center p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.25rem; color: #10b981; font-weight: bold;">
+              3
+            </div>
+            <h6 style="color: #fff;">קבל זיכוי</h6>
+            <p class="small text-muted mb-0">₪50 זיכוי חד-פעמי לכל חבר משלם</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Profile -->
+  <div class="text-center mt-4">
+    <a href="{{ url_for('profile') }}" class="btn" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 24px;">
+      <i class="bi bi-arrow-right me-2"></i> חזרה לפרופיל
+    </a>
+  </div>
+</div>
+
+<script>
+function copyRefLink() {
+  const input = document.getElementById('refLink');
+  navigator.clipboard.writeText(input.value);
+  const btn = input.nextElementSibling;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="bi bi-check2 me-2"></i> הועתק!';
+  btn.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+  setTimeout(() => {
+    btn.innerHTML = originalHtml;
+    btn.style.background = 'linear-gradient(90deg, #1abc9c, #16e0bd)';
+  }, 2000);
+}
+
+function shareNative() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'OnePoweb - ניתוח דוחות קופה',
+      text: 'הצטרף ל-OnePoweb וקבל ניתוח חכם לדוחות הקופה שלך',
+      url: document.getElementById('refLink').value
+    });
+  } else {
+    copyRefLink();
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5" style="max-width: 1000px;">
+  
+  <!-- Profile Header -->
+  <div class="card mb-4" style="border: none; background: linear-gradient(135deg, rgba(26,188,156,0.15) 0%, rgba(46,160,255,0.12) 100%), var(--bg-soft);">
+    <div class="card-body py-4">
+      <div class="d-flex flex-wrap align-items-center gap-4">
+        <!-- Avatar -->
+        <div class="profile-avatar" style="width: 80px; height: 80px; border-radius: 20px; background: linear-gradient(135deg, #1abc9c, #2ea0ff); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; font-weight: bold; box-shadow: 0 8px 24px rgba(26,188,156,0.25);">
+          {{ (user.first_name or user.email)[0]|upper }}
+        </div>
+        
+        <!-- User Info -->
+        <div class="flex-grow-1">
+          <h3 class="mb-1" style="color: #fff;">
+            {% if user.first_name %}
+              {{ user.first_name }} {{ user.last_name or '' }}
+            {% else %}
+              {{ user.email.split('@')[0] }}
+            {% endif %}
+          </h3>
+          <p class="mb-0 text-muted">{{ user.email }}</p>
+        </div>
+        
+        <!-- Plan Badge -->
+        <div class="text-center">
+          {% if is_trial_active(user) %}
+            <div class="plan-badge" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); padding: 12px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(245,158,11,0.3); position: relative;">
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(0,0,0,0.6);">תקופת ניסיון</span>
+              <div style="font-size: 1.25rem; font-weight: bold; color: #000;">PRO</div>
+              <div style="font-size: 0.7rem; color: rgba(0,0,0,0.7);">עד {{ user.trial_until }}</div>
+            </div>
+          {% elif user.plan == 'pro' %}
+            <div class="plan-badge" style="background: linear-gradient(135deg, #10b981, #34d399); padding: 12px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(16,185,129,0.3);">
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8);">תוכנית</span>
+              <div style="font-size: 1.25rem; font-weight: bold; color: #fff;">PRO</div>
+            </div>
+          {% elif user.plan == 'basic' %}
+            <div class="plan-badge" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); padding: 12px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(46,160,255,0.3);">
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8);">תוכנית</span>
+              <div style="font-size: 1.25rem; font-weight: bold; color: #fff;">BASIC</div>
+            </div>
+          {% else %}
+            <div class="plan-badge" style="background: rgba(255,255,255,0.08); padding: 12px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);">
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);">תוכנית</span>
+              <div style="font-size: 1.25rem; font-weight: bold; color: var(--text);">חינמית</div>
+            </div>
+          {% endif %}
+        </div>
+        
+        <!-- Edit Button -->
+        <a class="btn btn-outline-secondary" href="{{ url_for('profile_edit') }}" style="border-radius: 10px;">
+          <i class="bi bi-pencil me-1"></i> ערוך
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- Subscription Card -->
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(46,160,255,0.2), rgba(52,195,255,0.15)); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-credit-card" style="font-size: 1.25rem; color: #2ea0ff;"></i>
+            </div>
+            <h5 class="mb-0">ניהול מנוי</h5>
+          </div>
+          
+          <!-- Current Status -->
+          <div class="mb-4 p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">סטטוס נוכחי</span>
+              {% if user.plan in ['basic','pro'] %}
+                {% if not user.cancelled_at %}
+                  <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 8px;">
+                    <i class="bi bi-check-circle me-1"></i> פעיל
+                  </span>
+                {% else %}
+                  <span class="badge" style="background: rgba(239,68,68,0.15); color: #f87171; padding: 6px 12px; border-radius: 8px;">
+                    <i class="bi bi-x-circle me-1"></i> מבוטל
+                  </span>
+                {% endif %}
+              {% else %}
+                <span class="badge" style="background: rgba(255,255,255,0.08); color: var(--muted); padding: 6px 12px; border-radius: 8px;">
+                  ללא מנוי
+                </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Trial Banner for Free Users -->
+          {% if user.plan == 'free' and not user.trial_used and not is_trial_active(user) %}
+            <div class="mb-3 p-3" style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.1)); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px;">
+              <div class="d-flex align-items-center gap-3">
+                <div style="font-size: 2rem;">🎁</div>
+                <div class="flex-grow-1">
+                  <strong style="color: #fbbf24;">נסה PRO חינם!</strong>
+                  <p class="mb-0 small text-muted">7 ימים של כל הפיצ'רים ללא תשלום</p>
+                </div>
+                <form method="POST" action="{{ url_for('start_trial') }}">
+                  <button type="submit" class="btn" style="background: linear-gradient(90deg, #f59e0b, #fbbf24); color: #000; font-weight: 600; border-radius: 10px; padding: 10px 20px;">
+                    התחל ניסיון
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Subscription Actions -->
+          <div class="d-flex flex-column gap-2">
+            <a class="btn w-100" href="{{ url_for('subscribe', plan='basic') }}" style="background: rgba(46,160,255,0.15); color: #2ea0ff; border: 1px solid rgba(46,160,255,0.3); border-radius: 10px; padding: 12px;">
+              <i class="bi bi-star me-2"></i>
+              מנוי BASIC — ₪39/חודש
+            </a>
+            <a class="btn w-100" href="{{ url_for('subscribe', plan='pro') }}" style="background: linear-gradient(90deg, #10b981, #34d399); color: #fff; border: none; border-radius: 10px; padding: 12px; font-weight: 600;">
+              <i class="bi bi-rocket-takeoff me-2"></i>
+              מנוי PRO — ₪69/חודש
+            </a>
+            
+            {% if user.plan in ['basic','pro'] and not user.cancelled_at %}
+              <form method="POST" action="{{ url_for('cancel_subscription') }}" onsubmit="return confirm('האם לבטל את המנוי?')">
+                <button class="btn w-100" type="submit" style="background: transparent; color: #f87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px;">
+                  <i class="bi bi-x-lg me-2"></i> בטל מנוי
+                </button>
+              </form>
+            {% elif user.plan in ['basic','pro'] and user.cancelled_at %}
+              <form method="POST" action="{{ url_for('renew_subscription') }}">
+                <button class="btn w-100" type="submit" style="background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 12px;">
+                  <i class="bi bi-arrow-repeat me-2"></i> חידוש מנוי
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Referral Card -->
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(16,185,129,0.15)); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-gift" style="font-size: 1.25rem; color: #1abc9c;"></i>
+            </div>
+            <div>
+              <h5 class="mb-0">הזמן חברים</h5>
+              <span class="text-muted small">קבל ₪50 לכל חבר משלם</span>
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <div class="text-center p-3" style="background: rgba(16,185,129,0.08); border-radius: 12px; border: 1px solid rgba(16,185,129,0.15);">
+                <div style="font-size: 2rem; font-weight: bold; color: #34d399;">
+                  ₪{{ user.credit_balance or 0 }}
+                </div>
+                <div class="text-muted small">יתרת זיכוי</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center p-3" style="background: rgba(46,160,255,0.08); border-radius: 12px; border: 1px solid rgba(46,160,255,0.15);">
+                <div style="font-size: 2rem; font-weight: bold; color: #34c3ff;">
+                  {{ user.referred_count or 0 }}
+                </div>
+                <div class="text-muted small">חברים הצטרפו</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Referral Link -->
+          <label class="form-label small text-muted mb-2">הלינק האישי שלך:</label>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" readonly value="{{ url_for('signup', ref=user.ref_code, _external=True) }}" style="font-size: 0.85rem; border-radius: 10px 0 0 10px;">
+            <button class="btn" type="button" onclick="copyLink(this)" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); color: #fff; border: none; border-radius: 0 10px 10px 0; padding: 0 20px;">
+              <i class="bi bi-clipboard"></i> העתק
+            </button>
+          </div>
+
+          <p class="small text-muted mb-3" style="line-height: 1.6;">
+            <i class="bi bi-info-circle me-1"></i>
+            שתף/י את הלינק — כל חבר/ה שמצטרף/ת ומשלם/ת מזכה אותך ב־<strong>50₪</strong> זיכוי. הזיכוי ינוכה אוטומטית (עד ₪50) בחיוב הבא.
+          </p>
+
+          <a class="btn w-100" href="{{ url_for('referrals') }}" style="background: rgba(26,188,156,0.12); color: #1abc9c; border: 1px solid rgba(26,188,156,0.25); border-radius: 10px; padding: 10px;">
+            <i class="bi bi-bar-chart me-2"></i> פרטים נוספים
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function copyLink(btn) {
+  const input = btn.parentElement.querySelector('input');
+  navigator.clipboard.writeText(input.value);
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="bi bi-check2"></i> הועתק!';
+  btn.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+  setTimeout(() => {
+    btn.innerHTML = originalHtml;
+    btn.style.background = 'linear-gradient(90deg, #1abc9c, #16e0bd)';
+  }, 2000);
+}
+</script>
+{% endblock %}

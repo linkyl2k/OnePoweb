@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-5">
+      
+      <div class="card" style="border: none; border-radius: 20px;">
+        <div class="card-body p-4 p-md-5">
+          
+          <!-- Header -->
+          <div class="text-center mb-4">
+            <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, rgba(46,160,255,0.2), rgba(26,188,156,0.15)); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #2ea0ff;"></i>
+            </div>
+            <h3 class="mb-1">ברוכים הבאים!</h3>
+            <p class="text-muted small mb-0">התחבר לחשבון שלך</p>
+          </div>
+
+          <form method="POST" class="vstack gap-3" novalidate>
+            
+            <!-- Email or Username -->
+            <div>
+              <label class="form-label">אימייל או שם משתמש</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input name="email" type="text" class="form-control" value="{{ email or '' }}" required placeholder="email או username" autofocus>
+              </div>
+            </div>
+            
+            <!-- Password -->
+            <div>
+              <div class="d-flex justify-content-between align-items-center">
+                <label class="form-label mb-0">סיסמה</label>
+                <a href="/forgot" class="small" style="color: #fbbf24;">שכחתי סיסמה</a>
+              </div>
+              <div class="input-group mt-1">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input name="password" type="password" class="form-control" required placeholder="הסיסמה שלך">
+              </div>
+            </div>
+            
+            <!-- Submit -->
+            <button type="submit" class="btn w-100 py-2 mt-2" style="background: linear-gradient(90deg, #2ea0ff, #1abc9c); color: #fff; border: none; border-radius: 12px; font-weight: 600;">
+              <i class="bi bi-box-arrow-in-right me-2"></i>התחברות
+            </button>
+            
+          </form>
+          
+          <!-- Divider -->
+          <div class="text-center my-4" style="position: relative;">
+            <hr style="border-color: var(--border);">
+            <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-soft); padding: 0 1rem; color: var(--muted); font-size: 0.85rem;">
+              אין לך חשבון?
+            </span>
+          </div>
+          
+          <!-- Signup Link -->
+          <a href="{{ url_for('signup') }}" class="btn w-100" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
+            <i class="bi bi-person-plus me-2"></i>הרשמה חינם
+          </a>
+
+        </div>
+      </div>
+      
+      <!-- Security note -->
+      <div class="text-center mt-4">
+        <p class="small text-muted mb-0">
+          <i class="bi bi-shield-check me-1"></i>
+          החיבור מאובטח ומוצפן
+        </p>
+      </div>
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /uploads/
+Disallow: /api/
+Disallow: /cancel-subscription
+Disallow: /renew-subscription
+
+Sitemap: https://onepoweb.com/sitemap.xml
+

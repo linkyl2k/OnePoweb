@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5" style="max-width: 600px;">
+  
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, {% if plan == 'pro' %}#10b981, #34d399{% else %}#2ea0ff, #34c3ff{% endif %}); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 8px 24px {% if plan == 'pro' %}rgba(16,185,129,0.3){% else %}rgba(46,160,255,0.3){% endif %};">
+      <i class="bi bi-{% if plan == 'pro' %}rocket-takeoff{% else %}star{% endif %}" style="font-size: 1.75rem; color: #fff;"></i>
+    </div>
+    <h2 style="color: #fff;">תשלום עבור {{ plan|upper }}</h2>
+    <p class="text-muted">מנוי חודשי ל-OnePoweb</p>
+  </div>
+
+  <!-- Order Summary -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="mb-4">
+        <i class="bi bi-receipt me-2" style="color: #2ea0ff;"></i>
+        פירוט הזמנה
+      </h5>
+      
+      <div class="d-flex justify-content-between mb-2">
+        <span>חבילת {{ plan|upper }} (חודשי)</span>
+        <span>₪{{ base_price_ils }} / ${{ base_price_usd }}</span>
+      </div>
+      
+      {% if credit > 0 and credit_usd > 0 %}
+      <div class="d-flex justify-content-between mb-2" style="color: #34d399;">
+        <span><i class="bi bi-tag me-1"></i> ניכוי זיכוי</span>
+        <span>-₪{{ discount_ils }} / -${{ credit_usd }}</span>
+      </div>
+      {% endif %}
+      
+      <hr style="border-color: var(--border);">
+      
+      <div class="d-flex justify-content-between" style="font-size: 1.25rem; font-weight: bold;">
+        <span>סה"כ לתשלום</span>
+        <span style="color: {% if plan == 'pro' %}#34d399{% else %}#34c3ff{% endif %};">
+          ${{ net_price_usd }}
+          <span class="text-muted small">(≈₪{{ net_price_ils }})</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Features -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h6 class="mb-3">מה כלול בחבילה:</h6>
+      <ul class="list-unstyled mb-0">
+        {% if plan == 'pro' %}
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> ניתוחים ללא הגבלה</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> גרפים מתקדמים</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> ייצוא PDF מותאם</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> תובנות AI מותאמות אישית</li>
+        <li class="mb-0"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> תמיכה עדיפות</li>
+        {% else %}
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> עד 50 ניתוחים בחודש</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> גרפים בסיסיים</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> ייצוא PDF</li>
+        <li class="mb-0"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> תמיכה באימייל</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- PayPal Button Container -->
+  {% if paypal_client_id and paypal_client_id != 'YOUR_PAYPAL_CLIENT_ID' %}
+  <div class="card mb-4">
+    <div class="card-body">
+      <h6 class="mb-3">
+        <i class="bi bi-shield-check me-2" style="color: #34d399;"></i>
+        תשלום מאובטח
+      </h6>
+      
+      <div id="paypal-button-container"></div>
+      
+      <div id="payment-status" class="text-center mt-3" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">מעבד תשלום...</span>
+        </div>
+        <p class="mt-2 text-muted">מעבד את התשלום...</p>
+      </div>
+      
+      <p class="small text-muted text-center mt-3 mb-0">
+        <i class="bi bi-lock me-1"></i>
+        התשלום מאובטח ומוצפן באמצעות PayPal
+      </p>
+    </div>
+  </div>
+  {% else %}
+  <!-- Fallback when PayPal not configured -->
+  <div class="card mb-4">
+    <div class="card-body text-center">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(251,191,36,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+        <i class="bi bi-exclamation-triangle" style="font-size: 1.25rem; color: #fbbf24;"></i>
+      </div>
+      <h6>מערכת התשלום בהקמה</h6>
+      <p class="text-muted small mb-3">PayPal עדיין לא מוגדר. צור קשר לפרטים נוספים.</p>
+      <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">
+        <i class="bi bi-envelope me-2"></i> צור קשר
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Back Button -->
+  <div class="text-center">
+    <a href="{{ url_for('profile') }}" class="btn" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 24px;">
+      <i class="bi bi-arrow-right me-2"></i> חזרה לפרופיל
+    </a>
+  </div>
+</div>
+
+{% if paypal_client_id and paypal_client_id != 'YOUR_PAYPAL_CLIENT_ID' %}
+<!-- PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+<script>
+const plan = "{{ plan }}";
+
+paypal.Buttons({
+  style: {
+    layout: 'vertical',
+    color: 'blue',
+    shape: 'rect',
+    label: 'pay',
+    height: 45
+  },
+  
+  // Create order on server
+  createOrder: function(data, actions) {
+    console.log('[PayPal] Creating order for plan:', plan);
+    return fetch('/api/paypal/create-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ plan: plan })
+    })
+    .then(response => {
+      console.log('[PayPal] Response status:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('[PayPal] Response data:', data);
+      if (data.error) {
+        console.error('[PayPal] Error:', data.error);
+        throw new Error(data.error);
+      }
+      // If payment not needed (credits cover it), redirect
+      if (data.redirect) {
+        window.location.href = data.redirect;
+        return null;
+      }
+      console.log('[PayPal] Order created:', data.id);
+      return data.id;
+    })
+    .catch(err => {
+      console.error('[PayPal] Fetch error:', err);
+      throw err;
+    });
+  },
+  
+  // Capture payment on server
+  onApprove: function(data, actions) {
+    document.getElementById('paypal-button-container').style.display = 'none';
+    document.getElementById('payment-status').style.display = 'block';
+    
+    return fetch('/api/paypal/capture-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderID: data.orderID })
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success && result.redirect) {
+        window.location.href = result.redirect;
+      } else {
+        alert('שגיאה בעיבוד התשלום: ' + (result.error || 'Unknown error'));
+        document.getElementById('paypal-button-container').style.display = 'block';
+        document.getElementById('payment-status').style.display = 'none';
+      }
+    });
+  },
+  
+  onError: function(err) {
+    console.error('PayPal Error:', err);
+    alert('שגיאה בתשלום. נסה שוב או צור קשר.');
+  },
+  
+  onCancel: function(data) {
+    console.log('Payment cancelled');
+  }
+}).render('#paypal-button-container');
+</script>
+{% endif %}
+{% endblock %}
+

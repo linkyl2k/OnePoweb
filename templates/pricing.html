@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  
+  <!-- Header -->
+  <div class="text-center mb-5">
+    <h1 class="display-5 fw-bold mb-3">
+      <i class="bi bi-gem me-2" style="color: #1abc9c;"></i>
+      בחר את התוכנית המתאימה לך
+    </h1>
+    <p class="lead text-muted" style="max-width: 600px; margin: 0 auto;">
+      כל התוכניות כוללות ניתוח בסיסי. שדרג כדי לקבל יותר תובנות ולצמוח מהר יותר.
+    </p>
+  </div>
+
+  <!-- Current Plan Banner -->
+  {% if session.uid %}
+  <div class="text-center mb-4">
+    <div class="d-inline-flex align-items-center gap-2 px-4 py-2" style="background: rgba(255,255,255,0.05); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);">
+      <span class="text-muted">התוכנית הנוכחית שלך:</span>
+      {% if trial_active %}
+        <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #000; padding: 6px 12px;">
+          <i class="bi bi-clock me-1"></i>PRO (ניסיון)
+        </span>
+      {% elif current_plan == 'pro' %}
+        <span class="badge" style="background: linear-gradient(135deg, #10b981, #34d399); color: #fff; padding: 6px 12px;">
+          <i class="bi bi-rocket-takeoff-fill me-1"></i>PRO
+        </span>
+      {% elif current_plan == 'basic' %}
+        <span class="badge" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); color: #fff; padding: 6px 12px;">
+          <i class="bi bi-star-fill me-1"></i>BASIC
+        </span>
+      {% else %}
+        <span class="badge" style="background: rgba(255,255,255,0.1); color: var(--muted); padding: 6px 12px;">
+          <i class="bi bi-person me-1"></i>FREE
+        </span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Pricing Cards -->
+  <div class="row g-4 justify-content-center">
+    
+    <!-- FREE Plan -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="pricing-card {% if current_plan == 'free' and not trial_active %}current{% endif %}">
+        {% if current_plan == 'free' and not trial_active %}
+        <div class="current-badge">התוכנית שלך</div>
+        {% endif %}
+        <div class="pricing-header">
+          <div class="pricing-icon free">
+            <i class="bi bi-person"></i>
+          </div>
+          <h3 class="pricing-name">FREE</h3>
+          <div class="pricing-price">
+            <span class="amount">חינם</span>
+          </div>
+          <p class="pricing-desc">להתחלה ולהתנסות</p>
+        </div>
+        <div class="pricing-features">
+          <ul>
+            <li><i class="bi bi-check2"></i> העלאת דוח מכירות</li>
+            <li><i class="bi bi-check2"></i> 3 גרפים בסיסיים</li>
+            <li><i class="bi bi-check2"></i> סיכום נתונים</li>
+            <li class="disabled"><i class="bi bi-x"></i> השוואת תקופות</li>
+            <li class="disabled"><i class="bi bi-x"></i> ייצוא PDF</li>
+            <li class="disabled"><i class="bi bi-x"></i> תובנות AI</li>
+            <li class="disabled"><i class="bi bi-x"></i> תוכנית פעולה</li>
+          </ul>
+        </div>
+        <div class="pricing-action">
+          {% if session.uid %}
+            {% if current_plan == 'free' and not trial_active %}
+              <span class="btn btn-outline-secondary w-100 disabled">התוכנית הנוכחית</span>
+            {% else %}
+              <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary w-100">ניהול מנוי</a>
+            {% endif %}
+          {% else %}
+            <a href="{{ url_for('signup') }}" class="btn btn-outline-primary w-100">הרשמה חינם</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- BASIC Plan -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="pricing-card {% if current_plan == 'basic' %}current{% endif %}">
+        {% if current_plan == 'basic' %}
+        <div class="current-badge basic">התוכנית שלך</div>
+        {% endif %}
+        <div class="pricing-header">
+          <div class="pricing-icon basic">
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <h3 class="pricing-name">BASIC</h3>
+          <div class="pricing-price">
+            <span class="currency">₪</span>
+            <span class="amount">{{ prices.basic.ils }}</span>
+            <span class="period">/חודש</span>
+          </div>
+          <p class="pricing-desc text-muted small">(או ${{ prices.basic.usd }})</p>
+        </div>
+        <div class="pricing-features">
+          <ul>
+            <li><i class="bi bi-check2"></i> כל מה שב-FREE</li>
+            <li class="highlight"><i class="bi bi-plus-lg"></i> גרפים מתקדמים</li>
+            <li class="highlight"><i class="bi bi-plus-lg"></i> השוואת תקופות</li>
+            <li class="highlight"><i class="bi bi-plus-lg"></i> ייצוא PDF</li>
+            <li class="disabled"><i class="bi bi-x"></i> תובנות AI</li>
+            <li class="disabled"><i class="bi bi-x"></i> תוכנית פעולה</li>
+            <li class="disabled"><i class="bi bi-x"></i> הערכת ROI</li>
+          </ul>
+        </div>
+        <div class="pricing-action">
+          {% if session.uid %}
+            {% if current_plan == 'basic' %}
+              <span class="btn btn-basic w-100 disabled">התוכנית הנוכחית</span>
+            {% else %}
+              <a href="{{ url_for('subscribe', plan='basic') }}" class="btn btn-basic w-100">
+                {% if current_plan == 'free' %}שדרג ל-BASIC{% else %}עבור ל-BASIC{% endif %}
+              </a>
+            {% endif %}
+          {% else %}
+            <a href="{{ url_for('signup') }}" class="btn btn-basic w-100">התחל עכשיו</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- PRO Plan -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="pricing-card featured {% if current_plan == 'pro' %}current{% endif %}">
+        <div class="popular-badge">הכי פופולרי</div>
+        {% if current_plan == 'pro' and not trial_active %}
+        <div class="current-badge pro">התוכנית שלך</div>
+        {% elif trial_active %}
+        <div class="current-badge trial">תקופת ניסיון</div>
+        {% endif %}
+        <div class="pricing-header">
+          <div class="pricing-icon pro">
+            <i class="bi bi-rocket-takeoff-fill"></i>
+          </div>
+          <h3 class="pricing-name">PRO</h3>
+          <div class="pricing-price">
+            <span class="currency">₪</span>
+            <span class="amount">{{ prices.pro.ils }}</span>
+            <span class="period">/חודש</span>
+          </div>
+          <p class="pricing-desc text-muted small">(או ${{ prices.pro.usd }})</p>
+        </div>
+        <div class="pricing-features">
+          <ul>
+            <li><i class="bi bi-check2"></i> כל מה שב-BASIC</li>
+            <li class="highlight"><i class="bi bi-stars"></i> תובנות AI חכמות</li>
+            <li class="highlight"><i class="bi bi-lightning-fill"></i> תוכנית פעולה מותאמת</li>
+            <li class="highlight"><i class="bi bi-graph-up-arrow"></i> הערכת ROI</li>
+            <li class="highlight"><i class="bi bi-bar-chart-steps"></i> ניתוח מגמות מתקדם</li>
+            <li class="highlight"><i class="bi bi-headset"></i> תמיכה מועדפת</li>
+            <li class="highlight"><i class="bi bi-infinity"></i> העלאות ללא הגבלה</li>
+          </ul>
+        </div>
+        <div class="pricing-action">
+          {% if session.uid %}
+            {% if current_plan == 'pro' and not trial_active %}
+              <span class="btn btn-pro w-100 disabled">התוכנית הנוכחית</span>
+            {% elif trial_active %}
+              <a href="{{ url_for('subscribe', plan='pro') }}" class="btn btn-pro w-100">המשך עם PRO</a>
+            {% else %}
+              <a href="{{ url_for('subscribe', plan='pro') }}" class="btn btn-pro w-100">
+                <i class="bi bi-rocket-takeoff me-1"></i>שדרג ל-PRO
+              </a>
+            {% endif %}
+          {% else %}
+            <a href="{{ url_for('signup') }}" class="btn btn-pro w-100">התחל עכשיו</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Trial Banner -->
+  {% if session.uid and current_plan == 'free' and not trial_active %}
+  <div class="trial-banner mt-5">
+    <div class="d-flex flex-wrap align-items-center justify-content-center gap-4">
+      <div class="text-center text-md-start">
+        <h4 class="mb-1"><i class="bi bi-gift me-2"></i>לא בטוח/ה? נסה PRO חינם!</h4>
+        <p class="mb-0 text-muted">7 ימים של כל הפיצ'רים — בלי כרטיס אשראי</p>
+      </div>
+      <form method="POST" action="{{ url_for('start_trial') }}">
+        <button type="submit" class="btn btn-trial">
+          <i class="bi bi-play-fill me-1"></i>התחל ניסיון חינם
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- FAQ Section -->
+  <div class="mt-5 pt-4">
+    <h3 class="text-center mb-4">שאלות נפוצות</h3>
+    <div class="accordion" id="pricingFaq" style="max-width: 800px; margin: 0 auto;">
+      
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+            האם אפשר לבטל בכל עת?
+          </button>
+        </h2>
+        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+          <div class="accordion-body">
+            כן! אין התחייבות. אפשר לבטל את המנוי בכל עת מעמוד הפרופיל, ולא תחויב בחודש הבא.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+            איך עובד התשלום?
+          </button>
+        </h2>
+        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+          <div class="accordion-body">
+            התשלום מתבצע דרך PayPal בצורה מאובטחת. אפשר לשלם בכרטיס אשראי גם בלי חשבון PayPal.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+            מה קורה אחרי תקופת הניסיון?
+          </button>
+        </h2>
+        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+          <div class="accordion-body">
+            אחרי 7 ימים החשבון חוזר לתוכנית FREE. לא נדרש כרטיס אשראי לניסיון, ואין חיוב אוטומטי.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+            יש הנחה לתשלום שנתי?
+          </button>
+        </h2>
+        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+          <div class="accordion-body">
+            בקרוב! אנחנו עובדים על אפשרות תשלום שנתי עם הנחה משמעותית.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="text-center mt-5 pt-4">
+    <p class="text-muted mb-3">יש שאלות נוספות?</p>
+    <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">
+      <i class="bi bi-envelope me-2"></i>צור קשר
+    </a>
+  </div>
+
+</div>
+
+<style>
+/* ===== Pricing Cards ===== */
+.pricing-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.pricing-card.featured {
+  border: 2px solid rgba(16,185,129,0.4);
+  background: linear-gradient(180deg, rgba(16,185,129,0.08) 0%, var(--bg-soft) 30%);
+}
+
+.pricing-card.current {
+  border-color: rgba(46,160,255,0.5);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: #fff;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.current-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(46,160,255,0.15);
+  color: #34c3ff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.current-badge.basic { background: rgba(46,160,255,0.15); color: #34c3ff; }
+.current-badge.pro { background: rgba(16,185,129,0.15); color: #34d399; }
+.current-badge.trial { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+.pricing-header {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.pricing-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 1rem;
+}
+
+.pricing-icon.free {
+  background: rgba(255,255,255,0.05);
+  color: var(--muted);
+}
+
+.pricing-icon.basic {
+  background: linear-gradient(135deg, rgba(46,160,255,0.2), rgba(52,195,255,0.15));
+  color: #34c3ff;
+}
+
+.pricing-icon.pro {
+  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(52,211,153,0.15));
+  color: #34d399;
+}
+
+.pricing-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.pricing-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.pricing-price .currency {
+  font-size: 1.25rem;
+  color: var(--muted);
+}
+
+.pricing-price .amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pricing-price .period {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.pricing-features {
+  flex: 1;
+}
+
+.pricing-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pricing-features li {
+  padding: 0.6rem 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.pricing-features li i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.pricing-features li .bi-check2 { color: #34d399; }
+.pricing-features li .bi-plus-lg { color: #34c3ff; }
+.pricing-features li .bi-x { color: #6b7280; }
+.pricing-features li .bi-stars, 
+.pricing-features li .bi-lightning-fill { color: #fbbf24; }
+
+.pricing-features li.disabled {
+  color: #6b7280;
+}
+
+.pricing-features li.highlight {
+  color: #fff;
+  font-weight: 500;
+}
+
+.pricing-action {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Buttons */
+.btn-basic {
+  background: linear-gradient(90deg, #2ea0ff, #34c3ff);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.btn-basic:hover {
+  filter: brightness(1.1);
+  color: #fff;
+}
+
+.btn-pro {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.btn-pro:hover {
+  filter: brightness(1.1);
+  color: #fff;
+}
+
+.btn-trial {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.btn-trial:hover {
+  filter: brightness(1.05);
+  color: #000;
+}
+
+/* Trial Banner */
+.trial-banner {
+  background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(251,191,36,0.05));
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pricing-card {
+    padding: 1.5rem;
+  }
+  .pricing-price .amount {
+    font-size: 2rem;
+  }
+}
+</style>
+{% endblock %}
+

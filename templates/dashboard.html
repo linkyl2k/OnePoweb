@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  <!-- כותרת -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">📊 לוח בקרה</h2>
+      <p class="text-muted mb-0">השוואת תקופות וניתוח מגמות</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('index') }}">
+      <i class="bi bi-plus-lg"></i> העלה דוח חדש
+    </a>
+  </div>
+
+  <!-- כרטיסי סיכום -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white shadow h-100">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 opacity-75">סה"כ מכירות</h6>
+          <h2 class="card-title mb-0">₪{{ "{:,.0f}".format(total_sales) }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white shadow h-100">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 opacity-75">דוחות שמורים</h6>
+          <h2 class="card-title mb-0">{{ total_reports }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white shadow h-100">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 opacity-75">ממוצע יומי (אחרון)</h6>
+          <h2 class="card-title mb-0">₪{{ "{:,.0f}".format(latest_summary.get('avg_daily', 0)) }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-dark shadow h-100">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 opacity-75">תוכנית</h6>
+          <h2 class="card-title mb-0">{{ user.plan|upper }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if comparison %}
+  <!-- השוואת תקופות אוטומטית -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+      <h5 class="mb-0">📈 השוואה אוטומטית: {{ comparison.get('report2_name', 'אחרון') }} מול {{ comparison.get('report1_name', 'קודם') }}</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-4">
+        <!-- תקופה קודמת -->
+        <div class="col-md-5">
+          <div class="border rounded p-3 bg-light h-100">
+            <h6 class="text-muted mb-2">{{ comparison.get('report1_name', 'תקופה קודמת') }}</h6>
+            <p class="h3 mb-1 text-primary">₪{{ "{:,.0f}".format(comparison.period1.total) }}</p>
+            <div class="d-flex gap-3 text-muted small">
+              <span><i class="bi bi-calendar"></i> {{ comparison.period1.days }} ימים</span>
+              <span><i class="bi bi-receipt"></i> {{ comparison.period1.transactions }} עסקאות</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- חץ השוואה -->
+        <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
+          <i class="bi bi-arrow-left-right fs-3 text-muted mb-2"></i>
+          {% if comparison.changes.total_pct > 0 %}
+            <span class="badge bg-success fs-5 px-3 py-2">↑ {{ comparison.changes.total_pct }}%</span>
+          {% elif comparison.changes.total_pct < 0 %}
+            <span class="badge bg-danger fs-5 px-3 py-2">↓ {{ comparison.changes.total_pct|abs }}%</span>
+          {% else %}
+            <span class="badge bg-secondary fs-5 px-3 py-2">= 0%</span>
+          {% endif %}
+        </div>
+        
+        <!-- תקופה נוכחית -->
+        <div class="col-md-5">
+          <div class="border rounded p-3 h-100" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+            <h6 class="text-muted mb-2">{{ comparison.get('report2_name', 'תקופה אחרונה') }}</h6>
+            <p class="h3 mb-1 text-success">₪{{ "{:,.0f}".format(comparison.period2.total) }}</p>
+            <div class="d-flex gap-3 text-muted small">
+              <span><i class="bi bi-calendar"></i> {{ comparison.period2.days }} ימים</span>
+              <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} עסקאות</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- תובנה -->
+      <div class="alert alert-info mt-3 mb-0">
+        <i class="bi bi-lightbulb"></i> {{ comparison.insight }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- סינון לפי סוג תקופה -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body py-2">
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <span class="text-muted me-2">סנן לפי:</span>
+        <a href="{{ url_for('dashboard') }}" 
+           class="btn btn-sm {{ 'btn-primary' if not filter_type else 'btn-outline-secondary' }}">
+          הכל ({{ reports|length }})
+        </a>
+        {% for type_key, type_label in period_type_labels.items() %}
+          {% set count = reports_by_type.get(type_key, [])|length %}
+          {% if count > 0 %}
+          <a href="{{ url_for('dashboard', period_type=type_key) }}" 
+             class="btn btn-sm {{ 'btn-primary' if filter_type == type_key else 'btn-outline-secondary' }}">
+            {{ type_label }} ({{ count }})
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- רשימת דוחות -->
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">📁 הדוחות שלי</h5>
+      {% if reports|length >= 2 %}
+      <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#compareModal">
+        <i class="bi bi-bar-chart"></i> השווה תקופות
+      </button>
+      {% endif %}
+    </div>
+    <div class="card-body p-0">
+      {% if reports %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>שם הדוח</th>
+              <th>סוג</th>
+              <th>תקופה</th>
+              <th>סה"כ מכירות</th>
+              <th>ממוצע יומי</th>
+              <th>נוצר</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for report in reports %}
+            {% set summary = report.summary_json | fromjson if report.summary_json else {} %}
+            <tr>
+              <td><strong>{{ report.name }}</strong></td>
+              <td>
+                {% set pt = report.get('period_type', 'month') %}
+                {% if pt == 'month' %}
+                  <span class="badge bg-primary">חודש</span>
+                {% elif pt == 'week' %}
+                  <span class="badge bg-success">שבוע</span>
+                {% elif pt == 'day' %}
+                  <span class="badge bg-info">יום</span>
+                {% else %}
+                  <span class="badge bg-secondary">מותאם</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if report.period_start and report.period_end %}
+                  <small>{{ report.period_start }} → {{ report.period_end }}</small>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td><strong>₪{{ "{:,.0f}".format(summary.get('total_sales', 0)) }}</strong></td>
+              <td>₪{{ "{:,.0f}".format(summary.get('avg_daily', 0)) }}</td>
+              <td><small>{{ report.created_at[:10] if report.created_at else '—' }}</small></td>
+              <td>
+                <form method="POST" action="{{ url_for('dashboard_delete_report', report_id=report.id) }}" 
+                      onsubmit="return confirm('למחוק את הדוח?')" class="d-inline">
+                  <button class="btn btn-outline-danger btn-sm" title="מחק">🗑️</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5 text-muted">
+        <h4>אין דוחות שמורים עדיין</h4>
+        <p>העלה את הדוח הראשון שלך וכל הניתוחים יישמרו אוטומטית</p>
+        <a class="btn btn-primary" href="{{ url_for('index') }}">העלה דוח</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- טיפ לשימוש -->
+  <div class="alert alert-light border mt-4">
+    <div class="d-flex gap-3">
+      <div class="fs-3">💡</div>
+      <div>
+        <strong>טיפ:</strong> העלה דוחות מתקופות שונות (חודש שעבר, השבוע הזה) כדי לראות השוואה אוטומטית!
+        <br>
+        <small class="text-muted">בעת העלאת דוח, בחר את סוג התקופה (חודש/שבוע/יום) כדי לארגן את ההשוואות.</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- אבטחת מידע -->
+  <div class="alert alert-secondary mt-3">
+    <strong>🔐 אבטחת מידע:</strong> כל הנתונים שלך מוצפנים בהצפנת AES-256 (Fernet) ונשמרים בצורה מאובטחת. 
+    רק אתה יכול לגשת לדוחות שלך.
+  </div>
+</div>
+
+<!-- מודל להשוואת תקופות -->
+{% if reports|length >= 2 %}
+<div class="modal fade" id="compareModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title"><i class="bi bi-bar-chart me-2"></i>השוואת תקופות</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{{ url_for('dashboard_compare') }}" id="compareForm">
+        <div class="modal-body">
+          <p class="text-muted mb-3">בחר שתי תקופות להשוואה:</p>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">תקופה ראשונה (ישנה יותר)</label>
+            <select name="report1_id" class="form-select" required>
+              {% for report in reports %}
+              {% set pt = report.get('period_type', 'month') %}
+              <option value="{{ report.id }}">
+                {{ report.name }} 
+                {% if pt == 'month' %}📅{% elif pt == 'week' %}📆{% elif pt == 'day' %}📌{% endif %}
+                ({{ report.period_start or '?' }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">תקופה שנייה (חדשה יותר)</label>
+            <select name="report2_id" class="form-select" required>
+              {% for report in reports %}
+              {% set pt = report.get('period_type', 'month') %}
+              <option value="{{ report.id }}" {% if loop.first %}selected{% endif %}>
+                {{ report.name }}
+                {% if pt == 'month' %}📅{% elif pt == 'week' %}📆{% elif pt == 'day' %}📌{% endif %}
+                ({{ report.period_start or '?' }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="alert alert-info small mb-0">
+            <i class="bi bi-info-circle"></i> מומלץ להשוות תקופות מאותו סוג (חודש מול חודש, שבוע מול שבוע)
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-bar-chart me-1"></i> השווה
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+  .card { border-radius: 12px; }
+  .card-header { border-radius: 12px 12px 0 0 !important; }
+  .badge { font-weight: 500; }
+</style>
+{% endblock %}

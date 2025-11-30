@@ -1,0 +1,1076 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="landing-hero mb-5">
+  <div class="hero-content">
+    <div class="row g-5 align-items-center">
+      <div class="col-12 col-lg-6">
+        <div class="hero-badge mb-3">
+          <i class="bi bi-lightning-charge-fill"></i>
+          ניתוח חכם לעסקים קטנים
+        </div>
+        <h1 class="hero-title mb-4">
+          גלה תוך <span class="highlight">10 שניות</span><br>
+          איפה העסק שלך מפסיד כסף
+        </h1>
+        <p class="hero-subtitle mb-4">
+          העלה דוח קופה (CSV/Excel) וקבל מייד: גרפים חכמים, תובנות AI מעשיות, ו־PDF מקצועי לשיתוף.
+        </p>
+        
+        <div class="hero-features mb-4">
+          <div class="hero-feature">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>ניתוח אוטומטי — בלי אקסל</span>
+          </div>
+          <div class="hero-feature">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>מזהה שעות חזקות ומוצרים מובילים</span>
+          </div>
+          <div class="hero-feature">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>תובנות AI מותאמות לעסק שלך</span>
+          </div>
+        </div>
+
+        <div class="hero-cta d-flex flex-wrap gap-3">
+          <a class="btn btn-hero-primary btn-lg" href="{{ url_for('index') }}">
+            <i class="bi bi-upload me-2"></i>העלה דוח עכשיו
+          </a>
+          <a class="btn btn-hero-secondary btn-lg" href="{{ url_for('demo_analysis') }}">
+            <i class="bi bi-play-circle me-2"></i>צפה בדוגמה
+          </a>
+        </div>
+
+        {% if session.uid %}
+          <div class="hero-note mt-3">
+            <i class="bi bi-person-check me-1"></i>
+            מחובר בתור <strong>{{ current_user().first_name or "משתמש" }}</strong> · אפשר להתחיל מיד
+          </div>
+        {% else %}
+          <div class="hero-note mt-3">
+            <i class="bi bi-gift me-1"></i>
+            7 ימי ניסיון PRO חינם · <a href="{{ url_for('signup') }}">הרשמה בחינם</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="hero-visual">
+          <div class="visual-card">
+            <div class="visual-header">
+              <div class="visual-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="visual-title">דוגמה לניתוח</span>
+            </div>
+            <img class="img-fluid" src="{{ url_for('static', filename='img/hero_demo.png') }}" alt="דוגמה לגרף" onerror="this.style.display='none'">
+            <div class="visual-overlay">
+              <div class="visual-stat">
+                <span class="stat-value">+18%</span>
+                <span class="stat-label">שיפור ברווח</span>
+              </div>
+            </div>
+          </div>
+          <div class="floating-badge badge-1">
+            <i class="bi bi-graph-up-arrow"></i> 📈 מכירות לפי שעה
+          </div>
+          <div class="floating-badge badge-2">
+            <i class="bi bi-stars"></i> תובנות AI
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<section class="stats-bar mb-5">
+  <div class="row g-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-text">עסקים משתמשים</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-number">10K+</div>
+        <div class="stat-text">דוחות נותחו</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-number">15%</div>
+        <div class="stat-text">שיפור ממוצע ברווח</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-number">30 שנ'</div>
+        <div class="stat-text">זמן ניתוח ממוצע</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM/SOLUTION -->
+<section class="problem-section mb-5">
+  <div class="row g-4">
+    <div class="col-12 col-md-6">
+      <div class="problem-card">
+        <div class="card-icon problem">
+          <i class="bi bi-emoji-frown"></i>
+        </div>
+        <h3>בלי OnePoweb</h3>
+        <ul class="problem-list">
+          <li><i class="bi bi-x-circle"></i> שעות של עבודה באקסל</li>
+          <li><i class="bi bi-x-circle"></i> לא יודעים מה באמת עובד</li>
+          <li><i class="bi bi-x-circle"></i> החלטות על בסיס תחושות</li>
+          <li><i class="bi bi-x-circle"></i> מפסידים כסף בלי לדעת</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="solution-card">
+        <div class="card-icon solution">
+          <i class="bi bi-emoji-smile"></i>
+        </div>
+        <h3>עם OnePoweb</h3>
+        <ul class="solution-list">
+          <li><i class="bi bi-check-circle-fill"></i> ניתוח אוטומטי תוך שניות</li>
+          <li><i class="bi bi-check-circle-fill"></i> תובנות מבוססות נתונים</li>
+          <li><i class="bi bi-check-circle-fill"></i> החלטות חכמות שמביאות כסף</li>
+          <li><i class="bi bi-check-circle-fill"></i> מזהה הזדמנויות לשיפור</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section mb-5">
+  <div class="section-header text-center mb-5">
+    <span class="section-badge">יתרונות</span>
+    <h2 class="section-title">למה עסקים בוחרים ב-OnePoweb?</h2>
+    <p class="section-subtitle">כלים חזקים שעוזרים לך לקבל החלטות טובות יותר</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bi bi-bar-chart-line-fill"></i>
+        </div>
+        <h4>גרפים חכמים</h4>
+        <p>מכירות לפי שעה, יום, מוצר ואמצעי תשלום. הכל ויזואלי וברור.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="feature-card featured">
+        <div class="feature-badge">פופולרי</div>
+        <div class="feature-icon ai">
+          <i class="bi bi-stars"></i>
+        </div>
+        <h4>תובנות AI</h4>
+        <p>בינה מלאכותית מנתחת את הנתונים ונותנת המלצות מעשיות מותאמות לעסק שלך.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bi bi-file-earmark-pdf-fill"></i>
+        </div>
+        <h4>ייצוא PDF</h4>
+        <p>דוח מקצועי לשיתוף עם שותפים, מנהלים או רואה חשבון.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <h4>הערכת ROI</h4>
+        <p>מחשב את הפוטנציאל הכספי של שיפורים אפשריים בעסק שלך.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bi bi-calendar3"></i>
+        </div>
+        <h4>השוואת תקופות</h4>
+        <p>השווה חודש לחודש, שבוע לשבוע — וזהה מגמות ושינויים.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+        <h4>תוכנית פעולה</h4>
+        <p>צעדים קונקרטיים ליישום מיידי — לא סתם נתונים, אלא מה לעשות איתם.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section mb-5">
+  <div class="section-header text-center mb-5">
+    <span class="section-badge">פשוט</span>
+    <h2 class="section-title">איך זה עובד?</h2>
+    <p class="section-subtitle">3 צעדים פשוטים לתובנות שמשנות את העסק</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-md-4">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-icon">
+          <i class="bi bi-cloud-arrow-up"></i>
+        </div>
+        <h4>העלה דוח</h4>
+        <p>CSV או Excel מכל מערכת קופה. פשוט גרור ושחרר.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-icon">
+          <i class="bi bi-cpu"></i>
+        </div>
+        <h4>קבל ניתוח</h4>
+        <p>המערכת מנתחת אוטומטית ומייצרת גרפים ותובנות.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-icon">
+          <i class="bi bi-rocket-takeoff"></i>
+        </div>
+        <h4>פעל ושפר</h4>
+        <p>יישם את ההמלצות וראה שיפור אמיתי בביצועים.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{{ url_for('demo_analysis') }}" class="btn btn-outline-primary btn-lg">
+      <i class="bi bi-play-circle me-2"></i>צפה בדוגמה חיה
+    </a>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section mb-5">
+  <div class="section-header text-center mb-5">
+    <span class="section-badge">המלצות</span>
+    <h2 class="section-title">מה אומרים הלקוחות</h2>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <p class="testimonial-text">
+          "סוף סוף הבנתי באילו שעות אנחנו מפסידים. אחרי שינוי משמרות — הרווח החודשי עלה."
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar">ר</div>
+          <div class="author-info">
+            <strong>רן</strong>
+            <span>בית קפה, תל אביב</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <p class="testimonial-text">
+          "הסרנו מוצרים שלא נמכרים והדגשנו את המובילים. קיבלנו עוד 7% במחזור — בחודש הראשון."
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar">ד</div>
+          <div class="author-info">
+            <strong>דנה</strong>
+            <span>חנות נוחות, רמת גן</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-half"></i>
+        </div>
+        <p class="testimonial-text">
+          "הדוחות נראים מקצועיים ומסודרים. חוסך לי שעות של עבודה באקסל כל חודש."
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar">מ</div>
+          <div class="author-info">
+            <strong>מיכל</strong>
+            <span>מסעדה, ירושלים</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING PREVIEW -->
+<section class="pricing-preview mb-5">
+  <div class="pricing-preview-inner">
+    <div class="row align-items-center g-4">
+      <div class="col-12 col-lg-6">
+        <span class="section-badge">תמחור</span>
+        <h2 class="section-title mb-3">תוכניות לכל גודל עסק</h2>
+        <p class="mb-4">
+          התחל בחינם וגדל כשאתה מוכן. בלי התחייבות, בלי הפתעות.
+        </p>
+        <div class="pricing-highlights">
+          <div class="highlight-item">
+            <i class="bi bi-check2-circle"></i>
+            <span>תוכנית חינמית לתמיד</span>
+          </div>
+          <div class="highlight-item">
+            <i class="bi bi-check2-circle"></i>
+            <span>7 ימי ניסיון PRO חינם</span>
+          </div>
+          <div class="highlight-item">
+            <i class="bi bi-check2-circle"></i>
+            <span>ביטול בכל עת</span>
+          </div>
+        </div>
+        <a href="{{ url_for('pricing') }}" class="btn btn-hero-primary btn-lg mt-4">
+          <i class="bi bi-gem me-2"></i>צפה בתוכניות
+        </a>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="pricing-cards-preview">
+          <div class="mini-price-card">
+            <div class="mini-plan">FREE</div>
+            <div class="mini-price">חינם</div>
+            <div class="mini-desc">גרפים בסיסיים</div>
+          </div>
+          <div class="mini-price-card featured">
+            <div class="mini-badge">מומלץ</div>
+            <div class="mini-plan">PRO</div>
+            <div class="mini-price">₪69<span>/חודש</span></div>
+            <div class="mini-desc">AI + הכל כלול</div>
+          </div>
+          <div class="mini-price-card">
+            <div class="mini-plan">BASIC</div>
+            <div class="mini-price">₪39<span>/חודש</span></div>
+            <div class="mini-desc">השוואת תקופות</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section mb-5">
+  <div class="section-header text-center mb-5">
+    <span class="section-badge">שאלות</span>
+    <h2 class="section-title">שאלות נפוצות</h2>
+  </div>
+
+  <div class="accordion" id="lp_faq" style="max-width: 800px; margin: 0 auto;">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa1">
+          אילו קבצים נתמכים?
+        </button>
+      </h2>
+      <div id="fa1" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
+        <div class="accordion-body">
+          CSV, Excel (כולל xlsm, xlsb), JSON, XML, ODS ו-TXT מכל קופה בישראל. מעלים ומקבלים ניתוח תוך שניות.
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa2">
+          האם הנתונים שלי מאובטחים?
+        </button>
+      </h2>
+      <div id="fa2" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
+        <div class="accordion-body">
+          בהחלט. הנתונים מאוחסנים באופן מאובטח ואינם משותפים עם גורמים שלישיים. אתה יכול למחוק את הנתונים בכל עת.
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa3">
+          איך עובד התשלום?
+        </button>
+      </h2>
+      <div id="fa3" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
+        <div class="accordion-body">
+          התשלום דרך PayPal — מאובטח ונוח. אפשר לשלם גם בכרטיס אשראי. ביטול בכל עת, בלי התחייבות.
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa4">
+          אפשר לראות דוגמה לפני הרשמה?
+        </button>
+      </h2>
+      <div id="fa4" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
+        <div class="accordion-body">
+          כן! לחץ על "צפה בדוגמה" בראש העמוד כדי לראות ניתוח מלא עם נתונים לדוגמה — בלי הרשמה.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="cta-content text-center">
+    <h2 class="cta-title mb-3">מוכנים להפסיק לנחש ולהתחיל להרוויח?</h2>
+    <p class="cta-subtitle mb-4">הצטרפו למאות עסקים שכבר משתמשים ב-OnePoweb</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <a class="btn btn-hero-primary btn-lg" href="{{ url_for('index') }}">
+        <i class="bi bi-rocket-takeoff me-2"></i>להתחיל עכשיו — חינם
+      </a>
+      {% if not session.uid %}
+      <a class="btn btn-hero-secondary btn-lg" href="{{ url_for('signup') }}">
+        <i class="bi bi-person-plus me-2"></i>פתח חשבון
+      </a>
+      {% endif %}
+    </div>
+    <div class="cta-note mt-3">
+      <i class="bi bi-shield-check me-1"></i>
+      ללא כרטיס אשראי · 7 ימי ניסיון PRO חינם
+    </div>
+  </div>
+</section>
+
+<style>
+/* ===== Landing Page Styles ===== */
+
+/* Hero Section */
+.landing-hero {
+  padding: 3rem 0;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, rgba(26,188,156,0.15), rgba(46,160,255,0.1));
+  border: 1px solid rgba(26,188,156,0.3);
+  color: #1abc9c;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.hero-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #fff;
+}
+
+.hero-title .highlight {
+  background: linear-gradient(90deg, #1abc9c, #2ea0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.hero-feature i {
+  color: #1abc9c;
+  font-size: 1.1rem;
+}
+
+.btn-hero-primary {
+  background: linear-gradient(90deg, #1abc9c, #16e0bd);
+  color: #000;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-hero-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(26,188,156,0.35);
+  color: #000;
+}
+
+.btn-hero-secondary {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-hero-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.hero-note {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hero-note a {
+  color: #1abc9c;
+}
+
+/* Hero Visual */
+.hero-visual {
+  position: relative;
+}
+
+.visual-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.visual-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border);
+}
+
+.visual-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.visual-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.visual-dots span:nth-child(2) { background: #fbbf24; }
+.visual-dots span:nth-child(3) { background: #22c55e; }
+
+.visual-title {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.visual-card img {
+  width: 100%;
+  display: block;
+}
+
+.visual-overlay {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, rgba(16,185,129,0.9), rgba(34,211,153,0.9));
+  padding: 12px 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.floating-badge {
+  position: absolute;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: float-badge 3s ease-in-out infinite;
+}
+
+.floating-badge.badge-1 {
+  top: -10px;
+  right: 30px;
+}
+
+.floating-badge.badge-2 {
+  bottom: 80px;
+  left: -20px;
+  animation-delay: -1.5s;
+}
+
+@keyframes float-badge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Stats Bar */
+.stats-bar {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.stat-item {}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #1abc9c, #2ea0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stat-text {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Problem/Solution Cards */
+.problem-card, .solution-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  height: 100%;
+}
+
+.problem-card {
+  border-color: rgba(239,68,68,0.3);
+}
+
+.solution-card {
+  border-color: rgba(16,185,129,0.3);
+  background: linear-gradient(180deg, rgba(16,185,129,0.05), var(--bg-soft));
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card-icon.problem {
+  background: rgba(239,68,68,0.15);
+  color: #f87171;
+}
+
+.card-icon.solution {
+  background: rgba(16,185,129,0.15);
+  color: #34d399;
+}
+
+.problem-list, .solution-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.problem-list li, .solution-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  color: var(--text);
+}
+
+.problem-list li i { color: #f87171; }
+.solution-list li i { color: #34d399; }
+
+/* Section Headers */
+.section-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, rgba(26,188,156,0.15), rgba(46,160,255,0.1));
+  color: #1abc9c;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+/* Features */
+.feature-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  height: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(26,188,156,0.3);
+}
+
+.feature-card.featured {
+  border-color: rgba(26,188,156,0.4);
+  background: linear-gradient(180deg, rgba(26,188,156,0.08), var(--bg-soft));
+}
+
+.feature-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: linear-gradient(90deg, #1abc9c, #16e0bd);
+  color: #000;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.feature-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: rgba(46,160,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #34c3ff;
+  margin-bottom: 1rem;
+}
+
+.feature-icon.ai {
+  background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15));
+  color: #fbbf24;
+}
+
+.feature-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Steps */
+.step-card {
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.step-number {
+  position: absolute;
+  top: 0;
+  right: 50%;
+  transform: translateX(50%);
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #1abc9c, #16e0bd);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: rgba(46,160,255,0.1);
+  border: 1px solid rgba(46,160,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #34c3ff;
+  margin: 1rem auto;
+}
+
+.step-card h4 {
+  margin-bottom: 0.5rem;
+}
+
+.step-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Testimonials */
+.testimonial-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  height: 100%;
+}
+
+.testimonial-stars {
+  color: #fbbf24;
+  margin-bottom: 1rem;
+}
+
+.testimonial-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.author-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1abc9c, #2ea0ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-info strong {
+  color: var(--text);
+}
+
+.author-info span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Pricing Preview */
+.pricing-preview {
+  background: linear-gradient(135deg, rgba(26,188,156,0.08), rgba(46,160,255,0.05));
+  border: 1px solid rgba(26,188,156,0.2);
+  border-radius: 20px;
+  padding: 3rem;
+}
+
+.pricing-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.highlight-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.highlight-item i {
+  color: #1abc9c;
+}
+
+.pricing-cards-preview {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mini-price-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  min-width: 120px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.mini-price-card.featured {
+  border-color: rgba(16,185,129,0.4);
+  transform: scale(1.05);
+  background: linear-gradient(180deg, rgba(16,185,129,0.1), var(--bg-soft));
+}
+
+.mini-badge {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.mini-plan {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.mini-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.mini-price span {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.mini-desc {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Final CTA */
+.final-cta {
+  background: linear-gradient(135deg, rgba(26,188,156,0.1), rgba(46,160,255,0.08));
+  border: 1px solid rgba(26,188,156,0.25);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+}
+
+.cta-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.cta-subtitle {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.cta-note {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  .hero-visual {
+    margin-top: 2rem;
+  }
+  .floating-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 1.75rem;
+  }
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .stats-bar {
+    padding: 1.5rem;
+  }
+  .stat-number {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,882 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero Section -->
+<div class="hero-section mb-5">
+  <div class="hero-content text-center">
+    <div class="hero-badge mb-3">
+      <span class="badge-glow">✨ חדש</span>
+      <span>ניתוח מתקדם עם AI</span>
+    </div>
+    <h1 class="hero-title">נתח את הנתונים שלך<br><span class="gradient-text">בלחיצה אחת</span></h1>
+    <p class="hero-subtitle">העלה דוח קופה ותקבל גרפים מקצועיים, תובנות AI והשוואת תקופות</p>
+  </div>
+</div>
+
+<!-- Upload Section -->
+<div class="upload-container">
+  <form method="POST" action="{{ url_for('index') }}" enctype="multipart/form-data" id="uploadForm">
+    
+    <!-- Step 1: File Upload -->
+    <div class="glass-card step-card mb-4">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div>
+          <h3 class="step-title">העלאת קובץ</h3>
+          <p class="step-desc">גרור קובץ או לחץ לבחירה</p>
+        </div>
+      </div>
+      
+      <label class="upload-dropzone" data-dropzone>
+        <div class="dropzone-content">
+          <div class="dropzone-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="dropzone-text">גרור קובץ לכאן</div>
+          <div class="dropzone-or">או</div>
+          <div class="dropzone-btn">בחר קובץ מהמחשב</div>
+          <div class="dropzone-formats">CSV • Excel • JSON • XML • ODS</div>
+        </div>
+        <input class="visually-hidden" type="file" name="file" accept=".csv,.tsv,.txt,.xlsx,.xls,.xlsm,.xlsb,.ods,.json,.xml" required>
+        <div class="dropzone-selected" data-file-label></div>
+      </label>
+    </div>
+
+    <!-- Step 2: Period Selection -->
+    <div class="glass-card step-card mb-4">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div>
+          <h3 class="step-title">סוג תקופה</h3>
+          <p class="step-desc">בחר לצורך השוואה בדשבורד</p>
+        </div>
+      </div>
+      
+      <div class="period-selector">
+        <label class="period-option">
+          <input type="radio" name="period_type" value="month" checked>
+          <div class="period-card">
+            <div class="period-icon">📅</div>
+            <div class="period-label">חודש</div>
+          </div>
+        </label>
+        <label class="period-option">
+          <input type="radio" name="period_type" value="week">
+          <div class="period-card">
+            <div class="period-icon">📆</div>
+            <div class="period-label">שבוע</div>
+          </div>
+        </label>
+        <label class="period-option">
+          <input type="radio" name="period_type" value="day">
+          <div class="period-card">
+            <div class="period-icon">📌</div>
+            <div class="period-label">יום</div>
+          </div>
+        </label>
+        <label class="period-option">
+          <input type="radio" name="period_type" value="custom">
+          <div class="period-card">
+            <div class="period-icon">⚙️</div>
+            <div class="period-label">מותאם</div>
+          </div>
+        </label>
+      </div>
+      
+      <div class="period-name-input">
+        <input type="text" name="period_name" class="form-input" placeholder="שם התקופה (אופציונלי) — לדוגמה: נובמבר 2024">
+      </div>
+    </div>
+
+    <!-- Step 3: Graph Selection -->
+    <div class="glass-card step-card mb-4">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div>
+          <h3 class="step-title">בחירת גרפים</h3>
+          <p class="step-desc">סמן את הגרפים שברצונך לייצר</p>
+        </div>
+      </div>
+      
+      <div class="graphs-grid">
+        <!-- זמנים ומגמות -->
+        <div class="graph-category">
+          <div class="category-header">
+            <span class="category-icon">⏰</span>
+            <span class="category-title">זמנים ומגמות</span>
+          </div>
+          <div class="graph-options">
+            <label class="graph-option">
+              <input type="checkbox" name="opt_hourly" checked>
+              <span class="option-check"></span>
+              <span class="option-label">מכירות לפי שעה</span>
+              <span class="option-badge hot">פופולרי</span>
+            </label>
+            <label class="graph-option">
+              <input type="checkbox" name="opt_weekday" checked>
+              <span class="option-check"></span>
+              <span class="option-label">מכירות לפי יום בשבוע</span>
+            </label>
+            <label class="graph-option">
+              <input type="checkbox" name="opt_heatmap" checked>
+              <span class="option-check"></span>
+              <span class="option-label">מפת חום (שעה×יום)</span>
+              <span class="option-badge new">חדש</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- מכירות ומוצרים -->
+        <div class="graph-category">
+          <div class="category-header">
+            <span class="category-icon">📦</span>
+            <span class="category-title">מכירות ומוצרים</span>
+          </div>
+          <div class="graph-options">
+            <label class="graph-option">
+              <input type="checkbox" name="opt_daily" checked>
+              <span class="option-check"></span>
+              <span class="option-label">מכירות יומיות</span>
+            </label>
+            <label class="graph-option">
+              <input type="checkbox" name="opt_top_products" checked>
+              <span class="option-check"></span>
+              <span class="option-label">Top 10 מוצרים</span>
+            </label>
+            <label class="graph-option">
+              <input type="checkbox" name="opt_avg_ticket" checked>
+              <span class="option-check"></span>
+              <span class="option-label">ממוצע קנייה לפי שעה</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- השוואות -->
+        <div class="graph-category">
+          <div class="category-header">
+            <span class="category-icon">📊</span>
+            <span class="category-title">השוואות</span>
+          </div>
+          <div class="graph-options">
+            <label class="graph-option">
+              <input type="checkbox" name="opt_weekend_compare" checked>
+              <span class="option-check"></span>
+              <span class="option-label">סופ"ש מול ימי חול</span>
+            </label>
+            <label class="graph-option">
+              <input type="checkbox" name="opt_payments" checked>
+              <span class="option-check"></span>
+              <span class="option-label">פילוח אמצעי תשלום</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hour Range -->
+      <div class="hour-range-section">
+        <div class="hour-range-label">טווח שעות לגרף "לפי שעה"</div>
+        <div class="hour-range-inputs">
+          <div class="hour-input">
+            <label>התחלה</label>
+            <input type="number" name="hour_start" value="8" min="0" max="23">
+          </div>
+          <div class="hour-separator">—</div>
+          <div class="hour-input">
+            <label>סיום</label>
+            <input type="number" name="hour_end" value="20" min="0" max="23">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="submit-btn" id="analyzeBtn" disabled>
+      <span class="btn-text">התחל ניתוח</span>
+      <span class="btn-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </span>
+      <span class="btn-loader"></span>
+    </button>
+    <p class="submit-hint">הכפתור יופעל לאחר בחירת קובץ</p>
+  </form>
+  
+  <!-- Demo Button -->
+  <div class="text-center mt-4">
+    <div class="demo-divider">
+      <span>או</span>
+    </div>
+    <a href="{{ url_for('demo_analysis') }}" class="demo-btn">
+      <span class="demo-icon">👁️</span>
+      <span>צפה בדוגמה — בלי להעלות קובץ</span>
+    </a>
+  </div>
+</div>
+
+<!-- Features Preview -->
+<div class="features-section">
+  <div class="feature-card">
+    <div class="feature-icon">📈</div>
+    <h4>8 גרפים מקצועיים</h4>
+    <p>מכירות, מוצרים, זמנים ועוד</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🤖</div>
+    <h4>תובנות AI</h4>
+    <p>המלצות מותאמות לעסק שלך</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📄</div>
+    <h4>ייצוא PDF</h4>
+    <p>דוח מקצועי להדפסה</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🔒</div>
+    <h4>מאובטח</h4>
+    <p>הצפנת AES-256</p>
+  </div>
+</div>
+
+<style>
+/* ===== Hero Section ===== */
+.hero-section {
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  color: #a9b5c7;
+}
+
+.badge-glow {
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 1rem 0;
+  color: #fff !important;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: #8b93a7;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* ===== Upload Container ===== */
+.upload-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ===== Glass Card ===== */
+.glass-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+/* ===== Step Header ===== */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.step-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff !important;
+  margin: 0;
+}
+
+.step-desc {
+  font-size: 0.85rem;
+  color: #8b93a7;
+  margin: 0.2rem 0 0;
+}
+
+/* ===== Upload Dropzone ===== */
+.upload-dropzone {
+  display: block;
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(0,0,0,0.2);
+}
+
+.upload-dropzone:hover {
+  border-color: #06b6d4;
+  background: rgba(6,182,212,0.05);
+}
+
+.upload-dropzone.is-dragover {
+  border-color: #06b6d4;
+  background: rgba(6,182,212,0.1);
+  transform: scale(1.01);
+}
+
+.dropzone-icon {
+  color: #06b6d4;
+  margin-bottom: 1rem;
+}
+
+.dropzone-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e6e9ef;
+  margin-bottom: 0.5rem;
+}
+
+.dropzone-or {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.dropzone-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: transform 0.2s;
+}
+
+.upload-dropzone:hover .dropzone-btn {
+  transform: translateY(-2px);
+}
+
+.dropzone-formats {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.dropzone-selected {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(16,185,129,0.15);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 10px;
+  color: #10b981;
+  font-weight: 500;
+  display: none;
+}
+
+.dropzone-selected.active {
+  display: block;
+}
+
+/* ===== Period Selector ===== */
+.period-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.period-option {
+  cursor: pointer;
+}
+
+.period-option input {
+  display: none;
+}
+
+.period-card {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.period-option:hover .period-card {
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+}
+
+.period-option input:checked + .period-card {
+  border-color: #06b6d4;
+  background: rgba(6,182,212,0.15);
+  box-shadow: 0 0 20px rgba(6,182,212,0.2);
+}
+
+.period-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.period-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #e6e9ef;
+}
+
+.period-name-input input {
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  color: #e6e9ef;
+  font-size: 0.95rem;
+  transition: all 0.25s;
+}
+
+.period-name-input input:focus {
+  outline: none;
+  border-color: #06b6d4;
+  background: rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 3px rgba(6,182,212,0.15);
+}
+
+.period-name-input input::placeholder {
+  color: #6b7280;
+}
+
+/* ===== Graphs Grid ===== */
+.graphs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.graph-category {
+  background: rgba(0,0,0,0.25);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.category-icon {
+  font-size: 1.1rem;
+}
+
+.category-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #e6e9ef;
+}
+
+.graph-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.graph-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.graph-option:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.graph-option input {
+  display: none;
+}
+
+.option-check {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 5px;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.graph-option input:checked + .option-check {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  border-color: transparent;
+}
+
+.graph-option input:checked + .option-check::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.option-label {
+  font-size: 0.85rem;
+  color: #d1d5db;
+  flex: 1;
+}
+
+.option-badge {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.option-badge.hot {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+}
+
+.option-badge.new {
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: #fff;
+}
+
+/* ===== Hour Range ===== */
+.hour-range-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.hour-range-label {
+  font-size: 0.85rem;
+  color: #8b93a7;
+  margin-bottom: 0.75rem;
+}
+
+.hour-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hour-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hour-input label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.hour-input input {
+  width: 70px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: #e6e9ef;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.hour-input input:focus {
+  outline: none;
+  border-color: #06b6d4;
+}
+
+.hour-separator {
+  color: #6b7280;
+}
+
+/* ===== Submit Button ===== */
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+  border: none;
+  border-radius: 14px;
+  padding: 1.1rem 2rem;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+}
+
+.submit-btn:not(:disabled):hover::before {
+  left: 100%;
+}
+
+.submit-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(6,182,212,0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
+.btn-loader {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.submit-btn.loading .btn-text,
+.submit-btn.loading .btn-icon {
+  display: none;
+}
+
+.submit-btn.loading .btn-loader {
+  display: block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.submit-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.75rem;
+}
+
+/* ===== Demo Button ===== */
+.demo-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.demo-divider::before,
+.demo-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+}
+
+.demo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.75rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #a9b5c7;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.demo-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(46,160,255,0.3);
+  color: #2ea0ff;
+  transform: translateY(-2px);
+}
+
+.demo-icon {
+  font-size: 1.25rem;
+}
+
+/* ===== Features Section ===== */
+.features-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.feature-card {
+  text-align: center;
+  padding: 1.25rem 1rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
+}
+
+.feature-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.feature-card h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e6e9ef !important;
+  margin: 0 0 0.3rem;
+}
+
+.feature-card p {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .period-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .graphs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-title {
+    font-size: 1.75rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('uploadForm');
+  const fileInput = form.querySelector('input[type="file"]');
+  const fileLabel = form.querySelector('[data-file-label]');
+  const dropzone = form.querySelector('.upload-dropzone');
+  const btn = document.getElementById('analyzeBtn');
+
+  function updateFileLabel() {
+    const file = fileInput.files[0];
+    if (file) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+      fileLabel.textContent = `✅ ${file.name} (${sizeMB} MB)`;
+      fileLabel.classList.add('active');
+      btn.disabled = false;
+      document.querySelector('.submit-hint').textContent = 'מוכן לניתוח!';
+    } else {
+      fileLabel.classList.remove('active');
+      btn.disabled = true;
+      document.querySelector('.submit-hint').textContent = 'הכפתור יופעל לאחר בחירת קובץ';
+    }
+  }
+
+  fileInput.addEventListener('change', updateFileLabel);
+
+  // Drag & drop
+  ['dragenter', 'dragover'].forEach(ev => {
+    dropzone.addEventListener(ev, e => {
+      e.preventDefault();
+      dropzone.classList.add('is-dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(ev => {
+    dropzone.addEventListener(ev, e => {
+      e.preventDefault();
+      dropzone.classList.remove('is-dragover');
+    });
+  });
+
+  dropzone.addEventListener('drop', e => {
+    fileInput.files = e.dataTransfer.files;
+    updateFileLabel();
+  });
+
+  // Submit loading state
+  form.addEventListener('submit', function() {
+    btn.classList.add('loading');
+    btn.disabled = true;
+  });
+});
+</script>
+
+{% endblock %}

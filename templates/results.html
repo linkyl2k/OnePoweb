@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>תוצאות הניתוח</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 1100px; margin: 30px auto; }
+    .note { color: #a33; margin-bottom: 10px; }
+    .chart { margin: 28px 0; border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fff; }
+    h2 { margin: 0 0 14px; }
+    h3 { margin: 6px 0 10px; }
+    a { text-decoration: none; }
+    .ai-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: #f6f7fb;
+      border: 1px solid #e2e6f0;
+      border-radius: 8px;
+      color: #222;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .ai-title { font-weight: 700; margin-bottom: 6px; }
+    .toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .toolbar a { font-size: 14px; color: #444; }
+    img { max-width: 100%; height: auto; display: block; }
+  </style>
+</head>
+<body>
+  <h2>תוצאות הניתוח</h2>
+
+  {% if notes %}
+    <div class="note">הערות: {{ notes }}</div>
+  {% endif %}
+
+  {# =========================
+     ציפיות לנתונים:
+     1) charts = [(title, b64, ai_text), ...]  ← מועדף
+     2) או charts = [(title, b64), ...] + ai_list = [ai_text, ...] (באותו סדר)
+     3) או charts = [{'title':..., 'b64':..., 'ai':...}, ...]
+     ========================= #}
+
+  {% if charts and charts|length > 0 %}
+    {% for c in charts %}
+      {% if c is mapping %}
+        {% set title = c.title or c['title'] %}
+        {% set b64   = c.b64   or c['b64'] %}
+        {% set ai_text = c.ai  if 'ai' in c else (c.get('ai') if c.get else None) %}
+      {% else %}
+        {# tuple/list #}
+        {% if c|length >= 3 %}
+          {% set title = c[0] %}
+          {% set b64   = c[1] %}
+          {% set ai_text = c[2] %}
+        {% else %}
+          {% set title = c[0] %}
+          {% set b64   = c[1] %}
+          {% if ai_list is defined and ai_list %}
+            {% set ai_text = ai_list[loop.index0] %}
+          {% else %}
+            {% set ai_text = None %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+
+      <div class="chart">
+        <h3>{{ title }}</h3>
+        <img src="data:image/png;base64,{{ b64 }}" alt="{{ title }}">
+
+        {% if ai_text %}
+          <div class="ai-box">
+            <div class="ai-title">תובנה (AI)</div>
+            <div class="ai-content">{{ ai_text }}</div>
+          </div>
+        {% endif %}
+
+        {# אופציונלי: אזור כפתורים #}
+        {# <div class="toolbar">
+          <a href="/">↩ חזרה</a>
+        </div> #}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>לא נבחרו/נמצאו גרפים להצגה.</p>
+  {% endif %}
+
+  <p><a href="/">↩ חזרה להעלאת דוח נוסף</a></p>
+</body>
+</html>

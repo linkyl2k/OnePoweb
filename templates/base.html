@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "OnePoweb" }}</title>
+
+  <!-- Meta Description -->
+  <meta name="description" content="OnePoweb – מערכת חכמה לעסקים: העלה דוח קופה (POS), קבל גרפים מקצועיים, וייצוא PDF מסודר. בקרוב – הסברי AI מותאמים אישית.">
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content="OnePoweb – ניתוח קופה חכם">
+  <meta property="og:description" content="העלה דוח קופה, קבל גרפים ודו״ח PDF מסודר. בקרוב – הסברי AI לעסק שלך.">
+  <meta property="og:image" content="{{ url_for('static', filename='img/logo.png', _external=True) }}">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:type" content="website">
+
+  <!-- Bootstrap RTL -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Style -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+  <meta name="color-scheme" content="light dark">
+  
+  <style>
+    /* Trial Countdown Timer */
+    .trial-countdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(90deg, rgba(239,68,68,0.15), rgba(251,146,60,0.15));
+      color: #f87171;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-right: 6px;
+      animation: pulse-urgent 2s ease-in-out infinite;
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+    .trial-countdown i {
+      font-size: 0.65rem;
+      animation: spin-slow 3s linear infinite;
+    }
+    @keyframes pulse-urgent {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    @keyframes spin-slow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .trial-countdown.urgent {
+      background: linear-gradient(90deg, rgba(239,68,68,0.25), rgba(220,38,38,0.2));
+      color: #ef4444;
+      animation: pulse-urgent 1s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-body-tertiary">
+<!-- Aurora background effects -->
+<div class="aurora-orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="grid-pattern"></div>
+</div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm-sm">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('index') }}">
+        <i class="bi bi-graph-up-arrow"></i>
+        OnePoweb
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="nav" class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('index') }}">בית</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if active=='about' %}active{% endif %}" href="{{ url_for('about') }}">אודות</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if active=='contact' %}active{% endif %}" href="{{ url_for('contact') }}">צור קשר</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if active=='landing' %}active{% endif %}" href="{{ url_for('landing') }}">למה OnePoweb?</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if active=='pricing' %}active{% endif %}" href="{{ url_for('pricing') }}" style="background: linear-gradient(90deg, rgba(16,185,129,0.15), rgba(46,160,255,0.1)); color: #10b981 !important; border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 6px 12px !important; font-weight: 600;">
+              <i class="bi bi-gem me-1"></i>תוכניות ומחירים
+            </a>
+          </li>
+        </ul>
+
+        <!-- חלק ימין -->
+        <ul class="navbar-nav ms-auto align-items-center">
+          {% if session.uid %}
+            {% set u = current_user() %}
+            {% set effective = get_effective_plan(u) if u else 'free' %}
+            
+            {# Plan Badge with Dropdown #}
+            <li class="nav-item dropdown me-2">
+              <a class="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {% if effective == 'pro' or is_trial_active(u) %}
+                  <span class="plan-nav-badge pro">
+                    <i class="bi bi-rocket-takeoff-fill me-1"></i>PRO
+                  </span>
+                  {% if is_trial_active(u) %}
+                    <span class="trial-countdown" data-end="{{ get_trial_end_timestamp(u) }}">
+                      <i class="bi bi-clock-history"></i>
+                      <span class="countdown-text"></span>
+                    </span>
+                  {% endif %}
+                {% elif effective == 'basic' %}
+                  <span class="plan-nav-badge basic">
+                    <i class="bi bi-star-fill me-1"></i>BASIC
+                  </span>
+                {% else %}
+                  <span class="plan-nav-badge free">
+                    <i class="bi bi-person me-1"></i>FREE
+                  </span>
+                {% endif %}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end plan-dropdown">
+                <li class="dropdown-header">בחר תוכנית</li>
+                <li>
+                  <a class="dropdown-item plan-option {% if effective == 'free' and not is_trial_active(u) %}current{% endif %}" href="{{ url_for('profile') }}">
+                    <div class="plan-option-header">
+                      <span class="plan-name">FREE</span>
+                      <span class="plan-price">חינם</span>
+                    </div>
+                    <small class="text-muted">גרפים בסיסיים</small>
+                    {% if effective == 'free' and not is_trial_active(u) %}<i class="bi bi-check-circle-fill current-mark"></i>{% endif %}
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item plan-option {% if effective == 'basic' %}current{% endif %}" href="{{ url_for('subscribe', plan='basic') }}">
+                    <div class="plan-option-header">
+                      <span class="plan-name basic-text">BASIC</span>
+                      <span class="plan-price">₪39/חודש</span>
+                    </div>
+                    <small class="text-muted">+ השוואת תקופות</small>
+                    {% if effective == 'basic' %}<i class="bi bi-check-circle-fill current-mark"></i>{% endif %}
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item plan-option {% if effective == 'pro' %}current{% endif %}" href="{{ url_for('subscribe', plan='pro') }}">
+                    <div class="plan-option-header">
+                      <span class="plan-name pro-text">PRO</span>
+                      <span class="plan-price">₪69/חודש</span>
+                    </div>
+                    <small class="text-muted">+ AI + PDF + הכל</small>
+                    {% if effective == 'pro' %}<i class="bi bi-check-circle-fill current-mark"></i>{% endif %}
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('profile') }}">
+                    <i class="bi bi-gear me-2"></i>ניהול מנוי
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">📊 לוח בקרה</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">הפרופיל שלי</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">התנתקות</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">התחברות</a></li>
+            <li class="nav-item"><a class="btn btn-sm btn-primary ms-2" href="{{ url_for('signup') }}">הרשמה חינם</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="container py-4">
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}
+        <div class="mb-3">
+          {% for cat, msg in msgs %}
+            {% if cat == 'warning' %}
+              <div class="alert alert-dismissible fade show" role="alert" style="background: linear-gradient(90deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1)); border: 2px solid rgba(251,191,36,0.4); border-radius: 12px; color: #fbbf24; font-weight: 600; font-size: 1rem; padding: 1rem 1.25rem;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+              </div>
+            {% else %}
+              <div class="alert alert-{{ 'info' if cat=='message' else cat }} alert-dismissible fade show" role="alert">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+ <!-- Footer -->
+<footer class="site-footer" style="padding: 2rem 0 1.5rem;">
+  <div class="container">
+    <!-- Main Footer Content -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <nav class="footer-nav">
+        <a href="{{ url_for('about') }}">אודות</a>
+        <a href="{{ url_for('contact') }}">צור קשר</a>
+        <a href="{{ url_for('terms') }}">תנאי שימוש</a>
+        <a href="{{ url_for('privacy') }}">מדיניות פרטיות</a>
+      </nav>
+
+      <div class="footer-copy">
+        <span>© {{ 2025 }} OnePoweb</span>
+      </div>
+    </div>
+    
+    <!-- Divider -->
+    <hr style="border-color: rgba(255,255,255,0.08); margin: 0 0 1.25rem 0;">
+    
+    <!-- Bottom Row: Payment & Security -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <!-- Payment Methods -->
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-muted small">תשלום מאובטח:</span>
+        <div class="d-flex gap-2 align-items-center">
+          <!-- PayPal -->
+          <div style="background: rgba(255,255,255,0.08); padding: 6px 10px; border-radius: 6px;" title="PayPal">
+            <svg width="60" height="16" viewBox="0 0 124 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M46.211 6.749h-6.839a.95.95 0 0 0-.939.802l-2.766 17.537a.57.57 0 0 0 .564.658h3.265a.95.95 0 0 0 .939-.803l.746-4.73a.95.95 0 0 1 .938-.803h2.165c4.505 0 7.105-2.18 7.784-6.5.306-1.89.013-3.375-.872-4.415-.972-1.142-2.696-1.746-4.985-1.746zM47.5 13.154c-.374 2.454-2.249 2.454-4.062 2.454h-1.032l.724-4.583a.57.57 0 0 1 .563-.481h.473c1.235 0 2.4 0 3.002.704.359.421.469 1.044.332 1.906zM66.654 13.075h-3.275a.57.57 0 0 0-.563.481l-.145.916-.229-.332c-.709-1.029-2.29-1.373-3.868-1.373-3.619 0-6.71 2.741-7.312 6.586-.313 1.918.132 3.752 1.22 5.031.998 1.176 2.426 1.666 4.125 1.666 2.916 0 4.533-1.875 4.533-1.875l-.146.91a.57.57 0 0 0 .562.66h2.95a.95.95 0 0 0 .939-.803l1.77-11.209a.568.568 0 0 0-.561-.658zm-4.565 6.374c-.316 1.871-1.801 3.127-3.695 3.127-.951 0-1.711-.305-2.199-.883-.484-.574-.668-1.391-.514-2.301.295-1.855 1.805-3.152 3.67-3.152.93 0 1.686.309 2.184.892.499.589.697 1.411.554 2.317zM84.096 13.075h-3.291a.954.954 0 0 0-.787.417l-4.539 6.686-1.924-6.425a.953.953 0 0 0-.912-.678h-3.234a.57.57 0 0 0-.541.754l3.625 10.638-3.408 4.811a.57.57 0 0 0 .465.9h3.287a.949.949 0 0 0 .781-.408l10.946-15.8a.57.57 0 0 0-.468-.895z" fill="#179BD7"/>
+              <path d="M94.992 6.749h-6.84a.95.95 0 0 0-.938.802l-2.766 17.537a.569.569 0 0 0 .562.658h3.51a.665.665 0 0 0 .656-.562l.785-4.971a.95.95 0 0 1 .938-.803h2.164c4.506 0 7.105-2.18 7.785-6.5.307-1.89.012-3.375-.873-4.415-.971-1.142-2.694-1.746-4.983-1.746zm1.289 6.405c-.373 2.454-2.248 2.454-4.062 2.454h-1.031l.725-4.583a.568.568 0 0 1 .562-.481h.473c1.234 0 2.4 0 3.002.704.359.421.468 1.044.331 1.906zM115.434 13.075h-3.273a.567.567 0 0 0-.562.481l-.145.916-.23-.332c-.709-1.029-2.289-1.373-3.867-1.373-3.619 0-6.709 2.741-7.311 6.586-.312 1.918.131 3.752 1.219 5.031 1 1.176 2.426 1.666 4.125 1.666 2.916 0 4.533-1.875 4.533-1.875l-.146.91a.57.57 0 0 0 .564.66h2.949a.95.95 0 0 0 .938-.803l1.771-11.209a.571.571 0 0 0-.565-.658zm-4.565 6.374c-.314 1.871-1.801 3.127-3.695 3.127-.949 0-1.711-.305-2.199-.883-.484-.574-.666-1.391-.514-2.301.297-1.855 1.805-3.152 3.67-3.152.93 0 1.686.309 2.184.892.501.589.699 1.411.554 2.317zM119.295 7.23l-2.807 17.858a.569.569 0 0 0 .562.658h2.822a.949.949 0 0 0 .939-.803l2.768-17.536a.57.57 0 0 0-.562-.659h-3.16a.571.571 0 0 0-.562.482z" fill="#253B80"/>
+            </svg>
+          </div>
+          <!-- Visa -->
+          <div style="background: rgba(255,255,255,0.08); padding: 6px 10px; border-radius: 6px;" title="Visa">
+            <svg width="40" height="13" viewBox="0 0 50 16" fill="none">
+              <path d="M19.5 15.5H16L18.5 0.5H22L19.5 15.5Z" fill="#3C58BF"/>
+              <path d="M33 0.8C32.2 0.5 31 0.2 29.5 0.2C25.2 0.2 22.2 2.4 22.2 5.5C22.2 7.8 24.3 9 25.9 9.8C27.5 10.6 28.1 11.1 28.1 11.8C28.1 12.9 26.8 13.4 25.6 13.4C23.9 13.4 23 13.2 21.5 12.5L20.9 12.2L20.3 16C21.5 16.5 23.5 16.9 25.6 16.9C30.2 16.9 33.1 14.7 33.1 11.4C33.1 9.6 32 8.2 29.5 7.1C28 6.4 27.1 5.9 27.1 5.1C27.1 4.4 27.9 3.7 29.6 3.7C31 3.7 32 3.9 32.8 4.3L33.2 4.5L33.8 0.8H33Z" fill="#3C58BF"/>
+              <path d="M38.5 0.5H35.5C34.5 0.5 33.8 0.8 33.4 1.8L27 15.5H31.5L32.4 13H37.8L38.3 15.5H42.3L38.5 0.5ZM33.6 10C33.6 10 35 6 35.2 5.5C35.2 5.5 35.6 4.4 35.8 3.8L36.1 5.4C36.1 5.4 37 9.2 37.2 10H33.6Z" fill="#3C58BF"/>
+              <path d="M13.5 0.5L9.2 10.7L8.7 8.3C7.9 5.6 5.4 2.6 2.6 1.1L6.4 15.5H11L18 0.5H13.5Z" fill="#3C58BF"/>
+              <path d="M6.5 0.5H0.1L0 0.8C5.5 2.1 9.2 5.5 10.5 9.5L9.1 1.9C8.9 0.9 8.2 0.6 7.3 0.5H6.5Z" fill="#F9A533"/>
+            </svg>
+          </div>
+          <!-- Mastercard -->
+          <div style="background: rgba(255,255,255,0.08); padding: 6px 10px; border-radius: 6px;" title="Mastercard">
+            <svg width="32" height="20" viewBox="0 0 32 20" fill="none">
+              <circle cx="10" cy="10" r="10" fill="#EB001B"/>
+              <circle cx="22" cy="10" r="10" fill="#F79E1B"/>
+              <path d="M16 2.5C14 4 12.5 6.8 12.5 10C12.5 13.2 14 16 16 17.5C18 16 19.5 13.2 19.5 10C19.5 6.8 18 4 16 2.5Z" fill="#FF5F00"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Security Badge -->
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-shield-lock-fill" style="color: #10b981;"></i>
+        <span class="text-muted small">SSL מאובטח 256-bit</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dropzone - הצגת שם קובץ וגרור-ושחרר
+    (function () {
+      const dz = document.querySelector('[data-dropzone]');
+      const input = document.querySelector('input[type=file][name=file]');
+      const label = document.querySelector('[data-file-label]');
+      if (!dz || !input) return;
+
+      input.addEventListener('change', () => {
+        label && (label.textContent = input.files?.[0]?.name || 'בחר קובץ…');
+      });
+
+      ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => {
+        e.preventDefault(); e.stopPropagation(); dz.classList.add('is-drag');
+      }));
+      ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => {
+        e.preventDefault(); e.stopPropagation(); dz.classList.remove('is-drag');
+      }));
+      dz.addEventListener('drop', e => {
+        input.files = e.dataTransfer.files;
+        input.dispatchEvent(new Event('change'));
+      });
+
+      // הורדת גרף כתמונה
+      document.addEventListener('click', (e) => {
+        const a = e.target.closest('[data-download]');
+        if (!a) return;
+        const url = a.getAttribute('data-download');
+        const name = a.getAttribute('data-filename') || 'chart.png';
+        const link = document.createElement('a');
+        link.href = url; link.download = name; document.body.appendChild(link);
+        link.click(); link.remove();
+      });
+    })();
+  </script>
+  
+  <!-- Trial Countdown Script -->
+  <script>
+    (function() {
+      const countdown = document.querySelector('.trial-countdown');
+      if (!countdown) return;
+      
+      const endDate = new Date(countdown.dataset.end);
+      const textEl = countdown.querySelector('.countdown-text');
+      
+      function update() {
+        const now = new Date();
+        const diff = endDate - now;
+        
+        if (diff <= 0) {
+          textEl.textContent = 'נגמר!';
+          countdown.classList.add('urgent');
+          return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        if (days > 0) {
+          textEl.textContent = `${days}d ${hours}h ${mins}m`;
+        } else if (hours > 0) {
+          textEl.textContent = `${hours}h ${mins}m ${secs}s`;
+          countdown.classList.add('urgent');
+        } else {
+          textEl.textContent = `${mins}m ${secs}s`;
+          countdown.classList.add('urgent');
+        }
+      }
+      
+      update();
+      setInterval(update, 1000);
+    })();
+  </script>
+</body>
+</html>

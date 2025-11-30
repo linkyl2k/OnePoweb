@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4">
+
+  {% if messages %}
+    <div class="mb-3">
+      {% for m in messages %}
+        <div class="alert alert-info">{{ m }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if not plots or plots|length == 0 %}
+    <div class="alert alert-warning">אין גרפים להצגה. חזור לדף הבית והעלה דוח חדש.</div>
+  {% else %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">תוצאות הניתוח</h3>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{{ url_for('index') }}">העלה דוח חדש</a>
+        {% if user_plan == 'pro' %}
+          <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">הורדת PDF</a>
+        {% else %}
+          <a class="btn btn-outline-warning" href="{{ url_for('profile') }}#plans">
+            <i class="bi bi-lock me-1"></i>הורדת PDF
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ==== Summary Block - Available for ALL plans ==== #}
+    {% if summary %}
+      <div class="card mb-4" dir="rtl" style="border: 1px solid rgba(46,160,255,0.2); border-radius: 16px; background: linear-gradient(135deg, rgba(46,160,255,0.05), rgba(16,185,129,0.03));">
+        <div class="card-body p-4">
+          <!-- Header -->
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-clipboard-data" style="font-size: 1.4rem; color: #fff;"></i>
+            </div>
+            <div>
+              <h4 class="mb-0" style="color: var(--text);">סיכום הניתוח</h4>
+              <p class="mb-0 text-muted small">תובנות עיקריות מהדוח שלך</p>
+            </div>
+          </div>
+          
+          <!-- Main Summary -->
+          <div style="color: #e6e9ef; font-size: 1.1rem; line-height: 1.9; white-space: pre-wrap;">{{ summary }}</div>
+          
+          {% if summary_ai and user_plan == 'pro' %}
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 1.5rem 0;">
+            <div class="d-flex align-items-start gap-2">
+              <i class="bi bi-stars" style="color: #fbbf24; margin-top: 3px;"></i>
+              <div style="color: #a9b5c7; font-size: 1rem; line-height: 1.8;">{{ summary_ai }}</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# ==== Upgrade Banner for FREE users ==== #}
+    {% if user_plan == 'free' %}
+      <div class="card mb-4" style="border: 2px solid rgba(251,191,36,0.3); border-radius: 16px; background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05));">
+        <div class="card-body text-center py-5">
+          <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-bar-chart-fill" style="font-size: 2rem; color: #fbbf24;"></i>
+          </div>
+          <h4 class="mb-2" style="color: var(--text);">רוצה לראות גרפים וניתוחים מתקדמים?</h4>
+          <p class="text-muted mb-4">שדרג לחבילת Basic או Pro כדי לראות את כל הגרפים והנתונים</p>
+          
+          <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+            <a href="{{ url_for('profile') }}#plans" class="btn btn-lg px-4" style="background: linear-gradient(90deg, #2ea0ff, #34c3ff); color: #fff; border: none; border-radius: 12px; font-weight: 600;">
+              <i class="bi bi-graph-up me-2"></i>Basic - גרפים בלבד
+            </a>
+            <a href="{{ url_for('profile') }}#plans" class="btn btn-lg px-4" style="background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #000; border: none; border-radius: 12px; font-weight: 600;">
+              <i class="bi bi-stars me-2"></i>Pro - כולל AI
+            </a>
+          </div>
+          
+          <div class="mt-4">
+            <form action="{{ url_for('start_trial') }}" method="POST" class="d-inline">
+              <button type="submit" class="btn" style="background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.3); border-radius: 10px;">
+                <i class="bi bi-gift me-1"></i>נסה 7 ימים חינם
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {# ==== Action Items (AI Recommendations) - PRO ONLY ==== #}
+    {% if user_plan == 'pro' and action_items and action_items|length > 0 %}
+      <div class="card mb-4" dir="rtl" style="text-align:right; border: 2px solid rgba(16,185,129,0.3); border-radius: 16px; background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(46,160,255,0.03));">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+              📋
+            </div>
+            <div>
+              <h4 class="mb-0" style="color: var(--text);">תוכנית פעולה מומלצת</h4>
+              <p class="mb-0 text-muted small">פעולות קונקרטיות על בסיס הניתוח שלך</p>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            {% for item in action_items[:3] %}
+              <div class="col-12 col-lg-4">
+                <div class="h-100 p-3" style="background: rgba(255,255,255,0.03); border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span style="font-size: 0.75rem; background: rgba(16,185,129,0.15); color: #34d399; padding: 4px 10px; border-radius: 20px;">{{ item.category }}</span>
+                  </div>
+                  <h6 class="mb-2" style="color: var(--text);">{{ item.title }}</h6>
+                  <p class="mb-2" style="color: #34d399; font-weight: 600; font-size: 0.9rem;">
+                    💡 {{ item.action }}
+                  </p>
+                  <p class="mb-3 small text-muted">{{ item.impact }}</p>
+                  
+                  <details class="action-details">
+                    <summary style="cursor: pointer; color: #2ea0ff; font-size: 0.85rem;">
+                      <i class="bi bi-chevron-down me-1"></i>איך לעשות את זה?
+                    </summary>
+                    <ul class="mt-2 mb-0 ps-3 small" style="color: var(--muted);">
+                      {% for step in item.how_to %}
+                        <li class="mb-1">{{ step }}</li>
+                      {% endfor %}
+                    </ul>
+                  </details>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {% if action_items|length > 3 %}
+            <div class="mt-3 text-center">
+              <button class="btn btn-sm" onclick="document.getElementById('moreActions').style.display='block'; this.style.display='none';" style="background: rgba(46,160,255,0.1); color: #2ea0ff; border: none; border-radius: 8px;">
+                <i class="bi bi-plus-circle me-1"></i>עוד {{ action_items|length - 3 }} המלצות
+              </button>
+            </div>
+            <div id="moreActions" style="display: none;" class="mt-3">
+              <div class="row g-3">
+                {% for item in action_items[3:] %}
+                  <div class="col-12 col-lg-6">
+                    <div class="p-3" style="background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <span style="font-size: 0.7rem; background: rgba(251,191,36,0.15); color: #fbbf24; padding: 3px 8px; border-radius: 12px;">{{ item.category }}</span>
+                        <strong style="font-size: 0.9rem; color: var(--text);">{{ item.title }}</strong>
+                      </div>
+                      <p class="mb-0 small" style="color: var(--muted);">{{ item.action }}</p>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% elif user_plan == 'basic' and action_items and action_items|length > 0 %}
+      {# Show teaser for Basic users #}
+      <div class="card mb-4" dir="rtl" style="text-align:right; border: 1px solid rgba(251,191,36,0.3); border-radius: 16px; background: rgba(251,191,36,0.03);">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-stars" style="font-size: 2rem; color: #fbbf24;"></i>
+          <h5 class="mt-2 mb-2" style="color: var(--text);">יש לנו {{ action_items|length }} המלצות AI עבורך!</h5>
+          <p class="text-muted small mb-3">שדרג לחבילת Pro כדי לקבל תוכנית פעולה מותאמת אישית</p>
+          <a href="{{ url_for('profile') }}#plans" class="btn" style="background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #000; border: none; border-radius: 10px;">
+            <i class="bi bi-rocket-takeoff me-1"></i>שדרג ל-Pro
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+    {# ==== ROI Section - BASIC and PRO only ==== #}
+    {% if user_plan in ['basic', 'pro'] and roi and (roi.text or roi.monthly_gain or roi.roi_percent) %}
+      {% set _gain = roi.monthly_gain or 0 %}
+      {% set _roi  = roi.roi_percent or 0 %}
+      <div class="card mb-4" dir="rtl" style="text-align:right; border-radius: 14px; border: 1px solid rgba(16,185,129,0.2);">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+              <i class="bi bi-graph-up-arrow me-2" style="color: #10b981;"></i>
+              פוטנציאל שיפור
+            </h5>
+            <a href="{{ url_for('roi_page') }}" class="btn btn-sm" style="background: rgba(16,185,129,0.1); color: #34d399; border-radius: 8px;">
+              פרטים נוספים <i class="bi bi-arrow-left"></i>
+            </a>
+          </div>
+          
+          <div class="row g-3 text-center">
+            <div class="col-6 col-md-4">
+              <div class="p-2" style="background: rgba(16,185,129,0.08); border-radius: 10px;">
+                <div class="small text-muted">פוטנציאל חודשי</div>
+                <div style="font-size: 1.25rem; font-weight: bold; color: #34d399;">~₪{{ "{:,.0f}".format(_gain) }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="p-2" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
+                <div class="small text-muted">ROI תיאורטי</div>
+                <div style="font-size: 1.25rem; font-weight: bold; color: #34c3ff;">{{ "{:,.0f}".format(_roi) }}%</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="p-2" style="background: rgba(251,191,36,0.08); border-radius: 10px;">
+                <div class="small text-muted">⚠️ הערכה בלבד</div>
+                <div style="font-size: 0.85rem; color: #fbbf24;">תלוי בפעולות שלך</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {# ==== Charts - BASIC and PRO only ==== #}
+    {% if user_plan in ['basic', 'pro'] %}
+      <div class="vstack gap-4">
+        {% for p in plots %}
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h5 class="mb-0">{{ p.title }}</h5>
+                <a class="btn btn-sm btn-outline-secondary"
+                   data-download="{{ url_for('static', filename='plots/' ~ p.filename) }}"
+                   data-filename="{{ p.filename }}">
+                  הורד תמונה
+                </a>
+              </div>
+
+              <img class="img-fluid rounded border"
+                   src="{{ url_for('static', filename='plots/' ~ p.filename) }}"
+                   alt="{{ p.title }}">
+
+              {% if p.note %}
+                <div class="small text-muted mt-2">{{ p.note }}</div>
+              {% endif %}
+
+              {# AI analysis on charts - PRO only #}
+              {% if p.ai and user_plan == 'pro' %}
+                <div class="alert alert-secondary mt-3 mb-0" dir="rtl" style="white-space:pre-wrap">
+                  {{ p.ai }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

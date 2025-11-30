@@ -1,0 +1,21 @@
+Flask==3.0.0
+Werkzeug==3.0.0
+pandas==2.2.3
+matplotlib==3.9.2
+openpyxl==3.1.5
+reportlab==4.2.2
+openai==1.42.0
+gunicorn==21.2.0
+xlrd==2.0.1
+
+# Better RTL handling for Hebrew PDF text
+python-bidi==0.4.2
+
+# תמיכה בפורמטים נוספים של קופות ישראליות
+pyxlsb==1.0.10       # Excel Binary (.xlsb)
+odfpy==1.4.1         # OpenDocument (.ods) - LibreOffice
+lxml==5.1.0          # XML parsing מתקדם
+python-dotenv==1.0.0 # לניהול משתני סביבה
+cryptography==42.0.0 # הצפנת נתוני משתמשים
+numpy==1.26.4        # לחישובים מתקדמים
+requests==2.31.0     # HTTP requests for PayPal API

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body text-center">
+    <h3 class="mb-2">תודה על ההרשמה!</h3>
+    {% if first_name %}
+      <p class="text-muted">ברוך הבא, {{ first_name }} 🙌</p>
+    {% endif %}
+    <p>החשבון שלך נוצר בהצלחה. אפשר להמשיך לפרופיל האישי.</p>
+    <a class="btn btn-primary mt-2" href="{{ url_for('profile') }}">עבור לפרופיל</a>
+  </div>
+</div>
+{% endblock %}

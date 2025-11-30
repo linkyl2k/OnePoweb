@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4" dir="rtl" style="text-align:right">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">פוטנציאל שיפור (חודשי)</h3>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="{{ url_for('result') }}">חזרה לתוצאות</a>
+      <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">הורדת PDF</a>
+    </div>
+  </div>
+
+  {% if not has_any %}
+    <div class="alert alert-warning">לא חושב פוטנציאל לדוח הזה. נסה לטעון דוח מחדש מהדף הראשי.</div>
+  {% else %}
+    <!-- Disclaimer -->
+    <div class="alert alert-info mb-4" style="border-radius: 12px;">
+      <i class="bi bi-info-circle me-2"></i>
+      <strong>חשוב:</strong> הנתונים מציגים <u>פוטנציאל תיאורטי</u> על בסיס ניתוח הדוח.
+      התוצאות בפועל תלויות בפעולות שתנקטו ובתנאי השוק.
+      אנחנו מספקים תובנות — ההצלחה תלויה ביישום שלכם.
+    </div>
+
+    <div class="card mb-4" style="border-color: rgba(16,185,129,0.3);">
+      <div class="card-body">
+        {% set _gain = roi.monthly_gain or 0 %}
+        {% set _roi  = roi.roi_percent or 0 %}
+
+        <h5 class="mb-3">
+          <i class="bi bi-lightbulb me-2" style="color: #fbbf24;"></i>
+          הזדמנויות שזיהינו בדוח שלך
+        </h5>
+
+        {% if roi.components %}
+          <div class="mb-4">
+            {% if roi.components.weak_day %}
+              {% set c = roi.components.weak_day %}
+              <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>יום '{{ c.day }}' חלש יחסית</strong>
+                    <div class="small text-muted">
+                      אם תצליחו לסגור {{ c.achievable_percent or 30 }}% מהפער לימים רגילים
+                    </div>
+                  </div>
+                  <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399;">
+                    עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש
+                  </span>
+                </div>
+              </div>
+            {% endif %}
+            
+            {% if roi.components.evening_hours %}
+              {% set c = roi.components.evening_hours %}
+              <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>שעות ערב חלשות</strong>
+                    <div class="small text-muted">
+                      פוטנציאל אם תחזקו פעילות בשעות 17:00-20:00
+                    </div>
+                  </div>
+                  <span class="badge" style="background: rgba(46,160,255,0.15); color: #34c3ff;">
+                    עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש
+                  </span>
+                </div>
+              </div>
+            {% endif %}
+            
+            {% if roi.components.tail_products %}
+              {% set c = roi.components.tail_products %}
+              <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>מוצרים בעלי מכירות נמוכות</strong>
+                    <div class="small text-muted">
+                      קידום קל (+5%) של מוצרים בתחתית הסל
+                    </div>
+                  </div>
+                  <span class="badge" style="background: rgba(251,191,36,0.15); color: #fbbf24;">
+                    עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש
+                  </span>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <hr style="border-color: var(--border);">
+
+        <div class="row g-3">
+          <div class="col-6 col-md-4">
+            <div class="text-center p-3" style="background: rgba(16,185,129,0.08); border-radius: 10px;">
+              <div class="small text-muted">פוטנציאל מקסימלי</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #34d399;">~₪{{ "{:,.0f}".format(_gain) }}</div>
+              <div class="small text-muted">לחודש</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="text-center p-3" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
+              <div class="small text-muted">עלות השירות</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">₪{{ "{:,.0f}".format(roi.service_cost or 149) }}</div>
+              <div class="small text-muted">לחודש</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="text-center p-3" style="background: rgba(251,191,36,0.08); border-radius: 10px;">
+              <div class="small text-muted">ROI תיאורטי</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #fbbf24;">{{ "{:,.0f}".format(_roi) }}%</div>
+              <div class="small text-muted">אם מיישמים הכל</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3" style="background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1);">
+          <div class="small text-muted">
+            <i class="bi bi-lightbulb me-1"></i>
+            <strong>מה אנחנו מציעים:</strong> תובנות מבוססות נתונים שמראות לכם היכן יש הזדמנויות.
+            ההחלטה והביצוע — בידיים שלכם. אנחנו לא מבטיחים תוצאות, אלא מספקים כלים לקבלת החלטות חכמות יותר.
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

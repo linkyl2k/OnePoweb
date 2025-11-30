@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-6">
+      
+      <!-- Header Card -->
+      <div class="card mb-4" style="border: none; border-radius: 20px; overflow: hidden;">
+        <div class="card-body p-0">
+          
+          <!-- Profile Header -->
+          <div class="text-center py-4" style="background: linear-gradient(135deg, rgba(46,160,255,0.15), rgba(26,188,156,0.1));">
+            <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #2ea0ff, #1abc9c); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; font-weight: bold; box-shadow: 0 8px 24px rgba(46,160,255,0.3);">
+              {{ (user.first_name or user.email)[0]|upper }}
+            </div>
+            <h4 class="mb-1" style="color: #fff;">עריכת פרופיל</h4>
+            <p class="mb-0 small text-muted">{{ user.email }}</p>
+          </div>
+          
+          <!-- Form -->
+          <div class="p-4">
+            <form method="POST" class="vstack gap-4" novalidate>
+              
+              <!-- Personal Info Section -->
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <div style="width: 36px; height: 36px; background: rgba(46,160,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-person" style="color: #2ea0ff;"></i>
+                  </div>
+                  <h6 class="mb-0">פרטים אישיים</h6>
+                </div>
+                
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small text-muted">שם פרטי</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                      <input name="first_name" type="text" class="form-control" value="{{ user.first_name or '' }}" placeholder="ישראל">
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small text-muted">שם משפחה</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+                      <input name="last_name" type="text" class="form-control" value="{{ user.last_name or '' }}" placeholder="ישראלי">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Username -->
+                <div class="mt-3">
+                  <label class="form-label small text-muted">שם משתמש (לכניסה מהירה)</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-at"></i></span>
+                    <input name="username" type="text" class="form-control" value="{{ user.username or '' }}" placeholder="username" pattern="^[A-Za-z0-9]{4,20}$" minlength="4" maxlength="20" required>
+                  </div>
+                  <div class="form-text small">4-20 תווים: אותיות אנגליות וספרות בלבד</div>
+                </div>
+              </div>
+              
+              <!-- Divider -->
+              <hr style="border-color: rgba(255,255,255,0.08); margin: 0;">
+              
+              <!-- Password Section -->
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <div style="width: 36px; height: 36px; background: rgba(26,188,156,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-shield-lock" style="color: #1abc9c;"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">שינוי סיסמה</h6>
+                    <span class="small text-muted">השאר ריק אם לא רוצה לשנות</span>
+                  </div>
+                </div>
+                
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small text-muted">סיסמה חדשה</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                      <input name="password" type="password" class="form-control" id="password" minlength="8" maxlength="32" placeholder="סיסמה חזקה">
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small text-muted">אימות סיסמה</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                      <input name="confirm_password" type="password" class="form-control" id="confirm_password" minlength="8" maxlength="32" placeholder="הקלד שוב">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Password Requirements (shown when typing) -->
+                <div id="password-requirements" class="mt-3 p-2" style="display: none; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                  <div class="small text-muted mb-1">דרישות סיסמה:</div>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">8-32 תווים</span>
+                    <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אותיות אנגליות בלבד</span>
+                    <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אות גדולה (A-Z)</span>
+                    <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">ספרה (0-9)</span>
+                  </div>
+                  <div id="password-match" class="small mt-2" style="display: none;"></div>
+                </div>
+              </div>
+              
+              <!-- Divider -->
+              <hr style="border-color: rgba(255,255,255,0.08); margin: 0;">
+              
+              <!-- Email Verification Status -->
+              <div class="d-flex align-items-center gap-3 p-3" style="background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="width: 40px; height: 40px; background: {% if user.email_verified %}rgba(16,185,129,0.15){% else %}rgba(251,191,36,0.15){% endif %}; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-{% if user.email_verified %}envelope-check{% else %}envelope-exclamation{% endif %}" style="color: {% if user.email_verified %}#10b981{% else %}#fbbf24{% endif %}; font-size: 1.1rem;"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="small" style="color: var(--text);">
+                    <i class="bi bi-envelope me-1"></i>{{ user.email }}
+                  </div>
+                  <div class="small {% if user.email_verified %}text-success{% else %}text-warning{% endif %}">
+                    {% if user.email_verified %}
+                      <i class="bi bi-check-circle me-1"></i>אימייל מאומת
+                    {% else %}
+                      <i class="bi bi-exclamation-circle me-1"></i>אימייל לא מאומת
+                    {% endif %}
+                  </div>
+                </div>
+                {% if not user.email_verified %}
+                <form method="POST" action="{{ url_for('resend_verification') }}" class="d-inline">
+                  <input type="hidden" name="email" value="{{ user.email }}">
+                  <button type="submit" class="btn btn-sm" style="background: rgba(251,191,36,0.15); color: #fbbf24; border: none; border-radius: 8px;">
+                    שלח שוב
+                  </button>
+                </form>
+                {% endif %}
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="d-flex gap-3 pt-2">
+                <button type="submit" class="btn flex-grow-1 py-2" style="background: linear-gradient(90deg, #2ea0ff, #1abc9c); color: #fff; border: none; border-radius: 12px; font-weight: 600;">
+                  <i class="bi bi-check2-circle me-2"></i>שמור שינויים
+                </button>
+                <a href="{{ url_for('profile') }}" class="btn py-2 px-4" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
+                  ביטול
+                </a>
+              </div>
+              
+            </form>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Account Info -->
+      <div class="text-center">
+        <p class="small text-muted mb-2">
+          <i class="bi bi-calendar3 me-1"></i>
+          נרשמת: {{ user.agreed_at[:10] if user.agreed_at else 'לא ידוע' }}
+        </p>
+        <p class="small text-muted mb-0">
+          <i class="bi bi-shield-check me-1"></i>
+          הנתונים שלך מוגנים ומוצפנים
+        </p>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const password = document.getElementById('password');
+  const confirm = document.getElementById('confirm_password');
+  const requirements = document.getElementById('password-requirements');
+  const matchDiv = document.getElementById('password-match');
+  
+  const reqLength = document.getElementById('req-length');
+  const reqEnglish = document.getElementById('req-english');
+  const reqUpper = document.getElementById('req-upper');
+  const reqDigit = document.getElementById('req-digit');
+  
+  const validStyle = 'background: rgba(16,185,129,0.2); color: #34d399;';
+  const invalidStyle = 'background: rgba(255,255,255,0.05); color: var(--muted);';
+  
+  function validatePassword() {
+    const val = password.value;
+    
+    // Show/hide requirements
+    if (val.length > 0) {
+      requirements.style.display = 'block';
+    } else {
+      requirements.style.display = 'none';
+    }
+    
+    // Length check (8-32)
+    if (val.length >= 8 && val.length <= 32) {
+      reqLength.style.cssText = validStyle;
+    } else {
+      reqLength.style.cssText = invalidStyle;
+    }
+    
+    // English only
+    if (/^[A-Za-z0-9]*$/.test(val) && val.length > 0) {
+      reqEnglish.style.cssText = validStyle;
+    } else {
+      reqEnglish.style.cssText = invalidStyle;
+    }
+    
+    // Uppercase
+    if (/[A-Z]/.test(val)) {
+      reqUpper.style.cssText = validStyle;
+    } else {
+      reqUpper.style.cssText = invalidStyle;
+    }
+    
+    // Digit
+    if (/[0-9]/.test(val)) {
+      reqDigit.style.cssText = validStyle;
+    } else {
+      reqDigit.style.cssText = invalidStyle;
+    }
+    
+    checkMatch();
+  }
+  
+  function checkMatch() {
+    if (confirm.value.length > 0 && password.value.length > 0) {
+      matchDiv.style.display = 'block';
+      if (password.value === confirm.value) {
+        matchDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>הסיסמאות תואמות';
+        matchDiv.style.color = '#34d399';
+      } else {
+        matchDiv.innerHTML = '<i class="bi bi-x-circle me-1"></i>הסיסמאות לא תואמות';
+        matchDiv.style.color = '#f87171';
+      }
+    } else {
+      matchDiv.style.display = 'none';
+    }
+  }
+  
+  password.addEventListener('input', validatePassword);
+  confirm.addEventListener('input', checkMatch);
+});
+</script>
+{% endblock %}

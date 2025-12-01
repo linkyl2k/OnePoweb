@@ -1091,6 +1091,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Progress update function
   function updateProgress(percent, status, step) {
+    if (!progressBarFill || !progressPercent || !progressStatus) {
+      console.error('Progress elements not found!', {
+        progressBarFill: !!progressBarFill,
+        progressPercent: !!progressPercent,
+        progressStatus: !!progressStatus
+      });
+      return;
+    }
+    
+    console.log('Updating progress:', percent + '%', status, 'step', step);
+    
     progressBarFill.style.width = percent + '%';
     progressPercent.textContent = Math.round(percent) + '%';
     progressStatus.textContent = status;
@@ -1108,45 +1119,76 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Submit loading state with progress
   form.addEventListener('submit', function(e) {
+    console.log('Form submitted!');
+    
+    if (!progressContainer || !progressBarFill) {
+      console.error('Progress container not found!', {
+        progressContainer: !!progressContainer,
+        progressBarFill: !!progressBarFill
+      });
+      return; // Allow form to submit normally
+    }
+    
+    console.log('Showing progress bar...');
+    
+    // Show progress immediately
+    progressContainer.style.display = 'block';
+    progressBarFill.style.width = '0%';
+    progressPercent.textContent = '0%';
+    progressStatus.textContent = 'מתחיל...';
+    
+    // Hide button
     btn.classList.add('loading');
     btn.disabled = true;
     btn.style.display = 'none';
-    progressContainer.style.display = 'block';
+    
+    // Force reflow to ensure display change is applied
+    progressContainer.offsetHeight;
+    
+    // Initialize first step immediately
+    console.log('Initializing progress to 5%...');
+    updateProgress(5, 'מתחיל...', 1);
     
     // Scroll to progress bar
-    progressContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    requestAnimationFrame(() => {
+      progressContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
     
     // Simulate progress (since we can't track real server progress)
+    let currentPercent = 5;
+    
     const steps = [
-      { percent: 10, status: 'מעלה קובץ...', step: 1 },
-      { percent: 30, status: 'מעבד נתונים...', step: 2 },
-      { percent: 60, status: 'יוצר גרפים...', step: 3 },
-      { percent: 85, status: 'מנתח עם AI...', step: 4 },
-      { percent: 95, status: 'מסיים...', step: 5 }
+      { percent: 15, status: 'מעלה קובץ...', step: 1, delay: 300 },
+      { percent: 35, status: 'מעבד נתונים...', step: 2, delay: 1000 },
+      { percent: 60, status: 'יוצר גרפים...', step: 3, delay: 1800 },
+      { percent: 85, status: 'מנתח עם AI...', step: 4, delay: 2600 },
+      { percent: 95, status: 'מסיים...', step: 5, delay: 3400 }
     ];
     
-    let stepIndex = 0;
-    let currentPercent = 0;
-    
-    const progressInterval = setInterval(() => {
-      if (stepIndex < steps.length) {
-        const step = steps[stepIndex];
+    // Execute steps with delays
+    steps.forEach((step) => {
+      setTimeout(() => {
         currentPercent = step.percent;
         updateProgress(step.percent, step.status, step.step);
-        stepIndex++;
-      } else {
-        // Gradually increase to 99% while waiting for response
-        if (currentPercent < 99) {
-          currentPercent = Math.min(99, currentPercent + 0.5);
-          updateProgress(currentPercent, 'מסיים...', 5);
-        }
-      }
-    }, 800);
-    
-    // Clean up interval when page unloads (redirect happens)
-    window.addEventListener('beforeunload', () => {
-      clearInterval(progressInterval);
+      }, step.delay);
     });
+    
+    // Continue updating after all steps
+    setTimeout(() => {
+      const finalUpdateInterval = setInterval(() => {
+        if (currentPercent < 99) {
+          currentPercent = Math.min(99, currentPercent + 0.15);
+          updateProgress(currentPercent, 'מסיים...', 5);
+        } else {
+          clearInterval(finalUpdateInterval);
+        }
+      }, 400);
+      
+      // Clean up interval when page unloads (redirect happens)
+      window.addEventListener('beforeunload', () => {
+        clearInterval(finalUpdateInterval);
+      });
+    }, steps[steps.length - 1].delay);
   });
 });
 </script>

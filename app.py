@@ -3225,21 +3225,53 @@ def export_pdf():
       <title>דו״ח ניתוח מכירות</title>
       <style>
         {_font_face_block()}
+        @page {{
+          size: A4;
+          margin: 16mm;
+        }}
         html, body {{
           direction: rtl;
           text-align: right;
-          margin: 0; padding: 0;
+          margin: 0; 
+          padding: 0;
           background: #ffffff;
+          width: 100%;
         }}
         .page {{
-          width: 210mm; min-height: 297mm;
-          padding: 16mm;
+          width: 100%; 
+          min-height: 100%;
+          margin: 0;
+          padding: 0;
           box-sizing: border-box;
+          direction: rtl;
         }}
-        h1 {{ margin: 0 0 8mm 0; font-size: 22pt; }}
-        h2 {{ margin: 10mm 0 4mm 0; font-size: 14pt; }}
-        p  {{ margin: 2mm 0; font-size: 11pt; line-height: 1.6; white-space: pre-wrap; }}
-        .meta {{ color:#555; margin-top: -6mm; margin-bottom: 6mm; }}
+        h1 {{ 
+          margin: 0 0 8mm 0; 
+          font-size: 22pt; 
+          text-align: right;
+          direction: rtl;
+        }}
+        h2 {{ 
+          margin: 10mm 0 4mm 0; 
+          font-size: 14pt; 
+          text-align: right;
+          direction: rtl;
+        }}
+        p {{ 
+          margin: 2mm 0; 
+          font-size: 11pt; 
+          line-height: 1.6; 
+          white-space: pre-wrap; 
+          text-align: right;
+          direction: rtl;
+        }}
+        .meta {{ 
+          color:#555; 
+          margin-top: -6mm; 
+          margin-bottom: 6mm; 
+          text-align: right;
+          direction: rtl;
+        }}
         .plot {{ page-break-inside: avoid; margin: 8mm 0; }}
         .plot img {{ max-width: 100%; height: auto; display:block; margin: 3mm 0; }}
         .hr {{ border-top: 1px solid #ddd; margin: 6mm 0; }}
@@ -3252,6 +3284,8 @@ def export_pdf():
           padding: 10mm;
           margin: 8mm 0;
           box-shadow: 0 1mm 3mm rgba(0,0,0,0.07);
+          text-align: right;
+          direction: rtl;
         }}
         .roi-header {{
           font-size: 16pt;
@@ -3291,6 +3325,8 @@ def export_pdf():
           width: 100%;
           border-collapse: collapse;
           font-size: 10pt;
+          direction: rtl;
+          text-align: right;
         }}
         .roi-table th, .roi-table td {{
           border: 1px solid #ddd;

@@ -2663,50 +2663,10 @@ def index():
     except Exception:
         roi_data = {"text": "", "monthly_gain": 0.0, "roi_percent": 0.0, "components": {}}
 
-    # ---------- שמירה למבנה ה"ישן" גם את ה-ROI (חשוב!) ----------
-    LAST_EXPORT["generated_at"] = _dt.now()
-    LAST_EXPORT["plots"] = plots
-    LAST_EXPORT["summary"] = summary_txt
-    LAST_EXPORT["summary_ai"] = summary_ai_txt
-    LAST_EXPORT["roi"] = roi_data   # ← הוסף שורה זו
-
-
-
-    # נשמור גם במבנה הישן (למי שקורא ממנו), אבל מקור האמת יהיה בסשן:
-    LAST_EXPORT["generated_at"] = _dt.now()
-    LAST_EXPORT["plots"] = plots
-    LAST_EXPORT["summary"] = summary_txt
-    LAST_EXPORT["summary_ai"] = summary_ai_txt
-
-    # --- SNAPSHOT יחיד: בדיוק מה שמוצג באתר ---
-    snap = {
-        "generated_at": _dt.now().strftime("%Y-%m-%d %H:%M"),
-        "summary": summary_txt,
-        "summary_ai": summary_ai_txt,
-        "roi": roi_data,   # ← חדש
-        "plots": [
-            {
-                "filename": p.get("filename", ""),
-                "title": p.get("title", ""),
-                # זה הטקסט שמופיע באתר – ללא שינוי/נרמול:
-                "ai": p.get("ai", "")
-            }
-            for p in plots
-        ],
-    }
-    # --- Reduce session size (prevent >4KB cookie crash) ---
-    snap["summary_ai"] = snap.get("summary_ai", "")[:400]  # טקסט קצר
-    for p in snap["plots"]:
-        p["ai"] = (p.get("ai") or "")[:400]  # חותך טקסטים ארוכים
-        session.modified = True
+    # Данные будут сохранены ниже в LAST_EXPORT и session
 
     print(f"✅ נוצרו {len(plots)} גרפים, מפנים ל-/result")
-    # שומרים הכל ב-LAST_EXPORT בלבד ולא בקוקי
-    LAST_EXPORT["generated_at"] = _dt.now()
-    LAST_EXPORT["plots"] = plots
-    LAST_EXPORT["summary"] = summary_txt
-    LAST_EXPORT["summary_ai"] = summary_ai_txt
-    LAST_EXPORT["roi"] = roi_data
+    print(f"📊 Plots details: {[p.get('title', 'no title') for p in plots]}")
     
     # --- 📋 יצירת רשימת פעולות מומלצות ---
     try:
@@ -2714,9 +2674,9 @@ def index():
     except Exception as e:
         print(f"⚠️ Failed to generate action items: {e}")
         action_items = []
-    LAST_EXPORT["action_items"] = action_items
 
     # --- 🔐 שמירה אוטומטית של הדוח למשתמשי Pro ---
+    saved_report_id = None
     try:
         u = current_user()
         effective_plan = get_effective_plan(u) if u else "free"
@@ -2728,11 +2688,45 @@ def index():
                 period_type=period_type
             )
             print(f"💾 דוח נשמר בהצלחה (ID: {report_id}, סוג: {period_type})")
-            LAST_EXPORT["saved_report_id"] = report_id
+            saved_report_id = report_id
         else:
             print(f"ℹ️ דוח לא נשמר - תוכנית: {effective_plan}")
     except Exception as e:
         print(f"⚠️ שגיאה בשמירת דוח: {e}")
+
+    # שומרים הכל ב-LAST_EXPORT (גלובלי) וגם ב-session (למקרה של multi-worker)
+    export_data = {
+        "generated_at": _dt.now().isoformat(),
+        "plots": [
+            {
+                "filename": p.get("filename", ""),
+                "title": p.get("title", ""),
+                "note": p.get("note", ""),
+                "ai": (p.get("ai") or "")[:400]  # חותך טקסטים ארוכים
+            }
+            for p in plots
+        ],
+        "summary": summary_txt[:1000] if summary_txt else "",  # מוגבל ל-1000 תווים
+        "summary_ai": summary_ai_txt[:400] if summary_ai_txt else "",  # מוגבל ל-400 תווים
+        "roi": roi_data,
+        "action_items": action_items,
+        "saved_report_id": saved_report_id
+    }
+    
+    # שמירה ב-LAST_EXPORT (גלובלי - למקרה של single worker)
+    LAST_EXPORT["generated_at"] = _dt.now()
+    LAST_EXPORT["plots"] = plots
+    LAST_EXPORT["summary"] = summary_txt
+    LAST_EXPORT["summary_ai"] = summary_ai_txt
+    LAST_EXPORT["roi"] = roi_data
+    LAST_EXPORT["action_items"] = action_items
+    LAST_EXPORT["saved_report_id"] = saved_report_id
+    
+    # שמירה ב-session (למקרה של multi-worker на Render)
+    session["last_export"] = export_data
+    session.modified = True
+    
+    print(f"💾 Saved to LAST_EXPORT and session. Plots: {len(plots)}")
 
     return redirect(url_for("result"))
 
@@ -3096,15 +3090,38 @@ def export_pdf():
                                feature="הורדת PDF עם המלצות",
                                title="שדרוג נדרש"), 403
     
-    # תמיד משתמשים ב-LAST_EXPORT (לא בסשן)
-    snap = {
-        "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
-                         if LAST_EXPORT.get("generated_at") else ""),
-        "summary": LAST_EXPORT.get("summary", ""),
-        "summary_ai": LAST_EXPORT.get("summary_ai", ""),
-        "roi": LAST_EXPORT.get("roi", {}),
-        "plots": LAST_EXPORT.get("plots", []),
-    }
+    # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
+    session_data = session.get("last_export", {})
+    
+    if session_data:
+        # Данные из сессии
+        generated_at_str = session_data.get("generated_at", "")
+        if generated_at_str:
+            try:
+                from datetime import datetime
+                dt = datetime.fromisoformat(generated_at_str)
+                generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
+            except:
+                generated_at_str = ""
+        snap = {
+            "generated_at": generated_at_str,
+            "summary": session_data.get("summary", ""),
+            "summary_ai": session_data.get("summary_ai", ""),
+            "roi": session_data.get("roi", {}),
+            "plots": session_data.get("plots", []),
+        }
+        print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
+    else:
+        # Fallback на LAST_EXPORT
+        snap = {
+            "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
+                             if LAST_EXPORT.get("generated_at") else ""),
+            "summary": LAST_EXPORT.get("summary", ""),
+            "summary_ai": LAST_EXPORT.get("summary_ai", ""),
+            "roi": LAST_EXPORT.get("roi", {}),
+            "plots": LAST_EXPORT.get("plots", []),
+        }
+        print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
     
     print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}")
 
@@ -4124,15 +4141,30 @@ def roi_page():
 
 @app.route("/result")
 def result():
-    plots = LAST_EXPORT.get("plots", [])
-    summary = LAST_EXPORT.get("summary", "")
-    summary_ai = LAST_EXPORT.get("summary_ai", "")
-    roi = LAST_EXPORT.get("roi", {})
-    action_items = LAST_EXPORT.get("action_items", [])
+    # Пробуем получить данные из сессии (для multi-worker), если нет - из LAST_EXPORT
+    session_data = session.get("last_export", {})
+    
+    if session_data:
+        # Данные из сессии
+        plots = session_data.get("plots", [])
+        summary = session_data.get("summary", "")
+        summary_ai = session_data.get("summary_ai", "")
+        roi = session_data.get("roi", {})
+        action_items = session_data.get("action_items", [])
+        print(f"📄 Loaded from session: {len(plots)} plots")
+    else:
+        # Fallback на LAST_EXPORT (для single worker)
+        plots = LAST_EXPORT.get("plots", [])
+        summary = LAST_EXPORT.get("summary", "")
+        summary_ai = LAST_EXPORT.get("summary_ai", "")
+        roi = LAST_EXPORT.get("roi", {})
+        action_items = LAST_EXPORT.get("action_items", [])
+        print(f"📄 Loaded from LAST_EXPORT: {len(plots)} plots")
 
     messages = []
     if not plots:
         messages.append("אין גרפים להצגה. חזור לדף הבית והעלה דוח חדש.")
+        print(f"⚠️ No plots found! Session data: {bool(session_data)}, LAST_EXPORT plots: {len(LAST_EXPORT.get('plots', []))}")
 
     # קבלת תוכנית המשתמש
     u = current_user()

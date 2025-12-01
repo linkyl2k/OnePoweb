@@ -3134,11 +3134,12 @@ def export_pdf():
         return "file:///" + p.replace("\\", "/")
 
     def _img_url(fname):
-        """Returns absolute path for weasyprint"""
+        """Returns just filename for weasyprint (will use base_url)"""
         if not fname:
             return ""
         path = os.path.join(PLOTS_DIR, fname)
-        return path if os.path.exists(path) else ""
+        # Return just filename - WeasyPrint will resolve it using base_url
+        return fname if os.path.exists(path) else ""
 
     def _font_face_block():
         fonts_dir = os.path.join(STATIC_DIR, "fonts")
@@ -3340,13 +3341,18 @@ def export_pdf():
         
         # Verify images exist
         for plot in snap.get('plots', []):
-            img_path = _img_url(plot.get('filename', ''))
-            if img_path:
-                print(f"📄 Image: {img_path} exists={os.path.exists(img_path)}")
+            filename = plot.get('filename', '')
+            if filename:
+                img_path = os.path.join(PLOTS_DIR, filename)
+                exists = os.path.exists(img_path)
+                print(f"📄 Image: {filename} -> {img_path} exists={exists}")
         
-        # Create PDF from HTML (weasyprint handles images from absolute paths)
+        # Create PDF from HTML
+        # WeasyPrint will resolve relative image paths using base_url
         font_config = FontConfiguration()
-        pdf_bytes = HTML(string=html, base_url=PLOTS_DIR).write_pdf(font_config=font_config)
+        # Use absolute path as base_url so WeasyPrint can find images
+        base_url_abs = os.path.abspath(PLOTS_DIR)
+        pdf_bytes = HTML(string=html, base_url=base_url_abs).write_pdf(font_config=font_config)
         
         print(f"✅ PDF created, size: {len(pdf_bytes)} bytes")
         

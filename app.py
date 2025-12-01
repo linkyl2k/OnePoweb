@@ -2724,9 +2724,10 @@ def index():
     
     # שמירה ב-session (למקרה של multi-worker на Render)
     session["last_export"] = export_data
+    session.permanent = True  # Делаем сессию постоянной для надежности
     session.modified = True
     
-    print(f"💾 Saved to LAST_EXPORT and session. Plots: {len(plots)}")
+    print(f"💾 Saved to LAST_EXPORT ({len(plots)} plots) and session. Redirecting to /result")
 
     return redirect(url_for("result"))
 
@@ -4147,30 +4148,44 @@ def roi_page():
 
 @app.route("/result")
 def result():
-    # Пробуем получить данные из сессии (для multi-worker), если нет - из LAST_EXPORT
-    session_data = session.get("last_export", {})
+    # ВАЖНО: Сначала проверяем LAST_EXPORT (работает мгновенно), потом сессию
+    # Это решает проблему race condition при первом запросе после редиректа
     
-    if session_data:
-        # Данные из сессии
-        plots = session_data.get("plots", [])
-        summary = session_data.get("summary", "")
-        summary_ai = session_data.get("summary_ai", "")
-        roi = session_data.get("roi", {})
-        action_items = session_data.get("action_items", [])
-        print(f"📄 Loaded from session: {len(plots)} plots")
-    else:
-        # Fallback на LAST_EXPORT (для single worker)
-        plots = LAST_EXPORT.get("plots", [])
+    # Сначала пробуем LAST_EXPORT (глобальная переменная - работает мгновенно)
+    plots_from_export = LAST_EXPORT.get("plots", [])
+    
+    if plots_from_export:
+        # Данные есть в LAST_EXPORT - используем их (самый быстрый способ)
+        plots = plots_from_export
         summary = LAST_EXPORT.get("summary", "")
         summary_ai = LAST_EXPORT.get("summary_ai", "")
         roi = LAST_EXPORT.get("roi", {})
         action_items = LAST_EXPORT.get("action_items", [])
         print(f"📄 Loaded from LAST_EXPORT: {len(plots)} plots")
+    else:
+        # Fallback на сессию (для multi-worker на Render)
+        session_data = session.get("last_export", {})
+        if session_data:
+            plots = session_data.get("plots", [])
+            summary = session_data.get("summary", "")
+            summary_ai = session_data.get("summary_ai", "")
+            roi = session_data.get("roi", {})
+            action_items = session_data.get("action_items", [])
+            print(f"📄 Loaded from session: {len(plots)} plots")
+        else:
+            # Нет данных нигде
+            plots = []
+            summary = ""
+            summary_ai = ""
+            roi = {}
+            action_items = []
+            print(f"⚠️ No data in LAST_EXPORT or session!")
 
     messages = []
     if not plots:
         messages.append("אין גרפים להצגה. חזור לדף הבית והעלה דוח חדש.")
-        print(f"⚠️ No plots found! Session data: {bool(session_data)}, LAST_EXPORT plots: {len(LAST_EXPORT.get('plots', []))}")
+        session_data_check = session.get("last_export", {})
+        print(f"⚠️ No plots found! LAST_EXPORT plots: {len(LAST_EXPORT.get('plots', []))}, Session data: {bool(session_data_check)}")
 
     # קבלת תוכנית המשתמש
     u = current_user()

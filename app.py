@@ -862,6 +862,49 @@ def ai_explain(title: str, brief: dict) -> str:
                     compact[k] = v
 
         payload = json.dumps(compact, ensure_ascii=False, separators=(",", ":"))
+        
+        # הוספת הוראות ספציפיות לפי סוג הגרף
+        specific_instructions = ""
+        
+        # Top 10 הכנסות - הצע קומבו עם מוצר לא נמכר
+        if "הכנסות" in title or "Top 10" in title or "מוצרים" in title:
+            bottom_items_text = ""
+            if isinstance(compact, dict) and "bottom_items" in compact:
+                bottom_items = compact.get("bottom_items", {})
+                if bottom_items:
+                    items_list = list(bottom_items.keys())[:3]  # Top 3 פחות נמכרים
+                    bottom_items_text = f"\n• מוצרים פחות נמכרים (לשימוש בקומבו): {', '.join(items_list)}\n"
+            
+            specific_instructions = (
+                "\n⚠️ הוראה מיוחדת לגרף זה:\n"
+                "• אם יש מוצר מוביל (הכי מכניס), אל תציע רק לקדם אותו עוד יותר\n"
+                "• במקום זה, הצע ליצור קומבו/חבילה של המוצר המוביל עם מוצר שפחות נמכר (ראה bottom_items בנתונים)\n"
+                "• המטרה: להגדיל מכירות של המוצר החלש תוך ניצול הפופולריות של המוצר החזק\n"
+                f"{bottom_items_text}"
+                "• דוגמה: '[מוצר מוביל] הוא המוצר הכי מכניס שלך. שקול להציע חבילה: [מוצר מוביל] + [אחד מהמוצרים הפחות נמכרים] במחיר מיוחד'\n"
+            )
+        
+        # מכירות לפי יום/שעה - התמקד בימים/שעות חלשים
+        if "יום" in title or "שעה" in title or "שבוע" in title:
+            weak_info = ""
+            if isinstance(compact, dict):
+                if "weak_day" in compact:
+                    weak_day = compact.get("weak_day")
+                    weak_sum = compact.get("weak_day_sum", 0)
+                    weak_info = f"\n• היום החלש ביותר: {weak_day} (₪{weak_sum:.0f}) - זה הזמן למשוך לקוחות חדשים!\n"
+                elif "weak_hour" in compact:
+                    weak_hour = compact.get("weak_hour")
+                    weak_info = f"\n• השעה החלשה ביותר: {weak_hour} - זה הזמן למשוך לקוחות חדשים!\n"
+            
+            specific_instructions = (
+                "\n⚠️ הוראה מיוחדת לגרף זה:\n"
+                "• אל תציע למשוך לקוחות בימים/שעות החזקים ביותר (יש כבר ביקוש גבוה)\n"
+                "• במקום זה, התמקד בימים/שעות החלשים ביותר - אלה הזדמנות למשוך לקוחות חדשים\n"
+                "• המטרה: למלא את הזמנים הריקים ולהגיע ללקוחות חדשים שלא מגיעים בשעות העמוסות\n"
+                f"{weak_info}"
+                "• דוגמה: '[יום/שעה חלש] הוא החלש ביותר. שקול להפעיל מבצע מיוחד ב[יום/שעה חלש] כדי למשוך לקוחות חדשים שלא מגיעים ב[ימים/שעות] החזקים'\n"
+            )
+        
         prompt = (
             "אתה יועץ עסקי מומחה לחנויות קמעונאיות ומסעדות בישראל. "
             "תפקידך לעזור לבעל העסק להבין את הנתונים ולקבל החלטות חכמות.\n\n"
@@ -870,11 +913,8 @@ def ai_explain(title: str, brief: dict) -> str:
             "• התמקד בתובנה העיקרית אחת — מה הכי חשוב לדעת מהגרף הזה?\n"
             "• תן המלצה מעשית אחת שאפשר ליישם מחר בבוקר (לא תיאוריה!)\n"
             "• אורך: 2-3 משפטים בלבד\n"
-            "• אל תחזור על מספרים שכבר מופיעים בגרף — תן פרשנות\n\n"
-            "דוגמאות להמלצות טובות:\n"
-            "- 'שקול להוסיף עובד בין 12:00-14:00'\n"
-            "- 'נסה מבצע על המוצר הזה ביום שלישי'\n"
-            "- 'בדוק למה יום ראשון חלש — אולי לפתוח מאוחר יותר?'\n\n"
+            "• אל תחזור על מספרים שכבר מופיעים בגרף — תן פרשנות\n"
+            f"{specific_instructions}\n"
             f"כותרת הגרף: {title}\n"
             f"נתונים: {payload}"
         )
@@ -2098,10 +2138,14 @@ def index():
             fname = _save_fig(fig, "hourly.png")
 
             # --- AI ---
+            best_hour_row = hourly.loc[hourly[COL_SUM].idxmax()] if not hourly.empty else None
+            weak_hour_row = hourly.loc[hourly[COL_SUM].idxmin()] if not hourly.empty else None
             brief = {
                 "range": [hour_start, hour_end],
-                "best_hour": (int(hourly.loc[hourly[COL_SUM].idxmax()][HOUR_COL]) if not hourly.empty else None),
+                "best_hour": (int(best_hour_row[HOUR_COL]) if best_hour_row is not None else None),
                 "best_hour_sum": float(hourly[COL_SUM].max()) if not hourly.empty else 0.0,
+                "weak_hour": (int(weak_hour_row[HOUR_COL]) if weak_hour_row is not None else None),
+                "weak_hour_sum": float(hourly[COL_SUM].min()) if not hourly.empty else 0.0,
                 "avg_hour": float(hourly[COL_SUM].mean()) if not hourly.empty else 0.0,
             }
             ai = ai_explain("מכירות לפי שעה", brief)
@@ -2155,9 +2199,12 @@ def index():
 
                 # --- AI ---
                 top_row = by_wd.sort_values(COL_SUM, ascending=False).iloc[0] if not by_wd.empty else None
+                weak_row = by_wd.sort_values(COL_SUM, ascending=True).iloc[0] if not by_wd.empty else None
                 brief = {
                     "best_day": (str(top_row["יום בשבוע"]) if top_row is not None else None),
                     "best_day_sum": float(top_row[COL_SUM]) if top_row is not None else 0.0,
+                    "weak_day": (str(weak_row["יום בשבוע"]) if weak_row is not None else None),
+                    "weak_day_sum": float(weak_row[COL_SUM]) if weak_row is not None else 0.0,
                     "avg_day": float(by_wd[COL_SUM].mean()) if not by_wd.empty else 0.0,
                     "dist": {str(k): float(v) for k, v in zip(by_wd["יום בשבוע"], by_wd[COL_SUM])}
                 }
@@ -2257,9 +2304,15 @@ def index():
                     fname = _save_fig(fig, "top_rev.png")
 
                     # --- AI ---
+                    # מציאת מוצרים פחות נמכרים (למטרת קומבו)
+                    all_items = rev_df.groupby(COL_ITEM)[COL_SUM].sum().sort_values(ascending=True)
+                    bottom_items = all_items.head(5).to_dict() if len(all_items) > 5 else all_items.to_dict()
+                    
                     brief = {
                         "top_item": str(revenue.iloc[0][COL_ITEM]),
                         "top_value": float(revenue.iloc[0][COL_SUM]),
+                        "bottom_items": {str(k): float(v) for k, v in bottom_items.items()},
+                        "all_items": {str(k): float(v) for k, v in all_items.items()}
                     }
                     ai = ai_explain("מוצרים – הכנסות", brief)
 
@@ -2882,9 +2935,13 @@ def demo_analysis():
             plt.xlabel("שעה"); plt.ylabel('סה"כ (₪)')
             fname = _save_fig(fig, "hourly.png")
 
+            best_hour_row = hourly.loc[hourly[COL_SUM].idxmax()] if not hourly.empty else None
+            weak_hour_row = hourly.loc[hourly[COL_SUM].idxmin()] if not hourly.empty else None
             brief = {
-                "best_hour": int(hourly.loc[hourly[COL_SUM].idxmax()]["שעה עגולה"]) if not hourly.empty else None,
+                "best_hour": int(best_hour_row["שעה עגולה"]) if best_hour_row is not None else None,
                 "best_hour_sum": float(hourly[COL_SUM].max()) if not hourly.empty else 0.0,
+                "weak_hour": int(weak_hour_row["שעה עגולה"]) if weak_hour_row is not None else None,
+                "weak_hour_sum": float(hourly[COL_SUM].min()) if not hourly.empty else 0.0,
                 "avg_hour": float(hourly[COL_SUM].mean()) if not hourly.empty else 0.0,
                 "range": [hour_start, hour_end],
             }
@@ -2905,9 +2962,12 @@ def demo_analysis():
             fname = _save_fig(fig, "by_weekday.png")
 
             top = by_wd.sort_values(COL_SUM, ascending=False).iloc[0] if not by_wd.empty else None
+            weak = by_wd.sort_values(COL_SUM, ascending=True).iloc[0] if not by_wd.empty else None
             brief = {
                 "best_day": (top["יום בשבוע"] if top is not None else None),
                 "best_day_sum": float(top[COL_SUM]) if top is not None else 0.0,
+                "weak_day": (weak["יום בשבוע"] if weak is not None else None),
+                "weak_day_sum": float(weak[COL_SUM]) if weak is not None else 0.0,
                 "avg_day": float(by_wd[COL_SUM].mean()) if not by_wd.empty else 0.0,
             }
             ai = ai_explain("מכירות לפי יום בשבוע", brief)
@@ -2964,9 +3024,16 @@ def demo_analysis():
             plt.title("Top 10 — הכנסות לפי מוצר")
             plt.xticks(rotation=40, ha="right"); plt.ylabel('סה"כ (₪)')
             fname2 = _save_fig(fig, "top_rev.png")
+            
+            # מציאת מוצרים פחות נמכרים (למטרת קומבו)
+            all_items = df.groupby(COL_ITEM)[COL_SUM].sum().sort_values(ascending=True)
+            bottom_items = all_items.head(5).to_dict() if len(all_items) > 5 else all_items.to_dict()
+            
             brief2 = {
                 "top_item": (None if revenue.empty else str(revenue.iloc[0][COL_ITEM])),
                 "top_value": (0.0 if revenue.empty else float(revenue.iloc[0][COL_SUM])),
+                "bottom_items": {str(k): float(v) for k, v in bottom_items.items()},
+                "all_items": {str(k): float(v) for k, v in all_items.items()}
             }
             ai2 = ai_explain("מוצרים – הכנסות", brief2)
             plots.append({"filename": fname2, "title": "Top 10 הכנסות", "note": "המוצרים שמכניסים הכי הרבה כסף", "ai": ai2})

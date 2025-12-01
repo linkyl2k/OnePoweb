@@ -3077,10 +3077,10 @@ def demo_analysis():
 @app.route("/export/pdf")
 def export_pdf():
     """
-    יצוא PDF בעזרת דפדפן headless (Chrome/Edge) עם RTL תקין.
+    יצוא PDF באמצעות WeasyPrint (ללא דפדפן) עם RTL תקין.
     כולל בלוק ROI מעוצב בדף הראשון + עמוד ROI מסכם (אם קיים ROI).
     """
-    import os, io, tempfile, shutil, subprocess, textwrap
+    import os, io, textwrap
     from datetime import datetime as _dt
 
     # ---------- 1) שליפת snapshot ----------
@@ -3117,19 +3117,22 @@ def export_pdf():
         return "file:///" + p.replace("\\", "/")
 
     def _img_url(fname):
+        """Returns absolute path for weasyprint"""
         if not fname:
             return ""
         path = os.path.join(PLOTS_DIR, fname)
-        return _file_url(path) if os.path.exists(path) else ""
+        return path if os.path.exists(path) else ""
 
     def _font_face_block():
         fonts_dir = os.path.join(STATIC_DIR, "fonts")
         noto = os.path.join(fonts_dir, "NotoSansHebrew-Regular.ttf")
         if os.path.exists(noto):
+            # Use absolute path for weasyprint
+            noto_path = os.path.abspath(noto).replace("\\", "/")
             return textwrap.dedent(f"""
             @font-face {{
               font-family: 'NotoSansHebrew';
-              src: url('{_file_url(noto)}') format('truetype');
+              src: url('file://{noto_path}') format('truetype');
               font-weight: normal;
               font-style: normal;
             }}
@@ -3137,20 +3140,7 @@ def export_pdf():
             """)
         return "body { font-family: Arial, 'Segoe UI', sans-serif; }"
 
-    def _find_browser():
-        for p in [
-            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-            r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
-            r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-        ]:
-            if os.path.exists(p):
-                return p
-        return None
-
-    browser = _find_browser()
-    if not browser:
-        return "לא נמצא Chrome/Edge במחשב. התקן Chrome/Edge ואז נסה שוב.", 500
+    # No browser needed - using weasyprint
 
     # ---------- 3) ROI – הכנה בטוחה למשתנים ----------
     roi          = snap.get("roi") or {}
@@ -3311,7 +3301,7 @@ def export_pdf():
               (
                 f"<div class='plot'>"
                 f"{('<h2>' + _esc(p.get('title','')) + '</h2>') if p.get('title') else ''}"
-                f"{('<img src='+repr(_img_url(p.get('filename'))) + ' alt=\"plot\"/>') if _img_url(p.get('filename')) else ''}"
+                f"{('<img src=\"' + _img_url(p.get('filename')) + '\" alt=\"plot\"/>') if _img_url(p.get('filename')) else ''}"
                 f"{('<p>' + _esc(p.get('ai','')) + '</p>') if p.get('ai') else ''}"
                 f"</div>"
               )
@@ -3323,44 +3313,39 @@ def export_pdf():
     </html>
     """)
 
-    # ---------- 5) הדפסה באמצעות הדפדפן ----------
-    tmpdir = tempfile.mkdtemp(prefix="pdf_export_")
+    # ---------- 5) יצירת PDF באמצעות weasyprint (ללא דפדפן) ----------
     try:
-        html_path = os.path.join(tmpdir, "report.html")
-        pdf_path  = os.path.join(tmpdir, "report.pdf")
-        with open(html_path, "w", encoding="utf-8") as f:
-            f.write(html)
-
-            cmd = [
-            browser,
-            "--headless=new",
-            "--disable-gpu",
-            "--no-sandbox",
-            "--allow-file-access-from-files",
-            "--disable-web-security",
-            "--allow-file-access",
-            f"--print-to-pdf={pdf_path}",
-            html_path,
-        ]
-
-        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
-            return "נכשלה הפקת ה-PDF באמצעות הדפדפן.", 500
-
-        with open(pdf_path, "rb") as f:
-            data = io.BytesIO(f.read())
-
+        from weasyprint import HTML, CSS
+        from weasyprint.text.fonts import FontConfiguration
+        
+        print(f"📄 Creating PDF with weasyprint, {len(snap.get('plots', []))} plots")
+        print(f"📄 PLOTS_DIR: {PLOTS_DIR}")
+        
+        # Verify images exist
+        for plot in snap.get('plots', []):
+            img_path = _img_url(plot.get('filename', ''))
+            if img_path:
+                print(f"📄 Image: {img_path} exists={os.path.exists(img_path)}")
+        
+        # Create PDF from HTML (weasyprint handles images from absolute paths)
+        font_config = FontConfiguration()
+        pdf_bytes = HTML(string=html, base_url=PLOTS_DIR).write_pdf(font_config=font_config)
+        
+        print(f"✅ PDF created, size: {len(pdf_bytes)} bytes")
+        
+        data = io.BytesIO(pdf_bytes)
         fname = f"report_{_dt.now().strftime('%Y%m%d_%H%M')}.pdf"
         data.seek(0)
         return send_file(data, as_attachment=True, download_name=fname, mimetype="application/pdf")
-    except subprocess.CalledProcessError as e:
-        return f"שגיאה בהרצת הדפדפן להדפסת PDF: {e}", 500
-    finally:
-        try:
-            shutil.rmtree(tmpdir, ignore_errors=True)
-        except Exception:
-            pass
+        
+    except ImportError as e:
+        print(f"❌ WeasyPrint import error: {e}")
+        return "ספריית WeasyPrint לא מותקנת. אנא עדכן את requirements.txt.", 500
+    except Exception as e:
+        print(f"⚠️ PDF Export Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return f"שגיאה ביצירת PDF: {str(e)}", 500
 
 
 

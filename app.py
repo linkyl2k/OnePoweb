@@ -4175,8 +4175,6 @@ def demo_analysis():
             plt.bar(revenue[COL_ITEM], revenue[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            # Переводим заголовки и подписи осей
-            if current_lang == "he":
                 plt.title("Top 10 — הכנסות לפי מוצר")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":

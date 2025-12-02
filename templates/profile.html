@@ -27,31 +27,31 @@
         <div class="text-center">
           {% if is_trial_active(user) %}
             <div class="plan-badge" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); padding: 12px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(245,158,11,0.3); position: relative;">
-              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(0,0,0,0.6);">תקופת ניסיון</span>
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(0,0,0,0.6);">{% if current_lang == 'he' %}תקופת ניסיון{% elif current_lang == 'en' %}Trial Period{% else %}Пробный период{% endif %}</span>
               <div style="font-size: 1.25rem; font-weight: bold; color: #000;">PRO</div>
-              <div style="font-size: 0.7rem; color: rgba(0,0,0,0.7);">עד {{ user.trial_until }}</div>
+              <div style="font-size: 0.7rem; color: rgba(0,0,0,0.7);">{% if current_lang == 'he' %}עד{% elif current_lang == 'en' %}Until{% else %}До{% endif %} {{ user.trial_until }}</div>
             </div>
           {% elif user.plan == 'pro' %}
             <div class="plan-badge" style="background: linear-gradient(135deg, #10b981, #34d399); padding: 12px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(16,185,129,0.3);">
-              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8);">תוכנית</span>
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8);">{{ t('current_plan') }}</span>
               <div style="font-size: 1.25rem; font-weight: bold; color: #fff;">PRO</div>
             </div>
           {% elif user.plan == 'basic' %}
             <div class="plan-badge" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); padding: 12px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(46,160,255,0.3);">
-              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8);">תוכנית</span>
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8);">{{ t('current_plan') }}</span>
               <div style="font-size: 1.25rem; font-weight: bold; color: #fff;">BASIC</div>
             </div>
           {% else %}
             <div class="plan-badge" style="background: rgba(255,255,255,0.08); padding: 12px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);">
-              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);">תוכנית</span>
-              <div style="font-size: 1.25rem; font-weight: bold; color: var(--text);">חינמית</div>
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);">{{ t('current_plan') }}</span>
+              <div style="font-size: 1.25rem; font-weight: bold; color: var(--text);">{{ t('plan_free') }}</div>
             </div>
           {% endif %}
         </div>
         
         <!-- Edit Button -->
         <a class="btn btn-outline-secondary" href="{{ url_for('profile_edit') }}" style="border-radius: 10px;">
-          <i class="bi bi-pencil me-1"></i> ערוך
+          <i class="bi bi-pencil me-1"></i> {{ t('edit') }}
         </a>
       </div>
     </div>
@@ -67,7 +67,7 @@
             <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(46,160,255,0.2), rgba(52,195,255,0.15)); display: flex; align-items: center; justify-content: center;">
               <i class="bi bi-credit-card" style="font-size: 1.25rem; color: #2ea0ff;"></i>
             </div>
-            <h5 class="mb-0">ניהול מנוי</h5>
+            <h5 class="mb-0">{% if current_lang == 'he' %}ניהול מנוי{% elif current_lang == 'en' %}Subscription Management{% else %}Управление подпиской{% endif %}</h5>
           </div>
           
           <!-- Current Status -->

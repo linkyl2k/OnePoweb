@@ -158,6 +158,396 @@ _openai_client = OpenAI(api_key=OPENAI_KEY) if OPENAI_KEY else None
 
 app = Flask(__name__)  # <<< כאן Flask נוצר
 
+# =============================================================================
+# 🌍 Система переводов (i18n)
+# =============================================================================
+
+# Словари переводов
+TRANSLATIONS = {
+    "he": {  # Иврит (по умолчанию)
+        # Навигация
+        "nav_home": "דף הבית",
+        "nav_plans": "תוכניות ומחירים",
+        "nav_about": "למה OnePoweb",
+        "nav_contact": "צור קשר",
+        "nav_login": "התחברות",
+        "nav_signup": "הרשמה",
+        "nav_profile": "הפרופיל שלי",
+        "nav_dashboard": "לוח בקרה",
+        "nav_logout": "התנתקות",
+        
+        # Главная страница
+        "hero_new": "חדש",
+        "hero_title": "נתח את הנתונים שלך",
+        "hero_title_gradient": "בלחיצה אחת",
+        "hero_subtitle": "העלה דוח קופה ותקבל גרפים מקצועיים, תובנות AI והשוואת תקופות",
+        "upload_file": "העלאת קובץ",
+        "drag_drop": "גרור קובץ או לחץ לבחירה",
+        "select_file": "בחר קובץ",
+        "analyze": "נתח דוח",
+        
+        # Планы
+        "plan_free": "חינם",
+        "plan_basic": "Basic",
+        "plan_pro": "Pro",
+        "upgrade": "שדרג",
+        "current_plan": "התוכנית הנוכחית",
+        
+        # Общие
+        "loading": "טוען...",
+        "error": "שגיאה",
+        "success": "הצלחה",
+        "save": "שמור",
+        "cancel": "ביטול",
+        "delete": "מחק",
+        "edit": "ערוך",
+        "close": "סגור",
+        "back": "חזור",
+        "next": "הבא",
+        "previous": "הקודם",
+        "submit": "שלח",
+        "download": "הורד",
+        "upload": "העלה",
+        
+        # Форма загрузки
+        "select_graphs": "בחירת גרפים",
+        "select_graphs_desc": "סמן את הגרפים שברצונך לייצר",
+        "time_trends": "זמנים ומגמות",
+        "sales_by_hour": "מכירות לפי שעה",
+        "sales_by_weekday": "מכירות לפי יום בשבוע",
+        "heatmap": "מפת חום (שעה×יום)",
+        "daily_sales": "מכירות יומיות",
+        "products": "מכירות ומוצרים",
+        "top_quantity": "Top 10 כמות",
+        "top_revenue": "Top 10 הכנסות",
+        "payment_methods": "אמצעי תשלום",
+        "advanced": "מתקדם",
+        "avg_ticket": "ממוצע קנייה לפי שעה",
+        "weekend_compare": "סופ\"ש מול ימי חול",
+        "period_type": "סוג תקופה",
+        "month": "חודש",
+        "week": "שבוע",
+        "day": "יום",
+        "custom": "מותאם אישית",
+        "period_name": "שם תקופה (אופציונלי)",
+        "hour_range": "טווח שעות",
+        "to": "עד",
+        "analyze_button": "נתח דוח",
+        "popular": "פופולרי",
+        "new": "חדש",
+        
+        # Авторизация
+        "login_title": "התחברות",
+        "login_email": "אימייל או שם משתמש",
+        "login_password": "סיסמה",
+        "login_button": "התחבר",
+        "login_forgot": "שכחת סיסמה?",
+        "login_no_account": "אין לך חשבון?",
+        "signup_title": "הרשמה",
+        "signup_email": "אימייל",
+        "signup_username": "שם משתמש",
+        "signup_password": "סיסמה",
+        "signup_confirm": "אימות סיסמה",
+        "signup_terms": "אני מסכים לתנאי השימוש",
+        "signup_button": "הירשם",
+        "signup_have_account": "יש לך כבר חשבון?",
+        
+        # Профиль
+        "profile_title": "הפרופיל שלי",
+        "profile_email": "אימייל",
+        "profile_username": "שם משתמש",
+        "profile_plan": "תוכנית",
+        "profile_edit": "ערוך פרופיל",
+        "profile_change_password": "שנה סיסמה",
+        
+        # Flash сообщения
+        "msg_login_required": "יש להתחבר קודם",
+        "msg_login_success": "התחברת בהצלחה!",
+        "msg_login_failed": "אימייל/סיסמה שגויים",
+        "msg_signup_success": "נרשמת בהצלחה! בדוק את האימייל שלך לאימות",
+        "msg_signup_failed": "שגיאה בהרשמה",
+        "msg_logout": "התנתקת בהצלחה",
+        "msg_file_uploaded": "קובץ הועלה בהצלחה",
+        "msg_file_error": "שגיאה בהעלאת קובץ",
+        "msg_trial_started": "תקופת ניסיון הופעלה! 7 ימים חינם",
+        "msg_trial_used": "כבר ניצלת את תקופת הניסיון",
+        "msg_subscription_active": "המנוי הופעל בהצלחה!",
+        "msg_subscription_cancelled": "המנוי בוטל",
+        
+        # Ошибки
+        "error_404": "דף לא נמצא",
+        "error_403": "אין הרשאה",
+        "error_500": "שגיאת שרת",
+        "error_generic": "משהו השתבש",
+    },
+    "en": {  # English
+        # Navigation
+        "nav_home": "Home",
+        "nav_plans": "Plans & Pricing",
+        "nav_about": "Why OnePoweb",
+        "nav_contact": "Contact",
+        "nav_login": "Login",
+        "nav_signup": "Sign Up",
+        "nav_profile": "My Profile",
+        "nav_dashboard": "Dashboard",
+        "nav_logout": "Logout",
+        
+        # Home page
+        "hero_new": "New",
+        "hero_title": "Analyze Your Data",
+        "hero_title_gradient": "With One Click",
+        "hero_subtitle": "Upload a POS report and get professional graphs, AI insights, and period comparisons",
+        "upload_file": "Upload File",
+        "drag_drop": "Drag file or click to select",
+        "select_file": "Select File",
+        "analyze": "Analyze Report",
+        
+        # Plans
+        "plan_free": "Free",
+        "plan_basic": "Basic",
+        "plan_pro": "Pro",
+        "upgrade": "Upgrade",
+        "current_plan": "Current Plan",
+        
+        # General
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "close": "Close",
+        
+        # Upload form
+        "select_graphs": "Select Graphs",
+        "select_graphs_desc": "Mark the graphs you want to generate",
+        "time_trends": "Time & Trends",
+        "sales_by_hour": "Sales by Hour",
+        "sales_by_weekday": "Sales by Day of Week",
+        "heatmap": "Heat Map (Hour×Day)",
+        "daily_sales": "Daily Sales",
+        "products": "Products",
+        "top_quantity": "Top 10 Quantity",
+        "top_revenue": "Top 10 Revenue",
+        "payment_methods": "Payment Methods",
+        "advanced": "Advanced",
+        "avg_ticket": "Average Ticket",
+        "weekend_compare": "Weekend vs Weekdays",
+        "period_type": "Period Type",
+        "month": "Month",
+        "week": "Week",
+        "day": "Day",
+        "custom": "Custom",
+        "period_name": "Period Name (optional)",
+        "hour_range": "Hour Range",
+        "to": "to",
+        "analyze_button": "Analyze Report",
+        "popular": "Popular",
+        "new": "New",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "submit": "Submit",
+        "download": "Download",
+        "upload": "Upload",
+        
+        # Authentication
+        "login_title": "Login",
+        "login_email": "Email or Username",
+        "login_password": "Password",
+        "login_button": "Login",
+        "login_forgot": "Forgot Password?",
+        "login_no_account": "Don't have an account?",
+        "signup_title": "Sign Up",
+        "signup_email": "Email",
+        "signup_username": "Username",
+        "signup_password": "Password",
+        "signup_confirm": "Confirm Password",
+        "signup_terms": "I agree to the Terms of Service",
+        "signup_button": "Sign Up",
+        "signup_have_account": "Already have an account?",
+        
+        # Profile
+        "profile_title": "My Profile",
+        "profile_email": "Email",
+        "profile_username": "Username",
+        "profile_plan": "Plan",
+        "profile_edit": "Edit Profile",
+        "profile_change_password": "Change Password",
+        
+        # Flash messages
+        "msg_login_required": "Please login first",
+        "msg_login_success": "Logged in successfully!",
+        "msg_login_failed": "Invalid email/password",
+        "msg_signup_success": "Signed up successfully! Check your email for verification",
+        "msg_signup_failed": "Signup error",
+        "msg_logout": "Logged out successfully",
+        "msg_file_uploaded": "File uploaded successfully",
+        "msg_file_error": "File upload error",
+        "msg_trial_started": "Trial period activated! 7 days free",
+        "msg_trial_used": "Trial period already used",
+        "msg_subscription_active": "Subscription activated successfully!",
+        "msg_subscription_cancelled": "Subscription cancelled",
+        
+        # Errors
+        "error_404": "Page Not Found",
+        "error_403": "Forbidden",
+        "error_500": "Server Error",
+        "error_generic": "Something went wrong",
+    },
+    "ru": {  # Русский
+        # Навигация
+        "nav_home": "Главная",
+        "nav_plans": "Тарифы",
+        "nav_about": "О OnePoweb",
+        "nav_contact": "Контакты",
+        "nav_login": "Вход",
+        "nav_signup": "Регистрация",
+        "nav_profile": "Мой профиль",
+        "nav_dashboard": "Панель управления",
+        "nav_logout": "Выход",
+        
+        # Главная страница
+        "hero_new": "Новое",
+        "hero_title": "Анализируйте свои данные",
+        "hero_title_gradient": "В один клик",
+        "hero_subtitle": "Загрузите отчет кассы и получите профессиональные графики, AI-инсайты и сравнение периодов",
+        "upload_file": "Загрузить файл",
+        "drag_drop": "Перетащите файл или нажмите для выбора",
+        "select_file": "Выбрать файл",
+        "analyze": "Анализировать отчет",
+        
+        # Планы
+        "plan_free": "Бесплатно",
+        "plan_basic": "Basic",
+        "plan_pro": "Pro",
+        "upgrade": "Обновить",
+        "current_plan": "Текущий план",
+        
+        # Общие
+        "loading": "Загрузка...",
+        "error": "Ошибка",
+        "success": "Успешно",
+        "save": "Сохранить",
+        "cancel": "Отмена",
+        "delete": "Удалить",
+        "edit": "Редактировать",
+        "close": "Закрыть",
+        
+        # Форма загрузки
+        "select_graphs": "Выбор графиков",
+        "select_graphs_desc": "Отметьте графики, которые хотите создать",
+        "time_trends": "Время и тренды",
+        "sales_by_hour": "Продажи по часам",
+        "sales_by_weekday": "Продажи по дням недели",
+        "heatmap": "Тепловая карта (Час×День)",
+        "daily_sales": "Ежедневные продажи",
+        "products": "Продукты",
+        "top_quantity": "Топ 10 по количеству",
+        "top_revenue": "Топ 10 по выручке",
+        "payment_methods": "Способы оплаты",
+        "advanced": "Дополнительно",
+        "avg_ticket": "Средний чек",
+        "weekend_compare": "Выходные vs Будни",
+        "period_type": "Тип периода",
+        "month": "Месяц",
+        "week": "Неделя",
+        "day": "День",
+        "custom": "Произвольный",
+        "period_name": "Название периода (необязательно)",
+        "hour_range": "Диапазон часов",
+        "to": "до",
+        "analyze_button": "Анализировать отчет",
+        "popular": "Популярно",
+        "new": "Новое",
+        "back": "Назад",
+        "next": "Далее",
+        "previous": "Назад",
+        "submit": "Отправить",
+        "download": "Скачать",
+        "upload": "Загрузить",
+        
+        # Авторизация
+        "login_title": "Вход",
+        "login_email": "Email или имя пользователя",
+        "login_password": "Пароль",
+        "login_button": "Войти",
+        "login_forgot": "Забыли пароль?",
+        "login_no_account": "Нет аккаунта?",
+        "signup_title": "Регистрация",
+        "signup_email": "Email",
+        "signup_username": "Имя пользователя",
+        "signup_password": "Пароль",
+        "signup_confirm": "Подтвердите пароль",
+        "signup_terms": "Я согласен с условиями использования",
+        "signup_button": "Зарегистрироваться",
+        "signup_have_account": "Уже есть аккаунт?",
+        
+        # Профиль
+        "profile_title": "Мой профиль",
+        "profile_email": "Email",
+        "profile_username": "Имя пользователя",
+        "profile_plan": "План",
+        "profile_edit": "Редактировать профиль",
+        "profile_change_password": "Изменить пароль",
+        
+        # Flash сообщения
+        "msg_login_required": "Сначала войдите в систему",
+        "msg_login_success": "Вход выполнен успешно!",
+        "msg_login_failed": "Неверный email/пароль",
+        "msg_signup_success": "Регистрация успешна! Проверьте email для подтверждения",
+        "msg_signup_failed": "Ошибка регистрации",
+        "msg_logout": "Выход выполнен успешно",
+        "msg_file_uploaded": "Файл загружен успешно",
+        "msg_file_error": "Ошибка загрузки файла",
+        "msg_trial_started": "Пробный период активирован! 7 дней бесплатно",
+        "msg_trial_used": "Пробный период уже использован",
+        "msg_subscription_active": "Подписка активирована успешно!",
+        "msg_subscription_cancelled": "Подписка отменена",
+        
+        # Ошибки
+        "error_404": "Страница не найдена",
+        "error_403": "Доступ запрещен",
+        "error_500": "Ошибка сервера",
+        "error_generic": "Что-то пошло не так",
+    }
+}
+
+def get_language():
+    """Получить текущий язык из сессии, по умолчанию 'he'"""
+    from flask import session
+    return session.get("language", "he")
+
+def t(key, lang=None):
+    """Перевести ключ на указанный язык или текущий язык из сессии"""
+    if lang is None:
+        lang = get_language()
+    
+    translations = TRANSLATIONS.get(lang, TRANSLATIONS["he"])
+    return translations.get(key, key)  # Возвращаем ключ, если перевод не найден
+
+# Context processor для шаблонов
+@app.context_processor
+def inject_translations():
+    """Добавляет функцию t() и текущий язык во все шаблоны"""
+    return {
+        "t": t,
+        "current_lang": get_language(),
+        "languages": {
+            "he": "עברית",
+            "en": "English", 
+            "ru": "Русский"
+        }
+    }
+
+# Функция для перевода flash сообщений
+def flash_t(key, category="message"):
+    """Flash сообщение с автоматическим переводом"""
+    from flask import flash
+    message = t(key)
+    flash(message, category)
+
 # === Production vs Local paths ===
 # Render uses /data for persistent storage
 BASE_DIR = os.path.dirname(__file__)
@@ -1997,7 +2387,7 @@ def login_required(fn):
     @wraps(fn)
     def wrap(*args, **kwargs):
         if not current_user():
-            flash("יש להתחבר קודם", "warning")
+            flash_t("msg_login_required", "warning")
             return redirect(url_for("login", next=request.path))
         return fn(*args, **kwargs)
     return wrap
@@ -2033,6 +2423,17 @@ def cancel_subscription():
 
     return redirect(url_for("index"))
 
+
+@app.route("/set-language/<lang>")
+def set_language(lang):
+    """Переключение языка"""
+    from flask import session, redirect, url_for, request
+    if lang in ["he", "en", "ru"]:
+        session["language"] = lang
+        session.permanent = True
+        session.modified = True
+    # Редирект на предыдущую страницу или главную
+    return redirect(request.referrer or url_for("index"))
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -3688,7 +4089,7 @@ def subscribe_success():
     
     base_price = PLAN_PRICES.get(plan, PLAN_PRICES["basic"])["ils"]
     
-    flash("המנוי הופעל בהצלחה!", "success")
+    flash_t("msg_subscription_active", "success")
     msg = f"נרשמת לחבילת {plan.upper()} במחיר ₪{base_price}/חודש"
     
     return render_template("subscribe_thanks.html", name="תודה שהצטרפת!", message=msg)
@@ -3700,17 +4101,17 @@ def start_trial():
     """מפעיל תקופת ניסיון חינמית של 7 ימים"""
     u = current_user()
     if not u:
-        flash("יש להתחבר תחילה", "warning")
+        flash_t("msg_login_required", "warning")
         return redirect(url_for("login"))
     
     # בדיקה אם כבר ניצל תקופת ניסיון
     if u["trial_used"]:
-        flash("כבר ניצלת את תקופת הניסיון החינמית.", "warning")
+        flash_t("msg_trial_used", "warning")
         return redirect(url_for("profile"))
     
     # בדיקה אם כבר יש מנוי פעיל
     if u["plan"] in ("basic", "pro"):
-        flash("כבר יש לך מנוי פעיל!", "info")
+        flash_t("msg_subscription_active", "info")
         return redirect(url_for("profile"))
     
     # הפעלת תקופת ניסיון
@@ -3724,7 +4125,7 @@ def start_trial():
     """, (trial_end, u["id"]))
     db.commit()
     
-    flash(f"🎉 תקופת הניסיון הופעלה! PRO חינם עד {trial_end}", "success")
+    flash(f"🎉 {t('msg_trial_started')} PRO {t('plan_free')} עד {trial_end}", "success")
     return redirect(url_for("profile"))
 
 
@@ -3742,7 +4143,7 @@ def login():
     user = db.execute("SELECT * FROM users WHERE email=? OR LOWER(username)=?", (login_id, login_id.lower())).fetchone()
     
     if not user or not check_password_hash(user["password_hash"], password):
-        flash("אימייל/שם משתמש או סיסמה שגויים", "danger")
+        flash_t("msg_login_failed", "danger")
         return render_template("login.html", email=login_id)
     
     session["uid"] = user["id"]

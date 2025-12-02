@@ -5,11 +5,11 @@
 <div class="hero-section mb-5">
   <div class="hero-content text-center">
     <div class="hero-badge mb-3">
-      <span class="badge-glow">✨ חדש</span>
-      <span>ניתוח מתקדם עם AI</span>
+      <span class="badge-glow">✨ {{ t('hero_new') }}</span>
+      <span>{% if current_lang == 'he' %}ניתוח מתקדם עם AI{% elif current_lang == 'en' %}Advanced AI Analysis{% else %}Продвинутый анализ с AI{% endif %}</span>
     </div>
-    <h1 class="hero-title">נתח את הנתונים שלך<br><span class="gradient-text">בלחיצה אחת</span></h1>
-    <p class="hero-subtitle">העלה דוח קופה ותקבל גרפים מקצועיים, תובנות AI והשוואת תקופות</p>
+    <h1 class="hero-title">{{ t('hero_title') }}<br><span class="gradient-text">{{ t('hero_title_gradient') }}</span></h1>
+    <p class="hero-subtitle">{{ t('hero_subtitle') }}</p>
   </div>
 </div>
 
@@ -22,8 +22,8 @@
       <div class="step-header">
         <div class="step-number">1</div>
         <div>
-          <h3 class="step-title">העלאת קובץ</h3>
-          <p class="step-desc">גרור קובץ או לחץ לבחירה</p>
+          <h3 class="step-title">{{ t('upload_file') }}</h3>
+          <p class="step-desc">{{ t('drag_drop') }}</p>
         </div>
       </div>
       
@@ -36,9 +36,9 @@
               <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
           </div>
-          <div class="dropzone-text">גרור קובץ לכאן</div>
-          <div class="dropzone-or">או</div>
-          <div class="dropzone-btn">בחר קובץ מהמחשב</div>
+          <div class="dropzone-text">{% if current_lang == 'he' %}גרור קובץ לכאן{% elif current_lang == 'en' %}Drag file here{% else %}Перетащите файл сюда{% endif %}</div>
+          <div class="dropzone-or">{% if current_lang == 'he' %}או{% elif current_lang == 'en' %}or{% else %}или{% endif %}</div>
+          <div class="dropzone-btn">{{ t('select_file') }}</div>
           <div class="dropzone-formats">CSV • Excel • JSON • XML • ODS</div>
         </div>
         <input class="visually-hidden" type="file" name="file" accept=".csv,.tsv,.txt,.xlsx,.xls,.xlsm,.xlsb,.ods,.json,.xml" required>
@@ -61,34 +61,34 @@
           <input type="radio" name="period_type" value="month" checked>
           <div class="period-card">
             <div class="period-icon">📅</div>
-            <div class="period-label">חודש</div>
+            <div class="period-label">{{ t('month') }}</div>
           </div>
         </label>
         <label class="period-option">
           <input type="radio" name="period_type" value="week">
           <div class="period-card">
             <div class="period-icon">📆</div>
-            <div class="period-label">שבוע</div>
+            <div class="period-label">{{ t('week') }}</div>
           </div>
         </label>
         <label class="period-option">
           <input type="radio" name="period_type" value="day">
           <div class="period-card">
             <div class="period-icon">📌</div>
-            <div class="period-label">יום</div>
+            <div class="period-label">{{ t('day') }}</div>
           </div>
         </label>
         <label class="period-option">
           <input type="radio" name="period_type" value="custom">
           <div class="period-card">
             <div class="period-icon">⚙️</div>
-            <div class="period-label">מותאם</div>
+            <div class="period-label">{{ t('custom') }}</div>
           </div>
         </label>
       </div>
       
       <div class="period-name-input">
-        <input type="text" name="period_name" class="form-input" placeholder="שם התקופה (אופציונלי) — לדוגמה: נובמבר 2024">
+        <input type="text" name="period_name" class="form-input" placeholder="{{ t('period_name') }}">
       </div>
     </div>
 
@@ -97,8 +97,8 @@
       <div class="step-header">
         <div class="step-number">3</div>
         <div>
-          <h3 class="step-title">בחירת גרפים</h3>
-          <p class="step-desc">סמן את הגרפים שברצונך לייצר</p>
+          <h3 class="step-title">{{ t('select_graphs') }}</h3>
+          <p class="step-desc">{{ t('select_graphs_desc') }}</p>
         </div>
       </div>
       
@@ -107,25 +107,25 @@
         <div class="graph-category">
           <div class="category-header">
             <span class="category-icon">⏰</span>
-            <span class="category-title">זמנים ומגמות</span>
+            <span class="category-title">{{ t('time_trends') }}</span>
           </div>
           <div class="graph-options">
             <label class="graph-option">
               <input type="checkbox" name="opt_hourly" checked>
               <span class="option-check"></span>
-              <span class="option-label">מכירות לפי שעה</span>
-              <span class="option-badge hot">פופולרי</span>
+              <span class="option-label">{{ t('sales_by_hour') }}</span>
+              <span class="option-badge hot">{{ t('popular') }}</span>
             </label>
             <label class="graph-option">
               <input type="checkbox" name="opt_weekday" checked>
               <span class="option-check"></span>
-              <span class="option-label">מכירות לפי יום בשבוע</span>
+              <span class="option-label">{{ t('sales_by_weekday') }}</span>
             </label>
             <label class="graph-option">
               <input type="checkbox" name="opt_heatmap" checked>
               <span class="option-check"></span>
-              <span class="option-label">מפת חום (שעה×יום)</span>
-              <span class="option-badge new">חדש</span>
+              <span class="option-label">{{ t('heatmap') }}</span>
+              <span class="option-badge new">{{ t('new') }}</span>
             </label>
           </div>
         </div>
@@ -134,23 +134,23 @@
         <div class="graph-category">
           <div class="category-header">
             <span class="category-icon">📦</span>
-            <span class="category-title">מכירות ומוצרים</span>
+            <span class="category-title">{{ t('products') }}</span>
           </div>
           <div class="graph-options">
             <label class="graph-option">
               <input type="checkbox" name="opt_daily" checked>
               <span class="option-check"></span>
-              <span class="option-label">מכירות יומיות</span>
+              <span class="option-label">{{ t('daily_sales') }}</span>
             </label>
             <label class="graph-option">
               <input type="checkbox" name="opt_top_products" checked>
               <span class="option-check"></span>
-              <span class="option-label">Top 10 מוצרים</span>
+              <span class="option-label">{% if current_lang == 'he' %}Top 10 מוצרים{% elif current_lang == 'en' %}Top 10 Products{% else %}Топ 10 продуктов{% endif %}</span>
             </label>
             <label class="graph-option">
               <input type="checkbox" name="opt_avg_ticket" checked>
               <span class="option-check"></span>
-              <span class="option-label">ממוצע קנייה לפי שעה</span>
+              <span class="option-label">{{ t('avg_ticket') }}</span>
             </label>
           </div>
         </div>
@@ -159,18 +159,18 @@
         <div class="graph-category">
           <div class="category-header">
             <span class="category-icon">📊</span>
-            <span class="category-title">השוואות</span>
+            <span class="category-title">{% if current_lang == 'he' %}השוואות{% elif current_lang == 'en' %}Comparisons{% else %}Сравнения{% endif %}</span>
           </div>
           <div class="graph-options">
             <label class="graph-option">
               <input type="checkbox" name="opt_weekend_compare" checked>
               <span class="option-check"></span>
-              <span class="option-label">סופ"ש מול ימי חול</span>
+              <span class="option-label">{{ t('weekend_compare') }}</span>
             </label>
             <label class="graph-option">
               <input type="checkbox" name="opt_payments" checked>
               <span class="option-check"></span>
-              <span class="option-label">פילוח אמצעי תשלום</span>
+              <span class="option-label">{{ t('payment_methods') }}</span>
             </label>
           </div>
         </div>
@@ -178,15 +178,15 @@
 
       <!-- Hour Range -->
       <div class="hour-range-section">
-        <div class="hour-range-label">טווח שעות לגרף "לפי שעה"</div>
+        <div class="hour-range-label">{% if current_lang == 'he' %}טווח שעות לגרף "לפי שעה"{% elif current_lang == 'en' %}Hour range for "Sales by Hour" graph{% else %}Диапазон часов для графика "Продажи по часам"{% endif %}</div>
         <div class="hour-range-inputs">
           <div class="hour-input">
-            <label>התחלה</label>
+            <label>{% if current_lang == 'he' %}התחלה{% elif current_lang == 'en' %}Start{% else %}Начало{% endif %}</label>
             <input type="number" name="hour_start" value="8" min="0" max="23">
           </div>
           <div class="hour-separator">—</div>
           <div class="hour-input">
-            <label>סיום</label>
+            <label>{% if current_lang == 'he' %}סיום{% elif current_lang == 'en' %}End{% else %}Конец{% endif %}</label>
             <input type="number" name="hour_end" value="20" min="0" max="23">
           </div>
         </div>
@@ -204,7 +204,7 @@
           </svg>
         </div>
         <div class="progress-info">
-          <div class="progress-status" id="progressStatus">מעבד את הדוח...</div>
+          <div class="progress-status" id="progressStatus">{% if current_lang == 'he' %}מעבד את הדוח...{% elif current_lang == 'en' %}Processing report...{% else %}Обработка отчета...{% endif %}</div>
           <div class="progress-percent" id="progressPercent">0%</div>
         </div>
       </div>
@@ -216,30 +216,30 @@
       <div class="progress-steps" id="progressSteps">
         <div class="progress-step active" data-step="1">
           <span class="step-icon">📤</span>
-          <span class="step-text">העלאת קובץ</span>
+          <span class="step-text">{{ t('upload_file') }}</span>
         </div>
         <div class="progress-step" data-step="2">
           <span class="step-icon">📊</span>
-          <span class="step-text">עיבוד נתונים</span>
+          <span class="step-text">{% if current_lang == 'he' %}עיבוד נתונים{% elif current_lang == 'en' %}Processing data{% else %}Обработка данных{% endif %}</span>
         </div>
         <div class="progress-step" data-step="3">
           <span class="step-icon">📈</span>
-          <span class="step-text">יצירת גרפים</span>
+          <span class="step-text">{% if current_lang == 'he' %}יצירת גרפים{% elif current_lang == 'en' %}Creating graphs{% else %}Создание графиков{% endif %}</span>
         </div>
         <div class="progress-step" data-step="4">
           <span class="step-icon">🤖</span>
-          <span class="step-text">ניתוח AI</span>
+          <span class="step-text">{% if current_lang == 'he' %}ניתוח AI{% elif current_lang == 'en' %}AI Analysis{% else %}AI-анализ{% endif %}</span>
         </div>
         <div class="progress-step" data-step="5">
           <span class="step-icon">✅</span>
-          <span class="step-text">מוכן!</span>
+          <span class="step-text">{% if current_lang == 'he' %}מוכן!{% elif current_lang == 'en' %}Ready!{% else %}Готово!{% endif %}</span>
         </div>
       </div>
     </div>
 
     <!-- Submit Button -->
     <button type="submit" class="submit-btn" id="analyzeBtn" disabled>
-      <span class="btn-text">התחל ניתוח</span>
+      <span class="btn-text">{{ t('analyze_button') }}</span>
       <span class="btn-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -247,17 +247,17 @@
       </span>
       <span class="btn-loader"></span>
     </button>
-    <p class="submit-hint">הכפתור יופעל לאחר בחירת קובץ</p>
+    <p class="submit-hint">{% if current_lang == 'he' %}הכפתור יופעל לאחר בחירת קובץ{% elif current_lang == 'en' %}Button will be enabled after selecting a file{% else %}Кнопка будет активирована после выбора файла{% endif %}</p>
   </form>
   
   <!-- Demo Button -->
   <div class="text-center mt-4">
     <div class="demo-divider">
-      <span>או</span>
+      <span>{% if current_lang == 'he' %}או{% elif current_lang == 'en' %}or{% else %}или{% endif %}</span>
     </div>
     <a href="{{ url_for('demo_analysis') }}" class="demo-btn">
       <span class="demo-icon">👁️</span>
-      <span>צפה בדוגמה — בלי להעלות קובץ</span>
+      <span>{% if current_lang == 'he' %}צפה בדוגמה — בלי להעלות קובץ{% elif current_lang == 'en' %}View example — without uploading a file{% else %}Посмотреть пример — без загрузки файла{% endif %}</span>
     </a>
   </div>
 </div>
@@ -266,23 +266,23 @@
 <div class="features-section">
   <div class="feature-card">
     <div class="feature-icon">📈</div>
-    <h4>8 גרפים מקצועיים</h4>
-    <p>מכירות, מוצרים, זמנים ועוד</p>
+    <h4>{% if current_lang == 'he' %}8 גרפים מקצועיים{% elif current_lang == 'en' %}8 Professional Graphs{% else %}8 Профессиональных графиков{% endif %}</h4>
+    <p>{% if current_lang == 'he' %}מכירות, מוצרים, זמנים ועוד{% elif current_lang == 'en' %}Sales, products, time trends and more{% else %}Продажи, продукты, временные тренды и многое другое{% endif %}</p>
   </div>
   <div class="feature-card">
     <div class="feature-icon">🤖</div>
-    <h4>תובנות AI</h4>
-    <p>המלצות מותאמות לעסק שלך</p>
+    <h4>{% if current_lang == 'he' %}תובנות AI{% elif current_lang == 'en' %}AI Insights{% else %}AI-инсайты{% endif %}</h4>
+    <p>{% if current_lang == 'he' %}המלצות מותאמות לעסק שלך{% elif current_lang == 'en' %}Personalized recommendations for your business{% else %}Персонализированные рекомендации для вашего бизнеса{% endif %}</p>
   </div>
   <div class="feature-card">
     <div class="feature-icon">📄</div>
-    <h4>ייצוא PDF</h4>
-    <p>דוח מקצועי להדפסה</p>
+    <h4>{% if current_lang == 'he' %}ייצוא PDF{% elif current_lang == 'en' %}PDF Export{% else %}Экспорт PDF{% endif %}</h4>
+    <p>{% if current_lang == 'he' %}דוח מקצועי להדפסה{% elif current_lang == 'en' %}Professional report for printing{% else %}Профессиональный отчет для печати{% endif %}</p>
   </div>
   <div class="feature-card">
     <div class="feature-icon">🔒</div>
-    <h4>מאובטח</h4>
-    <p>הצפנת AES-256</p>
+    <h4>{% if current_lang == 'he' %}מאובטח{% elif current_lang == 'en' %}Secure{% else %}Безопасно{% endif %}</h4>
+    <p>{% if current_lang == 'he' %}הצפנת AES-256{% elif current_lang == 'en' %}AES-256 Encryption{% else %}Шифрование AES-256{% endif %}</p>
   </div>
 </div>
 
@@ -1038,6 +1038,36 @@
 </style>
 
 <script>
+// Translations for JavaScript
+const translations = {
+  he: {
+    starting: 'מתחיל...',
+    uploading: 'מעלה קובץ...',
+    processing: 'מעבד נתונים...',
+    creating: 'יוצר גרפים...',
+    analyzing: 'מנתח עם AI...',
+    finishing: 'מסיים...'
+  },
+  en: {
+    starting: 'Starting...',
+    uploading: 'Uploading file...',
+    processing: 'Processing data...',
+    creating: 'Creating graphs...',
+    analyzing: 'Analyzing with AI...',
+    finishing: 'Finishing...'
+  },
+  ru: {
+    starting: 'Начинаем...',
+    uploading: 'Загрузка файла...',
+    processing: 'Обработка данных...',
+    creating: 'Создание графиков...',
+    analyzing: 'Анализ с AI...',
+    finishing: 'Завершение...'
+  }
+};
+const currentLang = '{{ current_lang }}';
+const t_js = (key) => translations[currentLang]?.[key] || translations.he[key];
+
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('uploadForm');
   const fileInput = form.querySelector('input[type="file"]');
@@ -1135,7 +1165,7 @@ document.addEventListener('DOMContentLoaded', function() {
     progressContainer.style.display = 'block';
     progressBarFill.style.width = '0%';
     progressPercent.textContent = '0%';
-    progressStatus.textContent = 'מתחיל...';
+    progressStatus.textContent = t_js('starting');
     
     // Hide button
     btn.classList.add('loading');
@@ -1147,7 +1177,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize first step immediately
     console.log('Initializing progress to 5%...');
-    updateProgress(5, 'מתחיל...', 1);
+    updateProgress(5, t_js('starting'), 1);
     
     // Scroll to progress bar
     requestAnimationFrame(() => {
@@ -1158,11 +1188,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPercent = 5;
     
     const steps = [
-      { percent: 15, status: 'מעלה קובץ...', step: 1, delay: 300 },
-      { percent: 35, status: 'מעבד נתונים...', step: 2, delay: 1000 },
-      { percent: 60, status: 'יוצר גרפים...', step: 3, delay: 1800 },
-      { percent: 85, status: 'מנתח עם AI...', step: 4, delay: 2600 },
-      { percent: 95, status: 'מסיים...', step: 5, delay: 3400 }
+      { percent: 15, status: t_js('uploading'), step: 1, delay: 300 },
+      { percent: 35, status: t_js('processing'), step: 2, delay: 1000 },
+      { percent: 60, status: t_js('creating'), step: 3, delay: 1800 },
+      { percent: 85, status: t_js('analyzing'), step: 4, delay: 2600 },
+      { percent: 95, status: t_js('finishing'), step: 5, delay: 3400 }
     ];
     
     // Execute steps with delays
@@ -1178,7 +1208,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const finalUpdateInterval = setInterval(() => {
         if (currentPercent < 99) {
           currentPercent = Math.min(99, currentPercent + 0.15);
-          updateProgress(currentPercent, 'מסיים...', 5);
+          updateProgress(currentPercent, t_js('finishing'), 5);
         } else {
           clearInterval(finalUpdateInterval);
         }

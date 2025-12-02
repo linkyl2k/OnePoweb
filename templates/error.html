@@ -2,9 +2,9 @@
 {% block content %}
 <div class="card shadow-sm">
   <div class="card-body">
-    <h3>שגיאה {{ code }}</h3>
+    <h3>{{ t('error') }} {{ code }}</h3>
     <p class="mb-3">{{ msg }}</p>
-    <a class="btn btn-primary" href="{{ url_for('index') }}">חזרה לדף הראשי</a>
+    <a class="btn btn-primary" href="{{ url_for('index') }}">{{ t('back') }} {{ t('nav_home') }}</a>
   </div>
 </div>
 {% endblock %}

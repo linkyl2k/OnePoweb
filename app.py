@@ -279,6 +279,9 @@ TRANSLATIONS = {
         "error_403": "אין הרשאה",
         "error_500": "שגיאת שרת",
         "error_generic": "משהו השתבש",
+        
+        # Results
+        "results_no_graphs_reload": "גרפים לא נמצאו. מפנים ללוח הבקרה שם תוכל לראות דוחות שמורים.",
     },
     "en": {  # English
         # Navigation
@@ -395,6 +398,9 @@ TRANSLATIONS = {
         "error_403": "Forbidden",
         "error_500": "Server Error",
         "error_generic": "Something went wrong",
+        
+        # Results
+        "results_no_graphs_reload": "Graphs not found. Redirecting to dashboard where you can view saved reports.",
     },
     "ru": {  # Русский
         # Навигация
@@ -534,6 +540,7 @@ TRANSLATIONS = {
         "results_upload_new": "Загрузить новый отчет",
         "results_download_pdf": "Скачать PDF",
         "results_no_graphs": "Нет графиков для отображения. Вернитесь на главную страницу и загрузите новый отчет.",
+        "results_no_graphs_reload": "Графики не найдены. Перенаправляем на панель управления, где вы можете просмотреть сохраненные отчеты.",
         "results_summary": "Сводка анализа",
         "results_summary_desc": "Основные выводы из вашего отчета",
         "results_upgrade_banner": "Хотите увидеть графики и продвинутый анализ?",
@@ -3276,7 +3283,9 @@ def index():
     session.permanent = True  # Делаем сессию постоянной для надежности
     session.modified = True
     
-    print(f"💾 Saved to LAST_EXPORT ({len(plots)} plots) and session. Redirecting to /result")
+    # Проверяем, что данные действительно сохранились
+    saved_plots_count = len(session.get("last_export", {}).get("plots", []))
+    print(f"💾 Saved to LAST_EXPORT ({len(plots)} plots) and session ({saved_plots_count} plots). Redirecting to /result")
 
     return redirect(url_for("result"))
 
@@ -4736,10 +4745,16 @@ def result():
     # ВАЖНО: Сначала проверяем LAST_EXPORT (работает мгновенно), потом сессию
     # Это решает проблему race condition при первом запросе после редиректа
     
+    plots = []
+    summary = ""
+    summary_ai = ""
+    roi = {}
+    action_items = []
+    
     # Сначала пробуем LAST_EXPORT (глобальная переменная - работает мгновенно)
     plots_from_export = LAST_EXPORT.get("plots", [])
     
-    if plots_from_export:
+    if plots_from_export and len(plots_from_export) > 0:
         # Данные есть в LAST_EXPORT - используем их (самый быстрый способ)
         plots = plots_from_export
         summary = LAST_EXPORT.get("summary", "")
@@ -4750,27 +4765,49 @@ def result():
     else:
         # Fallback на сессию (для multi-worker на Render)
         session_data = session.get("last_export", {})
+        print(f"🔍 Checking session: has_data={bool(session_data)}, keys={list(session_data.keys()) if session_data else []}")
+        
         if session_data:
-            plots = session_data.get("plots", [])
-            summary = session_data.get("summary", "")
-            summary_ai = session_data.get("summary_ai", "")
-            roi = session_data.get("roi", {})
-            action_items = session_data.get("action_items", [])
-            print(f"📄 Loaded from session: {len(plots)} plots")
+            plots_from_session = session_data.get("plots", [])
+            if plots_from_session and len(plots_from_session) > 0:
+                plots = plots_from_session
+                summary = session_data.get("summary", "")
+                summary_ai = session_data.get("summary_ai", "")
+                roi = session_data.get("roi", {})
+                action_items = session_data.get("action_items", [])
+                print(f"📄 Loaded from session: {len(plots)} plots")
+            else:
+                print(f"⚠️ Session data exists but plots is empty: {plots_from_session}")
         else:
-            # Нет данных нигде
-            plots = []
-            summary = ""
-            summary_ai = ""
-            roi = {}
-            action_items = []
-            print(f"⚠️ No data in LAST_EXPORT or session!")
+            print(f"⚠️ No session data found!")
 
     messages = []
-    if not plots:
-        messages.append("אין גרפים להצגה. חזור לדף הבית והעלה דוח חדש.")
+    if not plots or len(plots) == 0:
+        # Попытка загрузить последний сохраненный отчет пользователя
+        u = current_user()
+        if u:
+            try:
+                db = get_db()
+                last_report = db.execute("""
+                    SELECT id, name, period_type, summary_json, created_at
+                    FROM reports
+                    WHERE user_id = ?
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                """, (u["id"],)).fetchone()
+                
+                if last_report:
+                    print(f"🔄 Attempting to reload from last saved report (ID: {last_report['id']})")
+                    # Перенаправляем на страницу дашборда, где пользователь может просмотреть сохраненные отчеты
+                    flash_t("results_no_graphs_reload", "info")
+                    return redirect(url_for("dashboard"))
+            except Exception as e:
+                print(f"⚠️ Error loading last report: {e}")
+        
+        messages.append(t("results_no_graphs"))
         session_data_check = session.get("last_export", {})
-        print(f"⚠️ No plots found! LAST_EXPORT plots: {len(LAST_EXPORT.get('plots', []))}, Session data: {bool(session_data_check)}")
+        last_export_plots = LAST_EXPORT.get("plots", [])
+        print(f"⚠️ No plots found! LAST_EXPORT: {len(last_export_plots)} plots, Session: {len(session_data_check.get('plots', [])) if session_data_check else 0} plots, Session exists: {bool(session_data_check)}")
 
     # קבלת תוכנית המשתמש
     u = current_user()

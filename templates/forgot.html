@@ -12,28 +12,28 @@
             <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(46,160,255,0.15)); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
               <i class="bi bi-envelope-paper" style="font-size: 1.5rem; color: #fbbf24;"></i>
             </div>
-            <h3 class="mb-1">שכחת את הסיסמה?</h3>
-            <p class="text-muted small mb-0">נשלח לך קישור לאיפוס הסיסמה</p>
+            <h3 class="mb-1">{{ t('forgot_title') }}</h3>
+            <p class="text-muted small mb-0">{{ t('forgot_desc') }}</p>
           </div>
           
           <form method="POST" class="vstack gap-3">
             
             <!-- Email -->
             <div>
-              <label class="form-label">כתובת האימייל שלך</label>
+              <label class="form-label">{% if current_lang == 'he' %}כתובת האימייל שלך{% elif current_lang == 'en' %}Your Email Address{% else %}Ваш Email адрес{% endif %}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                 <input type="email" name="email" class="form-control" required placeholder="your@email.com" autofocus>
               </div>
               <div class="form-text small mt-2">
                 <i class="bi bi-info-circle me-1"></i>
-                הזן את האימייל שנרשמת איתו
+                {% if current_lang == 'he' %}הזן את האימייל שנרשמת איתו{% elif current_lang == 'en' %}Enter the email you registered with{% else %}Введите email, с которым вы регистрировались{% endif %}
               </div>
             </div>
             
             <!-- Submit -->
             <button type="submit" class="btn w-100 py-2 mt-2" style="background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #1a1a2e; border: none; border-radius: 12px; font-weight: 600;">
-              <i class="bi bi-send me-2"></i>שלח קישור איפוס
+              <i class="bi bi-send me-2"></i>{{ t('forgot_send') }}
             </button>
             
           </form>
@@ -43,11 +43,11 @@
             <div class="d-flex gap-2">
               <i class="bi bi-lightbulb" style="color: #2ea0ff;"></i>
               <div class="small text-muted">
-                <strong style="color: var(--text);">מה יקרה?</strong>
+                <strong style="color: var(--text);">{% if current_lang == 'he' %}מה יקרה?{% elif current_lang == 'en' %}What will happen?{% else %}Что произойдет?{% endif %}</strong>
                 <ul class="mb-0 mt-1 ps-3">
-                  <li>תקבל מייל עם קישור לאיפוס</li>
-                  <li>הקישור תקף לשעה אחת</li>
-                  <li>תוכל לבחור סיסמה חדשה</li>
+                  <li>{% if current_lang == 'he' %}תקבל מייל עם קישור לאיפוס{% elif current_lang == 'en' %}You'll receive an email with a reset link{% else %}Вы получите email со ссылкой для сброса{% endif %}</li>
+                  <li>{% if current_lang == 'he' %}הקישור תקף לשעה אחת{% elif current_lang == 'en' %}The link is valid for one hour{% else %}Ссылка действительна в течение часа{% endif %}</li>
+                  <li>{% if current_lang == 'he' %}תוכל לבחור סיסמה חדשה{% elif current_lang == 'en' %}You can choose a new password{% else %}Вы сможете выбрать новый пароль{% endif %}</li>
                 </ul>
               </div>
             </div>
@@ -55,9 +55,9 @@
           
           <!-- Back to login -->
           <div class="text-center mt-4 pt-3" style="border-top: 1px solid rgba(255,255,255,0.08);">
-            <span class="text-muted small">נזכרת בסיסמה?</span>
+            <span class="text-muted small">{% if current_lang == 'he' %}נזכרת בסיסמה?{% elif current_lang == 'en' %}Remembered your password?{% else %}Вспомнили пароль?{% endif %}</span>
             <a href="{{ url_for('login') }}" class="small ms-1" style="color: #2ea0ff;">
-              חזור להתחברות
+              {{ t('forgot_back_login') }}
             </a>
           </div>
           
@@ -68,7 +68,7 @@
       <div class="text-center mt-4">
         <p class="small text-muted mb-0">
           <i class="bi bi-shield-lock me-1"></i>
-          הקישור ישלח רק אם האימייל קיים במערכת
+          {% if current_lang == 'he' %}הקישור ישלח רק אם האימייל קיים במערכת{% elif current_lang == 'en' %}The link will only be sent if the email exists in the system{% else %}Ссылка будет отправлена только если email существует в системе{% endif %}
         </p>
       </div>
       

@@ -4,11 +4,11 @@
   <!-- כותרת -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="mb-1">📊 לוח בקרה</h2>
-      <p class="text-muted mb-0">השוואת תקופות וניתוח מגמות</p>
+      <h2 class="mb-1">📊 {{ t('dashboard_title') }}</h2>
+      <p class="text-muted mb-0">{{ t('dashboard_subtitle') }}</p>
     </div>
     <a class="btn btn-primary" href="{{ url_for('index') }}">
-      <i class="bi bi-plus-lg"></i> העלה דוח חדש
+      <i class="bi bi-plus-lg"></i> {{ t('dashboard_upload_new') }}
     </a>
   </div>
 
@@ -17,7 +17,7 @@
     <div class="col-md-3">
       <div class="card bg-primary text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">סה"כ מכירות</h6>
+          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_total_sales') }}</h6>
           <h2 class="card-title mb-0">₪{{ "{:,.0f}".format(total_sales) }}</h2>
         </div>
       </div>
@@ -25,7 +25,7 @@
     <div class="col-md-3">
       <div class="card bg-success text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">דוחות שמורים</h6>
+          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_saved_reports') }}</h6>
           <h2 class="card-title mb-0">{{ total_reports }}</h2>
         </div>
       </div>
@@ -33,7 +33,7 @@
     <div class="col-md-3">
       <div class="card bg-info text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">ממוצע יומי (אחרון)</h6>
+          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_avg_daily') }}</h6>
           <h2 class="card-title mb-0">₪{{ "{:,.0f}".format(latest_summary.get('avg_daily', 0)) }}</h2>
         </div>
       </div>
@@ -41,7 +41,7 @@
     <div class="col-md-3">
       <div class="card bg-warning text-dark shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">תוכנית</h6>
+          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_plan') }}</h6>
           <h2 class="card-title mb-0">{{ user.plan|upper }}</h2>
         </div>
       </div>
@@ -52,18 +52,18 @@
   <!-- השוואת תקופות אוטומטית -->
   <div class="card shadow-sm mb-4">
     <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-      <h5 class="mb-0">📈 השוואה אוטומטית: {{ comparison.get('report2_name', 'אחרון') }} מול {{ comparison.get('report1_name', 'קודם') }}</h5>
+      <h5 class="mb-0">📈 {% if current_lang == 'he' %}השוואה אוטומטית: {{ comparison.get('report2_name', 'אחרון') }} מול {{ comparison.get('report1_name', 'קודם') }}{% elif current_lang == 'en' %}Automatic Comparison: {{ comparison.get('report2_name', 'Latest') }} vs {{ comparison.get('report1_name', 'Previous') }}{% else %}Автоматическое сравнение: {{ comparison.get('report2_name', 'Последний') }} vs {{ comparison.get('report1_name', 'Предыдущий') }}{% endif %}</h5>
     </div>
     <div class="card-body">
       <div class="row g-4">
         <!-- תקופה קודמת -->
         <div class="col-md-5">
           <div class="border rounded p-3 bg-light h-100">
-            <h6 class="text-muted mb-2">{{ comparison.get('report1_name', 'תקופה קודמת') }}</h6>
+            <h6 class="text-muted mb-2">{{ comparison.get('report1_name', ('תקופה קודמת' if current_lang == 'he' else 'Previous Period' if current_lang == 'en' else 'Предыдущий период')) }}</h6>
             <p class="h3 mb-1 text-primary">₪{{ "{:,.0f}".format(comparison.period1.total) }}</p>
             <div class="d-flex gap-3 text-muted small">
-              <span><i class="bi bi-calendar"></i> {{ comparison.period1.days }} ימים</span>
-              <span><i class="bi bi-receipt"></i> {{ comparison.period1.transactions }} עסקאות</span>
+              <span><i class="bi bi-calendar"></i> {{ comparison.period1.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
+              <span><i class="bi bi-receipt"></i> {{ comparison.period1.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}transactions{% else %}транзакций{% endif %}</span>
             </div>
           </div>
         </div>
@@ -83,11 +83,11 @@
         <!-- תקופה נוכחית -->
         <div class="col-md-5">
           <div class="border rounded p-3 h-100" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
-            <h6 class="text-muted mb-2">{{ comparison.get('report2_name', 'תקופה אחרונה') }}</h6>
+            <h6 class="text-muted mb-2">{{ comparison.get('report2_name', ('תקופה אחרונה' if current_lang == 'he' else 'Latest Period' if current_lang == 'en' else 'Последний период')) }}</h6>
             <p class="h3 mb-1 text-success">₪{{ "{:,.0f}".format(comparison.period2.total) }}</p>
             <div class="d-flex gap-3 text-muted small">
-              <span><i class="bi bi-calendar"></i> {{ comparison.period2.days }} ימים</span>
-              <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} עסקאות</span>
+              <span><i class="bi bi-calendar"></i> {{ comparison.period2.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
+              <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}transactions{% else %}транзакций{% endif %}</span>
             </div>
           </div>
         </div>
@@ -105,10 +105,10 @@
   <div class="card shadow-sm mb-4">
     <div class="card-body py-2">
       <div class="d-flex gap-2 flex-wrap align-items-center">
-        <span class="text-muted me-2">סנן לפי:</span>
+        <span class="text-muted me-2">{% if current_lang == 'he' %}סנן לפי:{% elif current_lang == 'en' %}Filter by:{% else %}Фильтр по:{% endif %}</span>
         <a href="{{ url_for('dashboard') }}" 
            class="btn btn-sm {{ 'btn-primary' if not filter_type else 'btn-outline-secondary' }}">
-          הכל ({{ reports|length }})
+          {% if current_lang == 'he' %}הכל{% elif current_lang == 'en' %}All{% else %}Все{% endif %} ({{ reports|length }})
         </a>
         {% for type_key, type_label in period_type_labels.items() %}
           {% set count = reports_by_type.get(type_key, [])|length %}
@@ -126,10 +126,10 @@
   <!-- רשימת דוחות -->
   <div class="card shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">📁 הדוחות שלי</h5>
+      <h5 class="mb-0">📁 {% if current_lang == 'he' %}הדוחות שלי{% elif current_lang == 'en' %}My Reports{% else %}Мои отчеты{% endif %}</h5>
       {% if reports|length >= 2 %}
       <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#compareModal">
-        <i class="bi bi-bar-chart"></i> השווה תקופות
+        <i class="bi bi-bar-chart"></i> {% if current_lang == 'he' %}השווה תקופות{% elif current_lang == 'en' %}Compare Periods{% else %}Сравнить периоды{% endif %}
       </button>
       {% endif %}
     </div>
@@ -139,12 +139,12 @@
         <table class="table table-hover mb-0">
           <thead class="table-light">
             <tr>
-              <th>שם הדוח</th>
-              <th>סוג</th>
-              <th>תקופה</th>
-              <th>סה"כ מכירות</th>
-              <th>ממוצע יומי</th>
-              <th>נוצר</th>
+              <th>{% if current_lang == 'he' %}שם הדוח{% elif current_lang == 'en' %}Report Name{% else %}Название отчета{% endif %}</th>
+              <th>{% if current_lang == 'he' %}סוג{% elif current_lang == 'en' %}Type{% else %}Тип{% endif %}</th>
+              <th>{% if current_lang == 'he' %}תקופה{% elif current_lang == 'en' %}Period{% else %}Период{% endif %}</th>
+              <th>{% if current_lang == 'he' %}סה"כ מכירות{% elif current_lang == 'en' %}Total Sales{% else %}Общие продажи{% endif %}</th>
+              <th>{% if current_lang == 'he' %}ממוצע יומי{% elif current_lang == 'en' %}Daily Avg{% else %}Средний дневной{% endif %}</th>
+              <th>{% if current_lang == 'he' %}נוצר{% elif current_lang == 'en' %}Created{% else %}Создан{% endif %}</th>
               <th></th>
             </tr>
           </thead>
@@ -156,13 +156,13 @@
               <td>
                 {% set pt = report.get('period_type', 'month') %}
                 {% if pt == 'month' %}
-                  <span class="badge bg-primary">חודש</span>
+                  <span class="badge bg-primary">{{ t('month') }}</span>
                 {% elif pt == 'week' %}
-                  <span class="badge bg-success">שבוע</span>
+                  <span class="badge bg-success">{{ t('week') }}</span>
                 {% elif pt == 'day' %}
-                  <span class="badge bg-info">יום</span>
+                  <span class="badge bg-info">{{ t('day') }}</span>
                 {% else %}
-                  <span class="badge bg-secondary">מותאם</span>
+                  <span class="badge bg-secondary">{{ t('custom') }}</span>
                 {% endif %}
               </td>
               <td>
@@ -177,8 +177,8 @@
               <td><small>{{ report.created_at[:10] if report.created_at else '—' }}</small></td>
               <td>
                 <form method="POST" action="{{ url_for('dashboard_delete_report', report_id=report.id) }}" 
-                      onsubmit="return confirm('למחוק את הדוח?')" class="d-inline">
-                  <button class="btn btn-outline-danger btn-sm" title="מחק">🗑️</button>
+                      onsubmit="return confirm('{% if current_lang == 'he' %}למחוק את הדוח?{% elif current_lang == 'en' %}Delete this report?{% else %}Удалить этот отчет?{% endif %}')" class="d-inline">
+                  <button class="btn btn-outline-danger btn-sm" title="{{ t('delete') }}">🗑️</button>
                 </form>
               </td>
             </tr>
@@ -188,9 +188,9 @@
       </div>
       {% else %}
       <div class="text-center py-5 text-muted">
-        <h4>אין דוחות שמורים עדיין</h4>
-        <p>העלה את הדוח הראשון שלך וכל הניתוחים יישמרו אוטומטית</p>
-        <a class="btn btn-primary" href="{{ url_for('index') }}">העלה דוח</a>
+        <h4>{% if current_lang == 'he' %}אין דוחות שמורים עדיין{% elif current_lang == 'en' %}No saved reports yet{% else %}Нет сохраненных отчетов{% endif %}</h4>
+        <p>{% if current_lang == 'he' %}העלה את הדוח הראשון שלך וכל הניתוחים יישמרו אוטומטית{% elif current_lang == 'en' %}Upload your first report and all analyses will be saved automatically{% else %}Загрузите первый отчет, и все анализы будут сохраняться автоматически{% endif %}</p>
+        <a class="btn btn-primary" href="{{ url_for('index') }}">{% if current_lang == 'he' %}העלה דוח{% elif current_lang == 'en' %}Upload Report{% else %}Загрузить отчет{% endif %}</a>
       </div>
       {% endif %}
     </div>
@@ -201,17 +201,16 @@
     <div class="d-flex gap-3">
       <div class="fs-3">💡</div>
       <div>
-        <strong>טיפ:</strong> העלה דוחות מתקופות שונות (חודש שעבר, השבוע הזה) כדי לראות השוואה אוטומטית!
+        <strong>{% if current_lang == 'he' %}טיפ:{% elif current_lang == 'en' %}Tip:{% else %}Совет:{% endif %}</strong> {% if current_lang == 'he' %}העלה דוחות מתקופות שונות (חודש שעבר, השבוע הזה) כדי לראות השוואה אוטומטית!{% elif current_lang == 'en' %}Upload reports from different periods (last month, this week) to see automatic comparison!{% else %}Загружайте отчеты из разных периодов (прошлый месяц, эта неделя), чтобы увидеть автоматическое сравнение!{% endif %}
         <br>
-        <small class="text-muted">בעת העלאת דוח, בחר את סוג התקופה (חודש/שבוע/יום) כדי לארגן את ההשוואות.</small>
+        <small class="text-muted">{% if current_lang == 'he' %}בעת העלאת דוח, בחר את סוג התקופה (חודש/שבוע/יום) כדי לארגן את ההשוואות.{% elif current_lang == 'en' %}When uploading a report, select the period type (month/week/day) to organize comparisons.{% else %}При загрузке отчета выберите тип периода (месяц/неделя/день), чтобы организовать сравнения.{% endif %}</small>
       </div>
     </div>
   </div>
 
   <!-- אבטחת מידע -->
   <div class="alert alert-secondary mt-3">
-    <strong>🔐 אבטחת מידע:</strong> כל הנתונים שלך מוצפנים בהצפנת AES-256 (Fernet) ונשמרים בצורה מאובטחת. 
-    רק אתה יכול לגשת לדוחות שלך.
+    <strong>🔐 {% if current_lang == 'he' %}אבטחת מידע:{% elif current_lang == 'en' %}Data Security:{% else %}Безопасность данных:{% endif %}</strong> {% if current_lang == 'he' %}כל הנתונים שלך מוצפנים בהצפנת AES-256 (Fernet) ונשמרים בצורה מאובטחת. רק אתה יכול לגשת לדוחות שלך.{% elif current_lang == 'en' %}All your data is encrypted with AES-256 (Fernet) encryption and stored securely. Only you can access your reports.{% else %}Все ваши данные зашифрованы с помощью AES-256 (Fernet) и хранятся безопасно. Только вы можете получить доступ к своим отчетам.{% endif %}
   </div>
 </div>
 
@@ -221,14 +220,14 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-light">
-        <h5 class="modal-title"><i class="bi bi-bar-chart me-2"></i>השוואת תקופות</h5>
+        <h5 class="modal-title"><i class="bi bi-bar-chart me-2"></i>{% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Compare Periods{% else %}Сравнить периоды{% endif %}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{{ url_for('dashboard_compare') }}" id="compareForm">
         <div class="modal-body">
-          <p class="text-muted mb-3">בחר שתי תקופות להשוואה:</p>
+          <p class="text-muted mb-3">{% if current_lang == 'he' %}בחר שתי תקופות להשוואה:{% elif current_lang == 'en' %}Select two periods to compare:{% else %}Выберите два периода для сравнения:{% endif %}</p>
           <div class="mb-3">
-            <label class="form-label fw-semibold">תקופה ראשונה (ישנה יותר)</label>
+            <label class="form-label fw-semibold">{% if current_lang == 'he' %}תקופה ראשונה (ישנה יותר){% elif current_lang == 'en' %}First Period (older){% else %}Первый период (старше){% endif %}</label>
             <select name="report1_id" class="form-select" required>
               {% for report in reports %}
               {% set pt = report.get('period_type', 'month') %}
@@ -241,7 +240,7 @@
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">תקופה שנייה (חדשה יותר)</label>
+            <label class="form-label fw-semibold">{% if current_lang == 'he' %}תקופה שנייה (חדשה יותר){% elif current_lang == 'en' %}Second Period (newer){% else %}Второй период (новее){% endif %}</label>
             <select name="report2_id" class="form-select" required>
               {% for report in reports %}
               {% set pt = report.get('period_type', 'month') %}
@@ -254,13 +253,13 @@
             </select>
           </div>
           <div class="alert alert-info small mb-0">
-            <i class="bi bi-info-circle"></i> מומלץ להשוות תקופות מאותו סוג (חודש מול חודש, שבוע מול שבוע)
+            <i class="bi bi-info-circle"></i> {% if current_lang == 'he' %}מומלץ להשוות תקופות מאותו סוג (חודש מול חודש, שבוע מול שבוע){% elif current_lang == 'en' %}Recommended to compare periods of the same type (month vs month, week vs week){% else %}Рекомендуется сравнивать периоды одного типа (месяц с месяцем, неделя с неделей){% endif %}
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('cancel') }}</button>
           <button type="submit" class="btn btn-primary">
-            <i class="bi bi-bar-chart me-1"></i> השווה
+            <i class="bi bi-bar-chart me-1"></i> {% if current_lang == 'he' %}השווה{% elif current_lang == 'en' %}Compare{% else %}Сравнить{% endif %}
           </button>
         </div>
       </form>

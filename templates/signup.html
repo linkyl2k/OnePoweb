@@ -55,16 +55,16 @@
               <label class="form-label">{{ t('signup_password') }}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input name="password" type="password" class="form-control" id="password" minlength="8" maxlength="32" pattern="^(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9]{8,32}$" required placeholder="סיסמה חזקה">
+                <input name="password" type="password" class="form-control" id="password" minlength="8" maxlength="32" pattern="^(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9]{8,32}$" required placeholder="{% if current_lang == 'he' %}סיסמה חזקה{% elif current_lang == 'en' %}Strong password{% else %}Надежный пароль{% endif %}">
               </div>
               <!-- Password Requirements -->
               <div class="mt-2 p-2" style="background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                <div class="small text-muted mb-1">דרישות סיסמה:</div>
+                <div class="small text-muted mb-1">{{ t('password_requirements') }}</div>
                 <div class="d-flex flex-wrap gap-2">
-                  <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">8-32 תווים</span>
-                  <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אותיות אנגליות בלבד</span>
-                  <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אות גדולה (A-Z)</span>
-                  <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">ספרה (0-9)</span>
+                  <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_length') }}</span>
+                  <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_english') }}</span>
+                  <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_upper') }}</span>
+                  <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_digit') }}</span>
                 </div>
               </div>
             </div>
@@ -119,13 +119,13 @@
       <div class="text-center mt-4">
         <div class="d-flex justify-content-center gap-4 flex-wrap">
           <div class="small text-muted">
-            <i class="bi bi-check-circle text-success me-1"></i>7 ימי ניסיון חינם
+            <i class="bi bi-check-circle text-success me-1"></i>{{ t('benefits_trial') }}
           </div>
           <div class="small text-muted">
-            <i class="bi bi-check-circle text-success me-1"></i>ללא כרטיס אשראי
+            <i class="bi bi-check-circle text-success me-1"></i>{{ t('benefits_no_card') }}
           </div>
           <div class="small text-muted">
-            <i class="bi bi-check-circle text-success me-1"></i>ביטול בכל עת
+            <i class="bi bi-check-circle text-success me-1"></i>{{ t('benefits_cancel') }}
           </div>
         </div>
       </div>
@@ -186,10 +186,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (confirm.value.length > 0) {
       matchDiv.style.display = 'block';
       if (password.value === confirm.value) {
-        matchDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>הסיסמאות תואמות';
+        matchDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>{% if current_lang == 'he' %}הסיסמאות תואמות{% elif current_lang == 'en' %}Passwords match{% else %}Пароли совпадают{% endif %}';
         matchDiv.style.color = '#34d399';
       } else {
-        matchDiv.innerHTML = '<i class="bi bi-x-circle me-1"></i>הסיסמאות לא תואמות';
+        matchDiv.innerHTML = '<i class="bi bi-x-circle me-1"></i>{% if current_lang == 'he' %}הסיסמאות לא תואמות{% elif current_lang == 'en' %}Passwords do not match{% else %}Пароли не совпадают{% endif %}';
         matchDiv.style.color = '#f87171';
       }
     } else {

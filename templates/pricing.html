@@ -6,10 +6,10 @@
   <div class="text-center mb-5">
     <h1 class="display-5 fw-bold mb-3">
       <i class="bi bi-gem me-2" style="color: #1abc9c;"></i>
-      בחר את התוכנית המתאימה לך
+      {{ t('pricing_title') }}
     </h1>
     <p class="lead text-muted" style="max-width: 600px; margin: 0 auto;">
-      כל התוכניות כוללות ניתוח בסיסי. שדרג כדי לקבל יותר תובנות ולצמוח מהר יותר.
+      {{ t('pricing_subtitle') }}
     </p>
   </div>
 
@@ -17,10 +17,10 @@
   {% if session.uid %}
   <div class="text-center mb-4">
     <div class="d-inline-flex align-items-center gap-2 px-4 py-2" style="background: rgba(255,255,255,0.05); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);">
-      <span class="text-muted">התוכנית הנוכחית שלך:</span>
+      <span class="text-muted">{{ t('pricing_current') }}</span>
       {% if trial_active %}
         <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #000; padding: 6px 12px;">
-          <i class="bi bi-clock me-1"></i>PRO (ניסיון)
+          <i class="bi bi-clock me-1"></i>PRO ({% if current_lang == 'he' %}ניסיון{% elif current_lang == 'en' %}Trial{% else %}Пробный{% endif %})
         </span>
       {% elif current_plan == 'pro' %}
         <span class="badge" style="background: linear-gradient(135deg, #10b981, #34d399); color: #fff; padding: 6px 12px;">
@@ -46,7 +46,7 @@
     <div class="col-12 col-md-6 col-lg-4">
       <div class="pricing-card {% if current_plan == 'free' and not trial_active %}current{% endif %}">
         {% if current_plan == 'free' and not trial_active %}
-        <div class="current-badge">התוכנית שלך</div>
+        <div class="current-badge">{{ t('pricing_your_plan') }}</div>
         {% endif %}
         <div class="pricing-header">
           <div class="pricing-icon free">
@@ -54,30 +54,30 @@
           </div>
           <h3 class="pricing-name">FREE</h3>
           <div class="pricing-price">
-            <span class="amount">חינם</span>
+            <span class="amount">{{ t('pricing_free') }}</span>
           </div>
-          <p class="pricing-desc">להתחלה ולהתנסות</p>
+          <p class="pricing-desc">{% if current_lang == 'he' %}להתחלה ולהתנסות{% elif current_lang == 'en' %}To get started and try{% else %}Для начала и пробного использования{% endif %}</p>
         </div>
         <div class="pricing-features">
           <ul>
-            <li><i class="bi bi-check2"></i> העלאת דוח מכירות</li>
-            <li><i class="bi bi-check2"></i> 3 גרפים בסיסיים</li>
-            <li><i class="bi bi-check2"></i> סיכום נתונים</li>
-            <li class="disabled"><i class="bi bi-x"></i> השוואת תקופות</li>
-            <li class="disabled"><i class="bi bi-x"></i> ייצוא PDF</li>
-            <li class="disabled"><i class="bi bi-x"></i> תובנות AI</li>
-            <li class="disabled"><i class="bi bi-x"></i> תוכנית פעולה</li>
+            <li><i class="bi bi-check2"></i> {% if current_lang == 'he' %}העלאת דוח מכירות{% elif current_lang == 'en' %}Upload sales report{% else %}Загрузка отчета о продажах{% endif %}</li>
+            <li><i class="bi bi-check2"></i> {% if current_lang == 'he' %}3 גרפים בסיסיים{% elif current_lang == 'en' %}3 basic graphs{% else %}3 базовых графика{% endif %}</li>
+            <li><i class="bi bi-check2"></i> {% if current_lang == 'he' %}סיכום נתונים{% elif current_lang == 'en' %}Data summary{% else %}Сводка данных{% endif %}</li>
+            <li class="disabled"><i class="bi bi-x"></i> {% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Period comparison{% else %}Сравнение периодов{% endif %}</li>
+            <li class="disabled"><i class="bi bi-x"></i> {% if current_lang == 'he' %}ייצוא PDF{% elif current_lang == 'en' %}PDF export{% else %}Экспорт PDF{% endif %}</li>
+            <li class="disabled"><i class="bi bi-x"></i> {% if current_lang == 'he' %}תובנות AI{% elif current_lang == 'en' %}AI insights{% else %}AI-инсайты{% endif %}</li>
+            <li class="disabled"><i class="bi bi-x"></i> {% if current_lang == 'he' %}תוכנית פעולה{% elif current_lang == 'en' %}Action plan{% else %}План действий{% endif %}</li>
           </ul>
         </div>
         <div class="pricing-action">
           {% if session.uid %}
             {% if current_plan == 'free' and not trial_active %}
-              <span class="btn btn-outline-secondary w-100 disabled">התוכנית הנוכחית</span>
+              <span class="btn btn-outline-secondary w-100 disabled">{{ t('pricing_current_badge') }}</span>
             {% else %}
-              <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary w-100">ניהול מנוי</a>
+              <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary w-100">{% if current_lang == 'he' %}ניהול מנוי{% elif current_lang == 'en' %}Manage Subscription{% else %}Управление подпиской{% endif %}</a>
             {% endif %}
           {% else %}
-            <a href="{{ url_for('signup') }}" class="btn btn-outline-primary w-100">הרשמה חינם</a>
+            <a href="{{ url_for('signup') }}" class="btn btn-outline-primary w-100">{{ t('nav_signup') }}</a>
           {% endif %}
         </div>
       </div>
@@ -87,7 +87,7 @@
     <div class="col-12 col-md-6 col-lg-4">
       <div class="pricing-card {% if current_plan == 'basic' %}current{% endif %}">
         {% if current_plan == 'basic' %}
-        <div class="current-badge basic">התוכנית שלך</div>
+        <div class="current-badge basic">{{ t('pricing_your_plan') }}</div>
         {% endif %}
         <div class="pricing-header">
           <div class="pricing-icon basic">
@@ -97,32 +97,32 @@
           <div class="pricing-price">
             <span class="currency">₪</span>
             <span class="amount">{{ prices.basic.ils }}</span>
-            <span class="period">/חודש</span>
+            <span class="period">/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
           </div>
-          <p class="pricing-desc text-muted small">(או ${{ prices.basic.usd }})</p>
+          <p class="pricing-desc text-muted small">({% if current_lang == 'he' %}או{% elif current_lang == 'en' %}or{% else %}или{% endif %} ${{ prices.basic.usd }})</p>
         </div>
         <div class="pricing-features">
           <ul>
-            <li><i class="bi bi-check2"></i> כל מה שב-FREE</li>
-            <li class="highlight"><i class="bi bi-plus-lg"></i> גרפים מתקדמים</li>
-            <li class="highlight"><i class="bi bi-plus-lg"></i> השוואת תקופות</li>
-            <li class="highlight"><i class="bi bi-plus-lg"></i> ייצוא PDF</li>
-            <li class="disabled"><i class="bi bi-x"></i> תובנות AI</li>
-            <li class="disabled"><i class="bi bi-x"></i> תוכנית פעולה</li>
-            <li class="disabled"><i class="bi bi-x"></i> הערכת ROI</li>
+            <li><i class="bi bi-check2"></i> {% if current_lang == 'he' %}כל מה שב-FREE{% elif current_lang == 'en' %}Everything in FREE{% else %}Все из FREE{% endif %}</li>
+            <li class="highlight"><i class="bi bi-plus-lg"></i> {% if current_lang == 'he' %}גרפים מתקדמים{% elif current_lang == 'en' %}Advanced graphs{% else %}Продвинутые графики{% endif %}</li>
+            <li class="highlight"><i class="bi bi-plus-lg"></i> {% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Period comparison{% else %}Сравнение периодов{% endif %}</li>
+            <li class="highlight"><i class="bi bi-plus-lg"></i> {% if current_lang == 'he' %}ייצוא PDF{% elif current_lang == 'en' %}PDF export{% else %}Экспорт PDF{% endif %}</li>
+            <li class="disabled"><i class="bi bi-x"></i> {% if current_lang == 'he' %}תובנות AI{% elif current_lang == 'en' %}AI insights{% else %}AI-инсайты{% endif %}</li>
+            <li class="disabled"><i class="bi bi-x"></i> {% if current_lang == 'he' %}תוכנית פעולה{% elif current_lang == 'en' %}Action plan{% else %}План действий{% endif %}</li>
+            <li class="disabled"><i class="bi bi-x"></i> {% if current_lang == 'he' %}הערכת ROI{% elif current_lang == 'en' %}ROI estimate{% else %}Оценка ROI{% endif %}</li>
           </ul>
         </div>
         <div class="pricing-action">
           {% if session.uid %}
             {% if current_plan == 'basic' %}
-              <span class="btn btn-basic w-100 disabled">התוכנית הנוכחית</span>
+              <span class="btn btn-basic w-100 disabled">{{ t('pricing_current_badge') }}</span>
             {% else %}
               <a href="{{ url_for('subscribe', plan='basic') }}" class="btn btn-basic w-100">
-                {% if current_plan == 'free' %}שדרג ל-BASIC{% else %}עבור ל-BASIC{% endif %}
+                {% if current_plan == 'free' %}{% if current_lang == 'he' %}שדרג ל-BASIC{% elif current_lang == 'en' %}Upgrade to BASIC{% else %}Обновить до BASIC{% endif %}{% else %}{% if current_lang == 'he' %}עבור ל-BASIC{% elif current_lang == 'en' %}Switch to BASIC{% else %}Перейти на BASIC{% endif %}{% endif %}
               </a>
             {% endif %}
           {% else %}
-            <a href="{{ url_for('signup') }}" class="btn btn-basic w-100">התחל עכשיו</a>
+            <a href="{{ url_for('signup') }}" class="btn btn-basic w-100">{% if current_lang == 'he' %}התחל עכשיו{% elif current_lang == 'en' %}Start Now{% else %}Начать сейчас{% endif %}</a>
           {% endif %}
         </div>
       </div>
@@ -131,11 +131,11 @@
     <!-- PRO Plan -->
     <div class="col-12 col-md-6 col-lg-4">
       <div class="pricing-card featured {% if current_plan == 'pro' %}current{% endif %}">
-        <div class="popular-badge">הכי פופולרי</div>
+        <div class="popular-badge">{% if current_lang == 'he' %}הכי פופולרי{% elif current_lang == 'en' %}Most Popular{% else %}Самый популярный{% endif %}</div>
         {% if current_plan == 'pro' and not trial_active %}
-        <div class="current-badge pro">התוכנית שלך</div>
+        <div class="current-badge pro">{{ t('pricing_your_plan') }}</div>
         {% elif trial_active %}
-        <div class="current-badge trial">תקופת ניסיון</div>
+        <div class="current-badge trial">{{ t('pricing_trial') }}</div>
         {% endif %}
         <div class="pricing-header">
           <div class="pricing-icon pro">
@@ -145,34 +145,34 @@
           <div class="pricing-price">
             <span class="currency">₪</span>
             <span class="amount">{{ prices.pro.ils }}</span>
-            <span class="period">/חודש</span>
+            <span class="period">/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
           </div>
-          <p class="pricing-desc text-muted small">(או ${{ prices.pro.usd }})</p>
+          <p class="pricing-desc text-muted small">({% if current_lang == 'he' %}או{% elif current_lang == 'en' %}or{% else %}или{% endif %} ${{ prices.pro.usd }})</p>
         </div>
         <div class="pricing-features">
           <ul>
-            <li><i class="bi bi-check2"></i> כל מה שב-BASIC</li>
-            <li class="highlight"><i class="bi bi-stars"></i> תובנות AI חכמות</li>
-            <li class="highlight"><i class="bi bi-lightning-fill"></i> תוכנית פעולה מותאמת</li>
-            <li class="highlight"><i class="bi bi-graph-up-arrow"></i> הערכת ROI</li>
-            <li class="highlight"><i class="bi bi-bar-chart-steps"></i> ניתוח מגמות מתקדם</li>
-            <li class="highlight"><i class="bi bi-headset"></i> תמיכה מועדפת</li>
-            <li class="highlight"><i class="bi bi-infinity"></i> העלאות ללא הגבלה</li>
+            <li><i class="bi bi-check2"></i> {% if current_lang == 'he' %}כל מה שב-BASIC{% elif current_lang == 'en' %}Everything in BASIC{% else %}Все из BASIC{% endif %}</li>
+            <li class="highlight"><i class="bi bi-stars"></i> {% if current_lang == 'he' %}תובנות AI חכמות{% elif current_lang == 'en' %}Smart AI insights{% else %}Умные AI-инсайты{% endif %}</li>
+            <li class="highlight"><i class="bi bi-lightning-fill"></i> {% if current_lang == 'he' %}תוכנית פעולה מותאמת{% elif current_lang == 'en' %}Personalized action plan{% else %}Персонализированный план действий{% endif %}</li>
+            <li class="highlight"><i class="bi bi-graph-up-arrow"></i> {% if current_lang == 'he' %}הערכת ROI{% elif current_lang == 'en' %}ROI estimate{% else %}Оценка ROI{% endif %}</li>
+            <li class="highlight"><i class="bi bi-bar-chart-steps"></i> {% if current_lang == 'he' %}ניתוח מגמות מתקדם{% elif current_lang == 'en' %}Advanced trend analysis{% else %}Продвинутый анализ трендов{% endif %}</li>
+            <li class="highlight"><i class="bi bi-headset"></i> {% if current_lang == 'he' %}תמיכה מועדפת{% elif current_lang == 'en' %}Priority support{% else %}Приоритетная поддержка{% endif %}</li>
+            <li class="highlight"><i class="bi bi-infinity"></i> {% if current_lang == 'he' %}העלאות ללא הגבלה{% elif current_lang == 'en' %}Unlimited uploads{% else %}Неограниченные загрузки{% endif %}</li>
           </ul>
         </div>
         <div class="pricing-action">
           {% if session.uid %}
             {% if current_plan == 'pro' and not trial_active %}
-              <span class="btn btn-pro w-100 disabled">התוכנית הנוכחית</span>
+              <span class="btn btn-pro w-100 disabled">{{ t('pricing_current_badge') }}</span>
             {% elif trial_active %}
-              <a href="{{ url_for('subscribe', plan='pro') }}" class="btn btn-pro w-100">המשך עם PRO</a>
+              <a href="{{ url_for('subscribe', plan='pro') }}" class="btn btn-pro w-100">{% if current_lang == 'he' %}המשך עם PRO{% elif current_lang == 'en' %}Continue with PRO{% else %}Продолжить с PRO{% endif %}</a>
             {% else %}
               <a href="{{ url_for('subscribe', plan='pro') }}" class="btn btn-pro w-100">
-                <i class="bi bi-rocket-takeoff me-1"></i>שדרג ל-PRO
+                <i class="bi bi-rocket-takeoff me-1"></i>{% if current_lang == 'he' %}שדרג ל-PRO{% elif current_lang == 'en' %}Upgrade to PRO{% else %}Обновить до PRO{% endif %}
               </a>
             {% endif %}
           {% else %}
-            <a href="{{ url_for('signup') }}" class="btn btn-pro w-100">התחל עכשיו</a>
+            <a href="{{ url_for('signup') }}" class="btn btn-pro w-100">{% if current_lang == 'he' %}התחל עכשיו{% elif current_lang == 'en' %}Start Now{% else %}Начать сейчас{% endif %}</a>
           {% endif %}
         </div>
       </div>
@@ -185,12 +185,12 @@
   <div class="trial-banner mt-5">
     <div class="d-flex flex-wrap align-items-center justify-content-center gap-4">
       <div class="text-center text-md-start">
-        <h4 class="mb-1"><i class="bi bi-gift me-2"></i>לא בטוח/ה? נסה PRO חינם!</h4>
-        <p class="mb-0 text-muted">7 ימים של כל הפיצ'רים — בלי כרטיס אשראי</p>
+        <h4 class="mb-1"><i class="bi bi-gift me-2"></i>{% if current_lang == 'he' %}לא בטוח/ה? נסה PRO חינם!{% elif current_lang == 'en' %}Not sure? Try PRO for free!{% else %}Не уверены? Попробуйте PRO бесплатно!{% endif %}</h4>
+        <p class="mb-0 text-muted">{% if current_lang == 'he' %}7 ימים של כל הפיצ'רים — בלי כרטיס אשראי{% elif current_lang == 'en' %}7 days of all features — no credit card{% else %}7 дней всех функций — без кредитной карты{% endif %}</p>
       </div>
       <form method="POST" action="{{ url_for('start_trial') }}">
         <button type="submit" class="btn btn-trial">
-          <i class="bi bi-play-fill me-1"></i>התחל ניסיון חינם
+          <i class="bi bi-play-fill me-1"></i>{{ t('pricing_try_trial') }}
         </button>
       </form>
     </div>
@@ -199,18 +199,18 @@
 
   <!-- FAQ Section -->
   <div class="mt-5 pt-4">
-    <h3 class="text-center mb-4">שאלות נפוצות</h3>
+    <h3 class="text-center mb-4">{% if current_lang == 'he' %}שאלות נפוצות{% elif current_lang == 'en' %}Frequently Asked Questions{% else %}Часто задаваемые вопросы{% endif %}</h3>
     <div class="accordion" id="pricingFaq" style="max-width: 800px; margin: 0 auto;">
       
       <div class="accordion-item">
         <h2 class="accordion-header">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-            האם אפשר לבטל בכל עת?
+            {% if current_lang == 'he' %}האם אפשר לבטל בכל עת?{% elif current_lang == 'en' %}Can I cancel anytime?{% else %}Можно ли отменить в любое время?{% endif %}
           </button>
         </h2>
         <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
           <div class="accordion-body">
-            כן! אין התחייבות. אפשר לבטל את המנוי בכל עת מעמוד הפרופיל, ולא תחויב בחודש הבא.
+            {% if current_lang == 'he' %}כן! אין התחייבות. אפשר לבטל את המנוי בכל עת מעמוד הפרופיל, ולא תחויב בחודש הבא.{% elif current_lang == 'en' %}Yes! No commitment. You can cancel your subscription anytime from the profile page, and you won't be charged next month.{% else %}Да! Без обязательств. Вы можете отменить подписку в любое время со страницы профиля, и с вас не будет списана плата в следующем месяце.{% endif %}
           </div>
         </div>
       </div>
@@ -218,12 +218,12 @@
       <div class="accordion-item">
         <h2 class="accordion-header">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-            איך עובד התשלום?
+            {% if current_lang == 'he' %}איך עובד התשלום?{% elif current_lang == 'en' %}How does payment work?{% else %}Как работает оплата?{% endif %}
           </button>
         </h2>
         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
           <div class="accordion-body">
-            התשלום מתבצע דרך PayPal בצורה מאובטחת. אפשר לשלם בכרטיס אשראי גם בלי חשבון PayPal.
+            {% if current_lang == 'he' %}התשלום מתבצע דרך PayPal בצורה מאובטחת. אפשר לשלם בכרטיס אשראי גם בלי חשבון PayPal.{% elif current_lang == 'en' %}Payment is processed securely through PayPal. You can pay with a credit card even without a PayPal account.{% else %}Оплата обрабатывается безопасно через PayPal. Вы можете оплатить кредитной картой даже без аккаунта PayPal.{% endif %}
           </div>
         </div>
       </div>
@@ -231,12 +231,12 @@
       <div class="accordion-item">
         <h2 class="accordion-header">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-            מה קורה אחרי תקופת הניסיון?
+            {% if current_lang == 'he' %}מה קורה אחרי תקופת הניסיון?{% elif current_lang == 'en' %}What happens after the trial period?{% else %}Что происходит после пробного периода?{% endif %}
           </button>
         </h2>
         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
           <div class="accordion-body">
-            אחרי 7 ימים החשבון חוזר לתוכנית FREE. לא נדרש כרטיס אשראי לניסיון, ואין חיוב אוטומטי.
+            {% if current_lang == 'he' %}אחרי 7 ימים החשבון חוזר לתוכנית FREE. לא נדרש כרטיס אשראי לניסיון, ואין חיוב אוטומטי.{% elif current_lang == 'en' %}After 7 days, the account returns to the FREE plan. No credit card is required for the trial, and there's no automatic charge.{% else %}После 7 дней аккаунт возвращается к плану FREE. Для пробного периода не требуется кредитная карта, и нет автоматического списания.{% endif %}
           </div>
         </div>
       </div>
@@ -244,12 +244,12 @@
       <div class="accordion-item">
         <h2 class="accordion-header">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-            יש הנחה לתשלום שנתי?
+            {% if current_lang == 'he' %}יש הנחה לתשלום שנתי?{% elif current_lang == 'en' %}Is there a discount for annual payment?{% else %}Есть ли скидка на годовую оплату?{% endif %}
           </button>
         </h2>
         <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
           <div class="accordion-body">
-            בקרוב! אנחנו עובדים על אפשרות תשלום שנתי עם הנחה משמעותית.
+            {% if current_lang == 'he' %}בקרוב! אנחנו עובדים על אפשרות תשלום שנתי עם הנחה משמעותית.{% elif current_lang == 'en' %}Coming soon! We're working on an annual payment option with a significant discount.{% else %}Скоро! Мы работаем над возможностью годовой оплаты со значительной скидкой.{% endif %}
           </div>
         </div>
       </div>
@@ -259,9 +259,9 @@
 
   <!-- CTA -->
   <div class="text-center mt-5 pt-4">
-    <p class="text-muted mb-3">יש שאלות נוספות?</p>
+    <p class="text-muted mb-3">{% if current_lang == 'he' %}יש שאלות נוספות?{% elif current_lang == 'en' %}Have more questions?{% else %}Есть еще вопросы?{% endif %}</p>
     <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">
-      <i class="bi bi-envelope me-2"></i>צור קשר
+      <i class="bi bi-envelope me-2"></i>{{ t('nav_contact') }}
     </a>
   </div>
 

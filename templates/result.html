@@ -11,17 +11,17 @@
   {% endif %}
 
   {% if not plots or plots|length == 0 %}
-    <div class="alert alert-warning">אין גרפים להצגה. חזור לדף הבית והעלה דוח חדש.</div>
+    <div class="alert alert-warning">{{ t('results_no_graphs') }}</div>
   {% else %}
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="mb-0">תוצאות הניתוח</h3>
+      <h3 class="mb-0">{{ t('results_title') }}</h3>
       <div class="d-flex gap-2">
-        <a class="btn btn-outline-secondary" href="{{ url_for('index') }}">העלה דוח חדש</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('index') }}">{{ t('results_upload_new') }}</a>
         {% if user_plan == 'pro' %}
-          <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">הורדת PDF</a>
+          <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">{{ t('results_download_pdf') }}</a>
         {% else %}
           <a class="btn btn-outline-warning" href="{{ url_for('profile') }}#plans">
-            <i class="bi bi-lock me-1"></i>הורדת PDF
+            <i class="bi bi-lock me-1"></i>{{ t('results_download_pdf') }}
           </a>
         {% endif %}
       </div>
@@ -37,8 +37,8 @@
               <i class="bi bi-clipboard-data" style="font-size: 1.4rem; color: #fff;"></i>
             </div>
             <div>
-              <h4 class="mb-0" style="color: var(--text);">סיכום הניתוח</h4>
-              <p class="mb-0 text-muted small">תובנות עיקריות מהדוח שלך</p>
+              <h4 class="mb-0" style="color: var(--text);">{{ t('results_summary') }}</h4>
+              <p class="mb-0 text-muted small">{{ t('results_summary_desc') }}</p>
             </div>
           </div>
           
@@ -63,22 +63,22 @@
           <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
             <i class="bi bi-bar-chart-fill" style="font-size: 2rem; color: #fbbf24;"></i>
           </div>
-          <h4 class="mb-2" style="color: var(--text);">רוצה לראות גרפים וניתוחים מתקדמים?</h4>
-          <p class="text-muted mb-4">שדרג לחבילת Basic או Pro כדי לראות את כל הגרפים והנתונים</p>
+          <h4 class="mb-2" style="color: var(--text);">{{ t('results_upgrade_banner') }}</h4>
+          <p class="text-muted mb-4">{{ t('results_upgrade_desc') }}</p>
           
           <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
             <a href="{{ url_for('profile') }}#plans" class="btn btn-lg px-4" style="background: linear-gradient(90deg, #2ea0ff, #34c3ff); color: #fff; border: none; border-radius: 12px; font-weight: 600;">
-              <i class="bi bi-graph-up me-2"></i>Basic - גרפים בלבד
+              <i class="bi bi-graph-up me-2"></i>{{ t('results_basic_graphs') }}
             </a>
             <a href="{{ url_for('profile') }}#plans" class="btn btn-lg px-4" style="background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #000; border: none; border-radius: 12px; font-weight: 600;">
-              <i class="bi bi-stars me-2"></i>Pro - כולל AI
+              <i class="bi bi-stars me-2"></i>{{ t('results_pro_ai') }}
             </a>
           </div>
           
           <div class="mt-4">
             <form action="{{ url_for('start_trial') }}" method="POST" class="d-inline">
               <button type="submit" class="btn" style="background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.3); border-radius: 10px;">
-                <i class="bi bi-gift me-1"></i>נסה 7 ימים חינם
+                <i class="bi bi-gift me-1"></i>{{ t('results_try_free') }}
               </button>
             </form>
           </div>
@@ -95,8 +95,8 @@
               📋
             </div>
             <div>
-              <h4 class="mb-0" style="color: var(--text);">תוכנית פעולה מומלצת</h4>
-              <p class="mb-0 text-muted small">פעולות קונקרטיות על בסיס הניתוח שלך</p>
+              <h4 class="mb-0" style="color: var(--text);">{{ t('results_action_plan') }}</h4>
+              <p class="mb-0 text-muted small">{{ t('results_action_desc') }}</p>
             </div>
           </div>
 
@@ -115,7 +115,7 @@
                   
                   <details class="action-details">
                     <summary style="cursor: pointer; color: #2ea0ff; font-size: 0.85rem;">
-                      <i class="bi bi-chevron-down me-1"></i>איך לעשות את זה?
+                      <i class="bi bi-chevron-down me-1"></i>{{ t('results_how_to') }}
                     </summary>
                     <ul class="mt-2 mb-0 ps-3 small" style="color: var(--muted);">
                       {% for step in item.how_to %}
@@ -131,7 +131,7 @@
           {% if action_items|length > 3 %}
             <div class="mt-3 text-center">
               <button class="btn btn-sm" onclick="document.getElementById('moreActions').style.display='block'; this.style.display='none';" style="background: rgba(46,160,255,0.1); color: #2ea0ff; border: none; border-radius: 8px;">
-                <i class="bi bi-plus-circle me-1"></i>עוד {{ action_items|length - 3 }} המלצות
+                <i class="bi bi-plus-circle me-1"></i>{% if current_lang == 'he' %}עוד {{ action_items|length - 3 }} המלצות{% elif current_lang == 'en' %}More {{ action_items|length - 3 }} recommendations{% else %}Еще {{ action_items|length - 3 }} рекомендаций{% endif %}
               </button>
             </div>
             <div id="moreActions" style="display: none;" class="mt-3">
@@ -157,10 +157,10 @@
       <div class="card mb-4" dir="rtl" style="text-align:right; border: 1px solid rgba(251,191,36,0.3); border-radius: 16px; background: rgba(251,191,36,0.03);">
         <div class="card-body text-center py-4">
           <i class="bi bi-stars" style="font-size: 2rem; color: #fbbf24;"></i>
-          <h5 class="mt-2 mb-2" style="color: var(--text);">יש לנו {{ action_items|length }} המלצות AI עבורך!</h5>
-          <p class="text-muted small mb-3">שדרג לחבילת Pro כדי לקבל תוכנית פעולה מותאמת אישית</p>
+          <h5 class="mt-2 mb-2" style="color: var(--text);">{% if current_lang == 'he' %}יש לנו {{ action_items|length }} המלצות AI עבורך!{% elif current_lang == 'en' %}We have {{ action_items|length }} AI recommendations for you!{% else %}У нас есть {{ action_items|length }} AI-рекомендаций для вас!{% endif %}</h5>
+          <p class="text-muted small mb-3">{{ t('results_upgrade_for_ai') }}</p>
           <a href="{{ url_for('profile') }}#plans" class="btn" style="background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #000; border: none; border-radius: 10px;">
-            <i class="bi bi-rocket-takeoff me-1"></i>שדרג ל-Pro
+            <i class="bi bi-rocket-takeoff me-1"></i>{{ t('results_upgrade_to_pro') }}
           </a>
         </div>
       </div>
@@ -175,30 +175,30 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">
               <i class="bi bi-graph-up-arrow me-2" style="color: #10b981;"></i>
-              פוטנציאל שיפור
+              {{ t('results_roi_potential') }}
             </h5>
             <a href="{{ url_for('roi_page') }}" class="btn btn-sm" style="background: rgba(16,185,129,0.1); color: #34d399; border-radius: 8px;">
-              פרטים נוספים <i class="bi bi-arrow-left"></i>
+              {% if current_lang == 'he' %}פרטים נוספים{% elif current_lang == 'en' %}More Details{% else %}Подробнее{% endif %} <i class="bi bi-arrow-left"></i>
             </a>
           </div>
           
           <div class="row g-3 text-center">
             <div class="col-6 col-md-4">
               <div class="p-2" style="background: rgba(16,185,129,0.08); border-radius: 10px;">
-                <div class="small text-muted">פוטנציאל חודשי</div>
+                <div class="small text-muted">{{ t('results_roi_monthly') }}</div>
                 <div style="font-size: 1.25rem; font-weight: bold; color: #34d399;">~₪{{ "{:,.0f}".format(_gain) }}</div>
               </div>
             </div>
             <div class="col-6 col-md-4">
               <div class="p-2" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
-                <div class="small text-muted">ROI תיאורטי</div>
+                <div class="small text-muted">{{ t('results_roi_theoretical') }}</div>
                 <div style="font-size: 1.25rem; font-weight: bold; color: #34c3ff;">{{ "{:,.0f}".format(_roi) }}%</div>
               </div>
             </div>
             <div class="col-12 col-md-4">
               <div class="p-2" style="background: rgba(251,191,36,0.08); border-radius: 10px;">
-                <div class="small text-muted">⚠️ הערכה בלבד</div>
-                <div style="font-size: 0.85rem; color: #fbbf24;">תלוי בפעולות שלך</div>
+                <div class="small text-muted">⚠️ {{ t('results_roi_estimate') }}</div>
+                <div style="font-size: 0.85rem; color: #fbbf24;">{{ t('results_roi_depends') }}</div>
               </div>
             </div>
           </div>
@@ -217,7 +217,7 @@
                 <a class="btn btn-sm btn-outline-secondary"
                    data-download="{{ url_for('static', filename='plots/' ~ p.filename) }}"
                    data-filename="{{ p.filename }}">
-                  הורד תמונה
+                  {{ t('results_download_image') }}
                 </a>
               </div>
 

@@ -11,11 +11,11 @@
         </div>
         
         <!-- Title -->
-        <h2 class="mb-3" style="color: var(--text);">שדרוג נדרש</h2>
+        <h2 class="mb-3" style="color: var(--text);">{{ t('upgrade_title') }}</h2>
         
         <!-- Message -->
         <p class="text-muted mb-4" style="font-size: 1.1rem;">
-          <strong style="color: var(--text);">{{ feature }}</strong> זמין רק למנויי 
+          <strong style="color: var(--text);">{{ feature }}</strong> {% if current_lang == 'he' %}זמין רק למנויי{% elif current_lang == 'en' %}available only for{% else %}доступно только для{% endif %} 
           <span style="background: linear-gradient(90deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700;">PRO</span>
         </p>
         
@@ -23,24 +23,24 @@
         <div class="card mb-4" style="border: 1px solid rgba(251,191,36,0.2); border-radius: 16px; background: rgba(251,191,36,0.05);">
           <div class="card-body p-4">
             <h6 class="mb-3" style="color: #fbbf24;">
-              <i class="bi bi-stars me-2"></i>יתרונות חבילת PRO
+              <i class="bi bi-stars me-2"></i>{% if current_lang == 'he' %}יתרונות חבילת PRO{% elif current_lang == 'en' %}PRO Plan Benefits{% else %}Преимущества плана PRO{% endif %}
             </h6>
             <div class="d-flex flex-column gap-2 text-start">
               <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
-                <span>הורדת דו"ח PDF מקצועי עם המלצות</span>
+                <span>{% if current_lang == 'he' %}הורדת דו"ח PDF מקצועי עם המלצות{% elif current_lang == 'en' %}Download professional PDF report with recommendations{% else %}Скачать профессиональный PDF отчет с рекомендациями{% endif %}</span>
               </div>
               <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
-                <span>ניתוח מתקדם עם AI</span>
+                <span>{% if current_lang == 'he' %}ניתוח מתקדם עם AI{% elif current_lang == 'en' %}Advanced AI analysis{% else %}Продвинутый AI-анализ{% endif %}</span>
               </div>
               <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
-                <span>ללא הגבלת ניתוחים</span>
+                <span>{% if current_lang == 'he' %}ללא הגבלת ניתוחים{% elif current_lang == 'en' %}Unlimited analyses{% else %}Неограниченные анализы{% endif %}</span>
               </div>
               <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
-                <span>תמיכה בעדיפות גבוהה</span>
+                <span>{% if current_lang == 'he' %}תמיכה בעדיפות גבוהה{% elif current_lang == 'en' %}Priority support{% else %}Приоритетная поддержка{% endif %}</span>
               </div>
             </div>
           </div>
@@ -48,18 +48,18 @@
         
         <!-- Price -->
         <div class="mb-4">
-          <span class="text-muted">רק </span>
+          <span class="text-muted">{% if current_lang == 'he' %}רק {% elif current_lang == 'en' %}Only {% else %}Всего {% endif %}</span>
           <span style="font-size: 2rem; font-weight: 700; color: var(--text);">$20</span>
-          <span class="text-muted"> / חודש</span>
+          <span class="text-muted"> / {% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
         </div>
         
         <!-- CTA Buttons -->
         <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
           <a href="{{ url_for('profile') }}#plans" class="btn btn-lg px-5" style="background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #000; border: none; border-radius: 12px; font-weight: 600;">
-            <i class="bi bi-rocket-takeoff me-2"></i>שדרג עכשיו
+            <i class="bi bi-rocket-takeoff me-2"></i>{{ t('upgrade_upgrade_now') }}
           </a>
           <a href="{{ url_for('dashboard') }}" class="btn btn-lg px-4" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
-            <i class="bi bi-arrow-right me-2"></i>חזרה לדשבורד
+            <i class="bi bi-arrow-right me-2"></i>{% if current_lang == 'he' %}חזרה לדשבורד{% elif current_lang == 'en' %}Back to Dashboard{% else %}Вернуться в панель{% endif %}
           </a>
         </div>
         
@@ -67,11 +67,11 @@
         {% if current_user() and not current_user()['trial_used'] %}
         <div class="mt-4 p-3" style="background: rgba(16,185,129,0.1); border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">
           <p class="mb-2 small" style="color: #10b981;">
-            <i class="bi bi-gift me-1"></i>עדיין לא ניסית את תקופת הניסיון?
+            <i class="bi bi-gift me-1"></i>{% if current_lang == 'he' %}עדיין לא ניסית את תקופת הניסיון?{% elif current_lang == 'en' %}Haven't tried the trial period yet?{% else %}Еще не пробовали пробный период?{% endif %}
           </p>
           <form action="{{ url_for('start_trial') }}" method="POST" class="d-inline">
             <button type="submit" class="btn btn-sm" style="background: rgba(16,185,129,0.2); color: #10b981; border: none;">
-              התחל 7 ימי ניסיון חינם
+              {{ t('pricing_try_trial') }}
             </button>
           </form>
         </div>

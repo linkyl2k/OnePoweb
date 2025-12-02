@@ -73,20 +73,20 @@
           <!-- Current Status -->
           <div class="mb-4 p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
             <div class="d-flex justify-content-between align-items-center">
-              <span class="text-muted">סטטוס נוכחי</span>
+              <span class="text-muted">{{ t('profile_current_status') }}</span>
               {% if user.plan in ['basic','pro'] %}
                 {% if not user.cancelled_at %}
                   <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 8px;">
-                    <i class="bi bi-check-circle me-1"></i> פעיל
+                    <i class="bi bi-check-circle me-1"></i>{{ t('profile_active') }}
                   </span>
                 {% else %}
                   <span class="badge" style="background: rgba(239,68,68,0.15); color: #f87171; padding: 6px 12px; border-radius: 8px;">
-                    <i class="bi bi-x-circle me-1"></i> מבוטל
+                    <i class="bi bi-x-circle me-1"></i>{{ t('profile_cancelled') }}
                   </span>
                 {% endif %}
               {% else %}
                 <span class="badge" style="background: rgba(255,255,255,0.08); color: var(--muted); padding: 6px 12px; border-radius: 8px;">
-                  ללא מנוי
+                  {{ t('profile_no_subscription') }}
                 </span>
               {% endif %}
             </div>
@@ -98,12 +98,12 @@
               <div class="d-flex align-items-center gap-3">
                 <div style="font-size: 2rem;">🎁</div>
                 <div class="flex-grow-1">
-                  <strong style="color: #fbbf24;">נסה PRO חינם!</strong>
-                  <p class="mb-0 small text-muted">7 ימים של כל הפיצ'רים ללא תשלום</p>
+                  <strong style="color: #fbbf24;">{{ t('profile_trial_available') }}</strong>
+                  <p class="mb-0 small text-muted">{{ t('profile_trial_desc') }}</p>
                 </div>
                 <form method="POST" action="{{ url_for('start_trial') }}">
                   <button type="submit" class="btn" style="background: linear-gradient(90deg, #f59e0b, #fbbf24); color: #000; font-weight: 600; border-radius: 10px; padding: 10px 20px;">
-                    התחל ניסיון
+                    {{ t('profile_start_trial') }}
                   </button>
                 </form>
               </div>
@@ -114,23 +114,23 @@
           <div class="d-flex flex-column gap-2">
             <a class="btn w-100" href="{{ url_for('subscribe', plan='basic') }}" style="background: rgba(46,160,255,0.15); color: #2ea0ff; border: 1px solid rgba(46,160,255,0.3); border-radius: 10px; padding: 12px;">
               <i class="bi bi-star me-2"></i>
-              מנוי BASIC — ₪39/חודש
+              {% if current_lang == 'he' %}מנוי BASIC — ₪39/חודש{% elif current_lang == 'en' %}BASIC Subscription — ₪39/month{% else %}Подписка BASIC — ₪39/месяц{% endif %}
             </a>
             <a class="btn w-100" href="{{ url_for('subscribe', plan='pro') }}" style="background: linear-gradient(90deg, #10b981, #34d399); color: #fff; border: none; border-radius: 10px; padding: 12px; font-weight: 600;">
               <i class="bi bi-rocket-takeoff me-2"></i>
-              מנוי PRO — ₪69/חודש
+              {% if current_lang == 'he' %}מנוי PRO — ₪69/חודש{% elif current_lang == 'en' %}PRO Subscription — ₪69/month{% else %}Подписка PRO — ₪69/месяц{% endif %}
             </a>
             
             {% if user.plan in ['basic','pro'] and not user.cancelled_at %}
-              <form method="POST" action="{{ url_for('cancel_subscription') }}" onsubmit="return confirm('האם לבטל את המנוי?')">
+              <form method="POST" action="{{ url_for('cancel_subscription') }}" onsubmit="return confirm('{% if current_lang == 'he' %}האם לבטל את המנוי?{% elif current_lang == 'en' %}Cancel subscription?{% else %}Отменить подписку?{% endif %}')">
                 <button class="btn w-100" type="submit" style="background: transparent; color: #f87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px;">
-                  <i class="bi bi-x-lg me-2"></i> בטל מנוי
+                  <i class="bi bi-x-lg me-2"></i> {% if current_lang == 'he' %}בטל מנוי{% elif current_lang == 'en' %}Cancel Subscription{% else %}Отменить подписку{% endif %}
                 </button>
               </form>
             {% elif user.plan in ['basic','pro'] and user.cancelled_at %}
               <form method="POST" action="{{ url_for('renew_subscription') }}">
                 <button class="btn w-100" type="submit" style="background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 12px;">
-                  <i class="bi bi-arrow-repeat me-2"></i> חידוש מנוי
+                  <i class="bi bi-arrow-repeat me-2"></i> {% if current_lang == 'he' %}חידוש מנוי{% elif current_lang == 'en' %}Renew Subscription{% else %}Продлить подписку{% endif %}
                 </button>
               </form>
             {% endif %}
@@ -148,8 +148,8 @@
               <i class="bi bi-gift" style="font-size: 1.25rem; color: #1abc9c;"></i>
             </div>
             <div>
-              <h5 class="mb-0">הזמן חברים</h5>
-              <span class="text-muted small">קבל 50% הנחה על החודש הבא</span>
+              <h5 class="mb-0">{% if current_lang == 'he' %}הזמן חברים{% elif current_lang == 'en' %}Invite Friends{% else %}Пригласить друзей{% endif %}</h5>
+              <span class="text-muted small">{% if current_lang == 'he' %}קבל 50% הנחה על החודש הבא{% elif current_lang == 'en' %}Get 50% discount on next month{% else %}Получите 50% скидку на следующий месяц{% endif %}</span>
             </div>
           </div>
 
@@ -160,7 +160,7 @@
                 <div style="font-size: 2rem; font-weight: bold; color: #34d399;">
                   {% if user.referral_discount and user.referral_discount > 0 %}{{ user.referral_discount }}%{% else %}0%{% endif %}
                 </div>
-                <div class="text-muted small">הנחה ממתינה</div>
+                <div class="text-muted small">{{ t('profile_referral_pending') }}</div>
               </div>
             </div>
             <div class="col-6">
@@ -168,27 +168,27 @@
                 <div style="font-size: 2rem; font-weight: bold; color: #34c3ff;">
                   {{ user.referred_count or 0 }}
                 </div>
-                <div class="text-muted small">חברים הצטרפו</div>
+                <div class="text-muted small">{% if current_lang == 'he' %}חברים הצטרפו{% elif current_lang == 'en' %}Friends Joined{% else %}Друзей присоединилось{% endif %}</div>
               </div>
             </div>
           </div>
 
           <!-- Referral Link -->
-          <label class="form-label small text-muted mb-2">הלינק האישי שלך:</label>
+          <label class="form-label small text-muted mb-2">{% if current_lang == 'he' %}הלינק האישי שלך:{% elif current_lang == 'en' %}Your Personal Link:{% else %}Ваша персональная ссылка:{% endif %}</label>
           <div class="input-group mb-3">
             <input type="text" class="form-control" readonly value="{{ url_for('signup', ref=user.ref_code, _external=True) }}" style="font-size: 0.85rem; border-radius: 10px 0 0 10px;">
             <button class="btn" type="button" onclick="copyLink(this)" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); color: #fff; border: none; border-radius: 0 10px 10px 0; padding: 0 20px;">
-              <i class="bi bi-clipboard"></i> העתק
+              <i class="bi bi-clipboard"></i> {% if current_lang == 'he' %}העתק{% elif current_lang == 'en' %}Copy{% else %}Копировать{% endif %}
             </button>
           </div>
 
           <p class="small text-muted mb-3" style="line-height: 1.6;">
             <i class="bi bi-info-circle me-1"></i>
-            שתף/י את הלינק — כל חבר/ה שמצטרף/ת ומשלם/ת מזכה אותך ב־<strong>50% הנחה</strong> על החודש הבא. ההנחה חד-פעמית ותחול אוטומטית בחיוב הבא.
+            {% if current_lang == 'he' %}שתף/י את הלינק — כל חבר/ה שמצטרף/ת ומשלם/ת מזכה אותך ב־<strong>50% הנחה</strong> על החודש הבא. ההנחה חד-פעמית ותחול אוטומטית בחיוב הבא.{% elif current_lang == 'en' %}Share the link — every friend who joins and pays earns you a <strong>50% discount</strong> on next month. The discount is one-time and will apply automatically on the next charge.{% else %}Поделитесь ссылкой — каждый друг, который присоединится и оплатит, даст вам <strong>50% скидку</strong> на следующий месяц. Скидка одноразовая и будет применена автоматически при следующем платеже.{% endif %}
           </p>
 
           <a class="btn w-100" href="{{ url_for('referrals') }}" style="background: rgba(26,188,156,0.12); color: #1abc9c; border: 1px solid rgba(26,188,156,0.25); border-radius: 10px; padding: 10px;">
-            <i class="bi bi-bar-chart me-2"></i> פרטים נוספים
+            <i class="bi bi-bar-chart me-2"></i> {% if current_lang == 'he' %}פרטים נוספים{% elif current_lang == 'en' %}More Details{% else %}Подробнее{% endif %}
           </a>
         </div>
       </div>
@@ -202,7 +202,7 @@ function copyLink(btn) {
   const input = btn.parentElement.querySelector('input');
   navigator.clipboard.writeText(input.value);
   const originalHtml = btn.innerHTML;
-  btn.innerHTML = '<i class="bi bi-check2"></i> הועתק!';
+  btn.innerHTML = '<i class="bi bi-check2"></i> {% if current_lang == 'he' %}הועתק!{% elif current_lang == 'en' %}Copied!{% else %}Скопировано!{% endif %}';
   btn.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
   setTimeout(() => {
     btn.innerHTML = originalHtml;

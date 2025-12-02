@@ -7,8 +7,8 @@
     <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(16,185,129,0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
       <i class="bi bi-people-fill" style="font-size: 1.75rem; color: #1abc9c;"></i>
     </div>
-    <h2 style="color: #fff; margin-bottom: 0.5rem;">תוכנית ההפניות</h2>
-    <p class="text-muted">הזמן חברים וקבל 50% הנחה על החודש הבא!</p>
+    <h2 style="color: #fff; margin-bottom: 0.5rem;">{% if current_lang == 'he' %}תוכנית ההפניות{% elif current_lang == 'en' %}Referral Program{% else %}Реферальная программа{% endif %}</h2>
+    <p class="text-muted">{% if current_lang == 'he' %}הזמן חברים וקבל 50% הנחה על החודש הבא!{% elif current_lang == 'en' %}Invite friends and get 50% discount on next month!{% else %}Пригласите друзей и получите 50% скидку на следующий месяц!{% endif %}</p>
   </div>
 
   <!-- Stats Cards -->
@@ -22,14 +22,12 @@
           <div style="font-size: 2.5rem; font-weight: bold; color: #34d399; line-height: 1;">
             {% if referral_discount > 0 %}{{ referral_discount }}%{% else %}0%{% endif %}
           </div>
-          <div class="text-muted mt-2">הנחה ממתינה</div>
+          <div class="text-muted mt-2">{{ t('profile_referral_pending') }}</div>
           <p class="small text-muted mt-3 mb-0" style="line-height: 1.5;">
             {% if referral_discount > 0 %}
-            יש לך 50% הנחה על החודש הבא!<br>
-            (חד-פעמי)
+            {% if current_lang == 'he' %}יש לך 50% הנחה על החודש הבא!<br>(חד-פעמי){% elif current_lang == 'en' %}You have 50% discount on next month!<br>(One-time){% else %}У вас 50% скидка на следующий месяц!<br>(Одноразовая){% endif %}
             {% else %}
-            הזמן חברים וקבל 50% הנחה<br>
-            על החודש הבא
+            {% if current_lang == 'he' %}הזמן חברים וקבל 50% הנחה<br>על החודש הבא{% elif current_lang == 'en' %}Invite friends and get 50% discount<br>on next month{% else %}Пригласите друзей и получите 50% скидку<br>на следующий месяц{% endif %}
             {% endif %}
           </p>
         </div>
@@ -45,10 +43,9 @@
           <div style="font-size: 2.5rem; font-weight: bold; color: #34c3ff; line-height: 1;">
             {{ referred_count }}
           </div>
-          <div class="text-muted mt-2">חברים שהצטרפו</div>
+          <div class="text-muted mt-2">{% if current_lang == 'he' %}חברים שהצטרפו{% elif current_lang == 'en' %}Friends Joined{% else %}Друзей присоединилось{% endif %}</div>
           <p class="small text-muted mt-3 mb-0" style="line-height: 1.5;">
-            נרשמו דרך הלינק האישי שלך<br>
-            ושילמו על מנוי
+            {% if current_lang == 'he' %}נרשמו דרך הלינק האישי שלך<br>ושילמו על מנוי{% elif current_lang == 'en' %}Registered through your personal link<br>and paid for subscription{% else %}Зарегистрировались по вашей персональной ссылке<br>и оплатили подписку{% endif %}
           </p>
         </div>
       </div>
@@ -63,28 +60,28 @@
           <i class="bi bi-link-45deg" style="font-size: 1.25rem; color: #1abc9c;"></i>
         </div>
         <div>
-          <h5 class="mb-0">הלינק האישי שלך</h5>
-          <span class="text-muted small">שתף את הלינק וקבל זיכוי</span>
+          <h5 class="mb-0">{% if current_lang == 'he' %}הלינק האישי שלך{% elif current_lang == 'en' %}Your Personal Link{% else %}Ваша персональная ссылка{% endif %}</h5>
+          <span class="text-muted small">{% if current_lang == 'he' %}שתף את הלינק וקבל זיכוי{% elif current_lang == 'en' %}Share the link and get credit{% else %}Поделитесь ссылкой и получите скидку{% endif %}</span>
         </div>
       </div>
       
       <div class="input-group mb-3">
         <input type="text" class="form-control" readonly value="{{ ref_link }}" id="refLink" style="font-size: 0.9rem; padding: 14px 16px; border-radius: 12px 0 0 12px;">
         <button class="btn" type="button" onclick="copyRefLink()" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); color: #fff; border: none; border-radius: 0 12px 12px 0; padding: 0 24px; font-weight: 600;">
-          <i class="bi bi-clipboard me-2"></i> העתק
+          <i class="bi bi-clipboard me-2"></i> {% if current_lang == 'he' %}העתק{% elif current_lang == 'en' %}Copy{% else %}Копировать{% endif %}
         </button>
       </div>
 
       <!-- Share Buttons -->
       <div class="d-flex flex-wrap gap-2">
-        <a href="https://wa.me/?text={{ 'הצטרף ל-OnePoweb - ' ~ ref_link | urlencode }}" target="_blank" class="btn" style="background: rgba(37,211,102,0.15); color: #25d366; border: 1px solid rgba(37,211,102,0.25); border-radius: 10px;">
+        <a href="https://wa.me/?text={{ ('הצטרף ל-OnePoweb - ' if current_lang == 'he' else 'Join OnePoweb - ' if current_lang == 'en' else 'Присоединяйтесь к OnePoweb - ') ~ ref_link | urlencode }}" target="_blank" class="btn" style="background: rgba(37,211,102,0.15); color: #25d366; border: 1px solid rgba(37,211,102,0.25); border-radius: 10px;">
           <i class="bi bi-whatsapp me-1"></i> WhatsApp
         </a>
-        <a href="https://t.me/share/url?url={{ ref_link | urlencode }}&text={{ 'הצטרף ל-OnePoweb' | urlencode }}" target="_blank" class="btn" style="background: rgba(0,136,204,0.15); color: #0088cc; border: 1px solid rgba(0,136,204,0.25); border-radius: 10px;">
+        <a href="https://t.me/share/url?url={{ ref_link | urlencode }}&text={{ ('הצטרף ל-OnePoweb' if current_lang == 'he' else 'Join OnePoweb' if current_lang == 'en' else 'Присоединяйтесь к OnePoweb') | urlencode }}" target="_blank" class="btn" style="background: rgba(0,136,204,0.15); color: #0088cc; border: 1px solid rgba(0,136,204,0.25); border-radius: 10px;">
           <i class="bi bi-telegram me-1"></i> Telegram
         </a>
         <button onclick="shareNative()" class="btn" style="background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;">
-          <i class="bi bi-share me-1"></i> שיתוף
+          <i class="bi bi-share me-1"></i> {% if current_lang == 'he' %}שיתוף{% elif current_lang == 'en' %}Share{% else %}Поделиться{% endif %}
         </button>
       </div>
     </div>

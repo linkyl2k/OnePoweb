@@ -12,45 +12,45 @@
             <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(46,160,255,0.15)); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
               <i class="bi bi-key" style="font-size: 1.5rem; color: #1abc9c;"></i>
             </div>
-            <h3 class="mb-1">הגדרת סיסמה חדשה</h3>
-            <p class="text-muted small mb-0">בחר סיסמה חזקה לחשבון שלך</p>
+            <h3 class="mb-1">{{ t('reset_title') }}</h3>
+            <p class="text-muted small mb-0">{% if current_lang == 'he' %}בחר סיסמה חזקה לחשבון שלך{% elif current_lang == 'en' %}Choose a strong password for your account{% else %}Выберите надежный пароль для вашего аккаунта{% endif %}</p>
           </div>
           
           <form method="POST" class="vstack gap-3">
             
             <!-- New Password -->
             <div>
-              <label class="form-label">סיסמה חדשה</label>
+              <label class="form-label">{{ t('reset_new_password') }}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" name="password" id="password" minlength="8" maxlength="32" class="form-control" required placeholder="סיסמה חזקה">
+                <input type="password" name="password" id="password" minlength="8" maxlength="32" class="form-control" required placeholder="{% if current_lang == 'he' %}סיסמה חזקה{% elif current_lang == 'en' %}Strong password{% else %}Надежный пароль{% endif %}">
               </div>
               
               <!-- Password Requirements -->
               <div class="mt-2 p-2" style="background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                <div class="small text-muted mb-1">דרישות סיסמה:</div>
+                <div class="small text-muted mb-1">{{ t('password_requirements') }}</div>
                 <div class="d-flex flex-wrap gap-2">
-                  <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">8-32 תווים</span>
-                  <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אותיות אנגליות בלבד</span>
-                  <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אות גדולה (A-Z)</span>
-                  <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">ספרה (0-9)</span>
+                  <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_length') }}</span>
+                  <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_english') }}</span>
+                  <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_upper') }}</span>
+                  <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_digit') }}</span>
                 </div>
               </div>
             </div>
             
             <!-- Confirm Password -->
             <div>
-              <label class="form-label">אימות סיסמה</label>
+              <label class="form-label">{{ t('reset_confirm') }}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                <input type="password" name="confirm_password" id="confirm_password" minlength="8" maxlength="32" class="form-control" required placeholder="הקלד שוב">
+                <input type="password" name="confirm_password" id="confirm_password" minlength="8" maxlength="32" class="form-control" required placeholder="{{ t('reset_confirm') }}">
               </div>
               <div id="password-match" class="small mt-1" style="display: none;"></div>
             </div>
             
             <!-- Submit -->
             <button type="submit" class="btn w-100 py-2 mt-2" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); color: #fff; border: none; border-radius: 12px; font-weight: 600;">
-              <i class="bi bi-check2-circle me-2"></i>שמור סיסמה חדשה
+              <i class="bi bi-check2-circle me-2"></i>{{ t('reset_button') }}
             </button>
             
           </form>
@@ -58,7 +58,7 @@
           <!-- Back to login -->
           <div class="text-center mt-4">
             <a href="{{ url_for('login') }}" class="text-muted small">
-              <i class="bi bi-arrow-right me-1"></i>חזרה להתחברות
+              <i class="bi bi-arrow-right me-1"></i>{% if current_lang == 'he' %}חזרה להתחברות{% elif current_lang == 'en' %}Back to Login{% else %}Вернуться к входу{% endif %}
             </a>
           </div>
           
@@ -121,10 +121,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (confirm.value.length > 0) {
       matchDiv.style.display = 'block';
       if (password.value === confirm.value) {
-        matchDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>הסיסמאות תואמות';
+        matchDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>{% if current_lang == 'he' %}הסיסמאות תואמות{% elif current_lang == 'en' %}Passwords match{% else %}Пароли совпадают{% endif %}';
         matchDiv.style.color = '#34d399';
       } else {
-        matchDiv.innerHTML = '<i class="bi bi-x-circle me-1"></i>הסיסמאות לא תואמות';
+        matchDiv.innerHTML = '<i class="bi bi-x-circle me-1"></i>{% if current_lang == 'he' %}הסיסמאות לא תואמות{% elif current_lang == 'en' %}Passwords do not match{% else %}Пароли не совпадают{% endif %}';
         matchDiv.style.color = '#f87171';
       }
     } else {

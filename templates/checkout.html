@@ -7,8 +7,8 @@
     <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, {% if plan == 'pro' %}#10b981, #34d399{% else %}#2ea0ff, #34c3ff{% endif %}); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 8px 24px {% if plan == 'pro' %}rgba(16,185,129,0.3){% else %}rgba(46,160,255,0.3){% endif %};">
       <i class="bi bi-{% if plan == 'pro' %}rocket-takeoff{% else %}star{% endif %}" style="font-size: 1.75rem; color: #fff;"></i>
     </div>
-    <h2 style="color: #fff;">תשלום עבור {{ plan|upper }}</h2>
-    <p class="text-muted">מנוי חודשי ל-OnePoweb</p>
+    <h2 style="color: #fff;">{% if current_lang == 'he' %}תשלום עבור {{ plan|upper }}{% elif current_lang == 'en' %}Payment for {{ plan|upper }}{% else %}Оплата за {{ plan|upper }}{% endif %}</h2>
+    <p class="text-muted">{% if current_lang == 'he' %}מנוי חודשי ל-OnePoweb{% elif current_lang == 'en' %}Monthly subscription to OnePoweb{% else %}Месячная подписка на OnePoweb{% endif %}</p>
   </div>
 
   <!-- Order Summary -->
@@ -16,28 +16,28 @@
     <div class="card-body">
       <h5 class="mb-4">
         <i class="bi bi-receipt me-2" style="color: #2ea0ff;"></i>
-        פירוט הזמנה
+        {{ t('checkout_order_summary') }}
       </h5>
       
       <div class="d-flex justify-content-between mb-2">
-        <span>חבילת {{ plan|upper }} (חודשי)</span>
+        <span>{% if current_lang == 'he' %}חבילת {{ plan|upper }} (חודשי){% elif current_lang == 'en' %}{{ plan|upper }} Plan (Monthly){% else %}План {{ plan|upper }} (Месячный){% endif %}</span>
         <span>₪{{ base_price_ils }} / ${{ base_price_usd }}</span>
       </div>
       
       {% if referral_discount > 0 %}
       <div class="d-flex justify-content-between mb-2" style="color: #34d399;">
-        <span><i class="bi bi-gift me-1"></i> הנחת רפרל ({{ referral_discount }}%)</span>
+        <span><i class="bi bi-gift me-1"></i> {% if current_lang == 'he' %}הנחת רפרל ({{ referral_discount }}%){% elif current_lang == 'en' %}Referral Discount ({{ referral_discount }}%){% else %}Реферальная скидка ({{ referral_discount }}%){% endif %}</span>
         <span>-₪{{ discount_ils }} / -${{ discount_usd }}</span>
       </div>
       <div class="small text-muted mb-2">
-        <i class="bi bi-info-circle me-1"></i> הנחה חד-פעמית מהזמנת חבר
+        <i class="bi bi-info-circle me-1"></i> {% if current_lang == 'he' %}הנחה חד-פעמית מהזמנת חבר{% elif current_lang == 'en' %}One-time discount from friend's order{% else %}Одноразовая скидка от заказа друга{% endif %}
       </div>
       {% endif %}
       
       <hr style="border-color: var(--border);">
       
       <div class="d-flex justify-content-between" style="font-size: 1.25rem; font-weight: bold;">
-        <span>סה"כ לתשלום</span>
+        <span>{% if current_lang == 'he' %}סה"כ לתשלום{% elif current_lang == 'en' %}Total to Pay{% else %}Итого к оплате{% endif %}</span>
         <span style="color: {% if plan == 'pro' %}#34d399{% else %}#34c3ff{% endif %};">
           ${{ net_price_usd }}
           <span class="text-muted small">(≈₪{{ net_price_ils }})</span>
@@ -49,19 +49,19 @@
   <!-- Plan Features -->
   <div class="card mb-4">
     <div class="card-body">
-      <h6 class="mb-3">מה כלול בחבילה:</h6>
+      <h6 class="mb-3">{% if current_lang == 'he' %}מה כלול בחבילה:{% elif current_lang == 'en' %}What's included in the plan:{% else %}Что включено в план:{% endif %}</h6>
       <ul class="list-unstyled mb-0">
         {% if plan == 'pro' %}
-        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> ניתוחים ללא הגבלה</li>
-        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> גרפים מתקדמים</li>
-        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> ייצוא PDF מותאם</li>
-        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> תובנות AI מותאמות אישית</li>
-        <li class="mb-0"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> תמיכה עדיפות</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> {% if current_lang == 'he' %}ניתוחים ללא הגבלה{% elif current_lang == 'en' %}Unlimited analyses{% else %}Неограниченные анализы{% endif %}</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> {% if current_lang == 'he' %}גרפים מתקדמים{% elif current_lang == 'en' %}Advanced graphs{% else %}Продвинутые графики{% endif %}</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> {% if current_lang == 'he' %}ייצוא PDF מותאם{% elif current_lang == 'en' %}Custom PDF export{% else %}Настраиваемый экспорт PDF{% endif %}</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> {% if current_lang == 'he' %}תובנות AI מותאמות אישית{% elif current_lang == 'en' %}Personalized AI insights{% else %}Персонализированные AI-инсайты{% endif %}</li>
+        <li class="mb-0"><i class="bi bi-check-circle-fill me-2" style="color: #34d399;"></i> {% if current_lang == 'he' %}תמיכה עדיפות{% elif current_lang == 'en' %}Priority support{% else %}Приоритетная поддержка{% endif %}</li>
         {% else %}
-        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> עד 50 ניתוחים בחודש</li>
-        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> גרפים בסיסיים</li>
-        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> ייצוא PDF</li>
-        <li class="mb-0"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> תמיכה באימייל</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> {% if current_lang == 'he' %}עד 50 ניתוחים בחודש{% elif current_lang == 'en' %}Up to 50 analyses per month{% else %}До 50 анализов в месяц{% endif %}</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> {% if current_lang == 'he' %}גרפים בסיסיים{% elif current_lang == 'en' %}Basic graphs{% else %}Базовые графики{% endif %}</li>
+        <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> {% if current_lang == 'he' %}ייצוא PDF{% elif current_lang == 'en' %}PDF export{% else %}Экспорт PDF{% endif %}</li>
+        <li class="mb-0"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i> {% if current_lang == 'he' %}תמיכה באימייל{% elif current_lang == 'en' %}Email support{% else %}Поддержка по email{% endif %}</li>
         {% endif %}
       </ul>
     </div>
@@ -73,21 +73,21 @@
     <div class="card-body">
       <h6 class="mb-3">
         <i class="bi bi-shield-check me-2" style="color: #34d399;"></i>
-        תשלום מאובטח
+        {% if current_lang == 'he' %}תשלום מאובטח{% elif current_lang == 'en' %}Secure Payment{% else %}Безопасная оплата{% endif %}
       </h6>
       
       <div id="paypal-button-container"></div>
       
       <div id="payment-status" class="text-center mt-3" style="display: none;">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">מעבד תשלום...</span>
+          <span class="visually-hidden">{% if current_lang == 'he' %}מעבד תשלום...{% elif current_lang == 'en' %}Processing payment...{% else %}Обработка платежа...{% endif %}</span>
         </div>
-        <p class="mt-2 text-muted">מעבד את התשלום...</p>
+        <p class="mt-2 text-muted">{% if current_lang == 'he' %}מעבד את התשלום...{% elif current_lang == 'en' %}Processing payment...{% else %}Обработка платежа...{% endif %}</p>
       </div>
       
       <p class="small text-muted text-center mt-3 mb-0">
         <i class="bi bi-lock me-1"></i>
-        התשלום מאובטח ומוצפן באמצעות PayPal
+        {% if current_lang == 'he' %}התשלום מאובטח ומוצפן באמצעות PayPal{% elif current_lang == 'en' %}Payment is secured and encrypted via PayPal{% else %}Оплата защищена и зашифрована через PayPal{% endif %}
       </p>
     </div>
   </div>

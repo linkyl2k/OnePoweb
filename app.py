@@ -4209,14 +4209,14 @@ def demo_analysis():
             pay = df.groupby(COL_PAY)[COL_SUM].sum().reset_index()
             fig = plt.figure(figsize=(6,6))
             plt.pie(pay[COL_SUM], labels=pay[COL_PAY], autopct="%1.0f%%", startangle=90)
-                # Переводим заголовок
-                if current_lang == "he":
-                    plt.title("פילוח אמצעי תשלום (₪)")
-                elif current_lang == "en":
-                    plt.title("Payment Methods Breakdown (₪)")
-                else:  # ru
-                    plt.title(t("chart_payment_methods") + " (₪)")
-                fname = _save_fig(fig, "payments.png")
+            # Переводим заголовок
+            if current_lang == "he":
+                plt.title("פילוח אמצעי תשלום (₪)")
+            elif current_lang == "en":
+                plt.title("Payment Methods Breakdown (₪)")
+            else:  # ru
+                plt.title(t("chart_payment_methods") + " (₪)")
+            fname = _save_fig(fig, "payments.png")
 
             total = float(pay[COL_SUM].sum()) or 1.0
             top3 = (pay.sort_values(COL_SUM, ascending=False).head(3)

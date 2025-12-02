@@ -299,6 +299,24 @@ TRANSLATIONS = {
         "chart_note_top_quantity": "המוצרים הנמכרים בכמות הגבוהה ביותר",
         "chart_note_top_revenue": "המוצרים שמכניסים הכי הרבה כסף",
         "chart_note_payment_methods": "התפלגות לפי אמצעי תשלום",
+        
+        # Chart axis labels (Hebrew - same as original)
+        "chart_axis_hour": "שעה",
+        "chart_axis_day": "יום בשבוע",
+        "chart_axis_total": "סה\"כ (₪)",
+        "chart_axis_quantity": "כמות",
+        "chart_axis_avg_ticket": "ממוצע צ'ק (₪)",
+        "chart_axis_sales": "מכירות",
+        "chart_axis_currency": "₪",
+        
+        # Summary labels (Hebrew - same as original)
+        "summary_total_sales": "סה\"כ מכירות",
+        "summary_days_in_report": "ימים בדוח",
+        "summary_daily_avg": "ממוצע יומי",
+        "summary_transactions": "עסקאות",
+        "summary_avg_per_transaction": "ממוצע לעסקה",
+        "summary_best_day": "היום הכי טוב",
+        "summary_weakest_day": "היום הכי חלש",
     },
     "en": {  # English
         # Navigation
@@ -435,6 +453,24 @@ TRANSLATIONS = {
         "chart_note_top_quantity": "Products sold in the highest quantity",
         "chart_note_top_revenue": "Products that bring in the most money",
         "chart_note_payment_methods": "Distribution by payment method",
+        
+        # Chart axis labels
+        "chart_axis_hour": "Hour",
+        "chart_axis_day": "Day of Week",
+        "chart_axis_total": "Total (₪)",
+        "chart_axis_quantity": "Quantity",
+        "chart_axis_avg_ticket": "Average Ticket (₪)",
+        "chart_axis_sales": "Sales",
+        "chart_axis_currency": "₪",
+        
+        # Summary labels
+        "summary_total_sales": "Total Sales",
+        "summary_days_in_report": "Days in Report",
+        "summary_daily_avg": "Daily Average",
+        "summary_transactions": "Transactions",
+        "summary_avg_per_transaction": "Average per Transaction",
+        "summary_best_day": "Best Day",
+        "summary_weakest_day": "Weakest Day",
     },
     "ru": {  # Русский
         # Навигация
@@ -612,6 +648,24 @@ TRANSLATIONS = {
         "chart_note_top_quantity": "Продукты, продаваемые в наибольшем количестве",
         "chart_note_top_revenue": "Продукты, приносящие больше всего денег",
         "chart_note_payment_methods": "Распределение по способам оплаты",
+        
+        # Chart axis labels
+        "chart_axis_hour": "Час",
+        "chart_axis_day": "День недели",
+        "chart_axis_total": "Всего (₪)",
+        "chart_axis_quantity": "Количество",
+        "chart_axis_avg_ticket": "Средний чек (₪)",
+        "chart_axis_sales": "Продажи",
+        "chart_axis_currency": "₪",
+        
+        # Summary labels
+        "summary_total_sales": "Общие продажи",
+        "summary_days_in_report": "Дней в отчете",
+        "summary_daily_avg": "Средний дневной",
+        "summary_transactions": "Транзакции",
+        "summary_avg_per_transaction": "Средний за транзакцию",
+        "summary_best_day": "Лучший день",
+        "summary_weakest_day": "Слабый день",
         
         # Pricing
         "pricing_title": "Выберите подходящий план",
@@ -1858,7 +1912,7 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
     out["monthly_gain"] = total_gain
     out["roi_percent"] = (total_gain / max(1e-9, params.service_cost)) * 100.0
 
-    # טקסט מוכן (ימין-לשמאל תוסיף עם rtl/rtl_pdf אצלך)
+    # Переводим текст в зависимости от языка
     parts = []
     if "weak_day" in out["components"]:
         c = out["components"]["weak_day"]
@@ -1867,21 +1921,39 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
         )
     if "evening_hours" in out["components"]:
         c = out["components"]["evening_hours"]
-        parts.append(
-            f"שעות ערב חלשות → יעד חדש: +{c['uplift_per_day']:,.0f} ₪ ליום × {int(c['days_in_month_factor']):d} ימים ≈ +{c['monthly_gain']:,.0f} ₪/חודש."
-        )
+        if lang == "he":
+            parts.append(f"שעות ערב חלשות → יעד חדש: +{c['uplift_per_day']:,.0f} ₪ ליום × {int(c['days_in_month_factor']):d} ימים ≈ +{c['monthly_gain']:,.0f} ₪/חודש.")
+        elif lang == "en":
+            parts.append(f"Weak evening hours → new target: +{c['uplift_per_day']:,.0f} ₪ per day × {int(c['days_in_month_factor']):d} days ≈ +{c['monthly_gain']:,.0f} ₪/month.")
+        else:  # ru
+            parts.append(f"Слабые вечерние часы → новая цель: +{c['uplift_per_day']:,.0f} ₪ в день × {int(c['days_in_month_factor']):d} дней ≈ +{c['monthly_gain']:,.0f} ₪/месяц.")
     if "tail_products" in out["components"]:
         c = out["components"]["tail_products"]
         parts.append(
             f"קידום ‘זנב מוצרים’ (≈{int(params.tail_share_cutoff*100)}% מההכנסות) ב+{int(params.tail_boost_ratio*100)}% → +{c['monthly_gain']:,.0f} ₪/חודש."
         )
 
-    summary_text = (
-        f"פוטנציאל שיפור חודשי (בתנאי שפועלים על התובנות): ~{total_gain:,.0f} ₪. "
-        f"עלות השירות: {params.service_cost:,.0f} ₪. "
-        f"ROI תיאורטי: {out['roi_percent']:,.0f}%."
-    )
-    disclaimer = "⚠️ הערכה זו מבוססת על ניתוח הנתונים בלבד. התוצאות בפועל תלויות בפעולות שתנקטו."
+    if lang == "he":
+        summary_text = (
+            f"פוטנציאל שיפור חודשי (בתנאי שפועלים על התובנות): ~{total_gain:,.0f} ₪. "
+            f"עלות השירות: {params.service_cost:,.0f} ₪. "
+            f"ROI תיאורטי: {out['roi_percent']:,.0f}%."
+        )
+        disclaimer = "⚠️ הערכה זו מבוססת על ניתוח הנתונים בלבד. התוצאות בפועל תלויות בפעולות שתנקטו."
+    elif lang == "en":
+        summary_text = (
+            f"Monthly improvement potential (if you act on insights): ~{total_gain:,.0f} ₪. "
+            f"Service cost: {params.service_cost:,.0f} ₪. "
+            f"Theoretical ROI: {out['roi_percent']:,.0f}%."
+        )
+        disclaimer = "⚠️ This estimate is based on data analysis only. Actual results depend on actions taken."
+    else:  # ru
+        summary_text = (
+            f"Потенциал улучшения в месяц (при условии действий на основе инсайтов): ~{total_gain:,.0f} ₪. "
+            f"Стоимость услуги: {params.service_cost:,.0f} ₪. "
+            f"Теоретический ROI: {out['roi_percent']:,.0f}%."
+        )
+        disclaimer = "⚠️ Эта оценка основана только на анализе данных. Фактические результаты зависят от предпринятых действий."
     out["text"] = " • ".join(parts + [summary_text, disclaimer])
     return out
 
@@ -1902,29 +1974,75 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
         target = weak.get("target", 0)
         gap_pct = int((1 - current / max(1, target)) * 100) if target > 0 else 0
         
-        # המלצות ספציפיות לפי היום
-        day_actions = {
-            "ראשון": "הפעל מבצע 'פתיחת שבוע' - קפה + מאפה במחיר מיוחד",
-            "שני": "יום Happy Hour מוקדם (11:00-14:00) - הנחה 15% על ארוחות",
-            "שלישי": "יום נאמנות - כפל נקודות למועדון",
-            "רביעי": "מבצע 'באמצע השבוע' - מנה שנייה ב-50%",
-            "חמישי": "הכנה לסופ\"ש - מבצע משפחות",
-            "שישי": "מבצע בוקר מוקדם (עד 10:00) - הנחה 20%",
-            "שבת": "ארוחת שבת משפחתית - מנה ילדים חינם",
-        }
-        
-        actions.append({
-            "priority": 1,
-            "category": "📅 יום חלש",
-            "title": f"חזק את יום {day_name}",
-            "action": day_actions.get(day_name, f"הפעל מבצע מיוחד ביום {day_name}"),
-            "impact": f"פוטנציאל: עד +₪{weak.get('monthly_gain', 0):,.0f}/חודש",
-            "how_to": [
+        # Переводим рекомендации в зависимости от языка
+        if lang == "he":
+            day_actions = {
+                "ראשון": "הפעל מבצע 'פתיחת שבוע' - קפה + מאפה במחיר מיוחד",
+                "שני": "יום Happy Hour מוקדם (11:00-14:00) - הנחה 15% על ארוחות",
+                "שלישי": "יום נאמנות - כפל נקודות למועדון",
+                "רביעי": "מבצע 'באמצע השבוע' - מנה שנייה ב-50%",
+                "חמישי": "הכנה לסופ\"ש - מבצע משפחות",
+                "שישי": "מבצע בוקר מוקדם (עד 10:00) - הנחה 20%",
+                "שבת": "ארוחת שבת משפחתית - מנה ילדים חינם",
+            }
+            category = "📅 יום חלש"
+            title = f"חזק את יום {day_name}"
+            default_action = f"הפעל מבצע מיוחד ביום {day_name}"
+            impact = f"פוטנציאל: עד +₪{weak.get('monthly_gain', 0):,.0f}/חודש"
+            how_to = [
                 f"הפער מהימים הרגילים: ~{gap_pct}%",
                 "פרסם בסושיאל יום לפני",
                 "הדגש בשילוט בחנות",
                 "שלח SMS/וואטסאפ ללקוחות נאמנים"
             ]
+        elif lang == "en":
+            day_actions = {
+                "ראשון": "Launch 'Week Opening' promotion - coffee + pastry at special price",
+                "שני": "Early Happy Hour day (11:00-14:00) - 15% discount on meals",
+                "שלישי": "Loyalty day - double points for club members",
+                "רביעי": "'Midweek' promotion - second dish at 50%",
+                "חמישי": "Weekend prep - family promotion",
+                "שישי": "Early morning promotion (until 10:00) - 20% discount",
+                "שבת": "Family Shabbat meal - free kids' meal",
+            }
+            category = "📅 Weak Day"
+            title = f"Strengthen {day_name} day"
+            default_action = f"Launch special promotion on {day_name}"
+            impact = f"Potential: up to +₪{weak.get('monthly_gain', 0):,.0f}/month"
+            how_to = [
+                f"Gap from regular days: ~{gap_pct}%",
+                "Post on social media a day before",
+                "Highlight in store signage",
+                "Send SMS/WhatsApp to loyal customers"
+            ]
+        else:  # ru
+            day_actions = {
+                "ראשון": "Запустите акцию 'Открытие недели' - кофе + выпечка по специальной цене",
+                "שני": "День раннего Happy Hour (11:00-14:00) - скидка 15% на блюда",
+                "שלישי": "День лояльности - двойные баллы для клуба",
+                "רביעי": "Акция 'Середина недели' - второе блюдо за 50%",
+                "חמישי": "Подготовка к выходным - семейная акция",
+                "שישי": "Акция раннего утра (до 10:00) - скидка 20%",
+                "שבת": "Семейная субботняя трапеза - детское блюдо бесплатно",
+            }
+            category = "📅 Слабый день"
+            title = f"Усильте день {day_name}"
+            default_action = f"Запустите специальную акцию в день {day_name}"
+            impact = f"Потенциал: до +₪{weak.get('monthly_gain', 0):,.0f}/месяц"
+            how_to = [
+                f"Разрыв с обычными днями: ~{gap_pct}%",
+                "Опубликуйте в соцсетях за день до",
+                "Выделите в вывеске магазина",
+                "Отправьте SMS/WhatsApp постоянным клиентам"
+            ]
+        
+        actions.append({
+            "priority": 1,
+            "category": category,
+            "title": title,
+            "action": day_actions.get(day_name, default_action),
+            "impact": impact,
+            "how_to": how_to
         })
     
     # 2. שעות ערב חלשות
@@ -1936,33 +2054,72 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
         if midday > 0 and evening < midday * 0.4:  # ערב חלש משמעותית
             actions.append({
                 "priority": 2,
-                "category": "🌙 שעות ערב",
-                "title": "הגבר פעילות בערב (17:00-20:00)",
-                "action": "הפעל Happy Hour או מבצע ערב",
-                "impact": f"פוטנציאל: עד +₪{eve.get('monthly_gain', 0):,.0f}/חודש",
+                "category": "🌙 שעות ערב" if lang == "he" else ("🌙 Evening Hours" if lang == "en" else "🌙 Вечерние часы"),
+                "title": "הגבר פעילות בערב (17:00-20:00)" if lang == "he" else ("Increase evening activity (17:00-20:00)" if lang == "en" else "Увеличьте активность вечером (17:00-20:00)"),
+                "action": "הפעל Happy Hour או מבצע ערב" if lang == "he" else ("Launch Happy Hour or evening promotion" if lang == "en" else "Запустите Happy Hour или вечернюю акцию"),
+                "impact": f"פוטנציאל: עד +₪{eve.get('monthly_gain', 0):,.0f}/חודש" if lang == "he" else (f"Potential: up to +₪{eve.get('monthly_gain', 0):,.0f}/month" if lang == "en" else f"Потенциал: до +₪{eve.get('monthly_gain', 0):,.0f}/месяц"),
                 "how_to": [
                     "Happy Hour 17:00-19:00 - הנחה 20% על משקאות",
                     "מבצע 'After Work' לעובדי משרדים",
                     "תאורה ומוזיקה מתאימים לערב",
                     "תפריט ערב מיוחד (טאפאס, שיתוף)"
-                ]
+                ] if lang == "he" else ([
+                    "Happy Hour 17:00-19:00 - 20% discount on drinks",
+                    "'After Work' promotion for office workers",
+                    "Appropriate lighting and music for evening",
+                    "Special evening menu (tapas, sharing)"
+                ] if lang == "en" else [
+                    "Happy Hour 17:00-19:00 - скидка 20% на напитки",
+                    "Акция 'After Work' для офисных работников",
+                    "Подходящее освещение и музыка для вечера",
+                    "Специальное вечернее меню (тапас, на двоих)"
+                ])
             })
     
     # 3. מוצרים חלשים (זנב)
     if "tail_products" in comps:
         tail = comps["tail_products"]
-        actions.append({
-            "priority": 3,
-            "category": "📦 מוצרים",
-            "title": "הגבר מכירות מוצרים חלשים",
-            "action": "צור חבילות או מבצעי קומבו",
-            "impact": f"פוטנציאל: עד +₪{tail.get('monthly_gain', 0):,.0f}/חודש",
-            "how_to": [
+        if lang == "he":
+            category = "📦 מוצרים"
+            title = "הגבר מכירות מוצרים חלשים"
+            action = "צור חבילות או מבצעי קומבו"
+            impact = f"פוטנציאל: עד +₪{tail.get('monthly_gain', 0):,.0f}/חודש"
+            how_to = [
                 "צור קומבו: מוצר חזק + מוצר חלש",
                 "הצע כ'תוספת' במחיר מיוחד",
                 "מקם בגובה העיניים / ליד הקופה",
                 "הכשר צוות להציע אקטיבית"
             ]
+        elif lang == "en":
+            category = "📦 Products"
+            title = "Increase sales of weak products"
+            action = "Create packages or combo deals"
+            impact = f"Potential: up to +₪{tail.get('monthly_gain', 0):,.0f}/month"
+            how_to = [
+                "Create combo: strong product + weak product",
+                "Offer as 'add-on' at special price",
+                "Place at eye level / near checkout",
+                "Train staff to actively suggest"
+            ]
+        else:  # ru
+            category = "📦 Продукты"
+            title = "Увеличьте продажи слабых продуктов"
+            action = "Создайте пакеты или комбо-предложения"
+            impact = f"Потенциал: до +₪{tail.get('monthly_gain', 0):,.0f}/месяц"
+            how_to = [
+                "Создайте комбо: сильный продукт + слабый продукт",
+                "Предложите как 'дополнение' по специальной цене",
+                "Разместите на уровне глаз / у кассы",
+                "Обучите персонал активно предлагать"
+            ]
+        
+        actions.append({
+            "priority": 3,
+            "category": category,
+            "title": title,
+            "action": action,
+            "impact": impact,
+            "how_to": how_to
         })
     
     # 4. המלצות כלליות תמיד
@@ -1970,18 +2127,47 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
     if COL_ITEM in df.columns:
         top_product = df.groupby(COL_ITEM)[COL_SUM].sum().idxmax() if not df.empty else None
         if top_product:
-            actions.append({
-                "priority": 4,
-                "category": "⭐ מוצר מוביל",
-                "title": f"נצל את ההצלחה של '{top_product}'",
-                "action": "הרחב את קו המוצרים המוביל",
-                "impact": "שמור על הביקוש + הגדל סל קנייה",
-                "how_to": [
+            if lang == "he":
+                category = "⭐ מוצר מוביל"
+                title = f"נצל את ההצלחה של '{top_product}'"
+                action = "הרחב את קו המוצרים המוביל"
+                impact = "שמור על הביקוש + הגדל סל קנייה"
+                how_to = [
                     f"צור וריאציות של '{top_product}'",
                     "הצע גרסה פרימיום במחיר גבוה יותר",
                     "צור חבילה עם מוצרים משלימים",
                     "ודא שתמיד במלאי!"
                 ]
+            elif lang == "en":
+                category = "⭐ Leading Product"
+                title = f"Leverage the success of '{top_product}'"
+                action = "Expand the leading product line"
+                impact = "Maintain demand + increase basket size"
+                how_to = [
+                    f"Create variations of '{top_product}'",
+                    "Offer premium version at higher price",
+                    "Create package with complementary products",
+                    "Ensure always in stock!"
+                ]
+            else:  # ru
+                category = "⭐ Ведущий продукт"
+                title = f"Используйте успех '{top_product}'"
+                action = "Расширьте линейку ведущих продуктов"
+                impact = "Поддерживайте спрос + увеличивайте размер корзины"
+                how_to = [
+                    f"Создайте вариации '{top_product}'",
+                    "Предложите премиум-версию по более высокой цене",
+                    "Создайте пакет с дополнительными продуктами",
+                    "Убедитесь, что всегда в наличии!"
+                ]
+            
+            actions.append({
+                "priority": 4,
+                "category": category,
+                "title": title,
+                "action": action,
+                "impact": impact,
+                "how_to": how_to
             })
     
     # 5. טיפ להגדלת עסקה ממוצעת
@@ -1989,18 +2175,47 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
         avg_transaction = df[COL_SUM].mean() if not df.empty else 0
         if avg_transaction > 0:
             target_increase = avg_transaction * 0.15  # יעד: +15%
-            actions.append({
-                "priority": 5,
-                "category": "💰 הגדלת סל",
-                "title": f"הגדל עסקה ממוצעת ב-15%",
-                "action": f"יעד: מ-₪{avg_transaction:.0f} ל-₪{avg_transaction + target_increase:.0f}",
-                "impact": f"פוטנציאל: +₪{target_increase * 30:.0f}/חודש (30 עסקאות/יום)",
-                "how_to": [
+            if lang == "he":
+                category = "💰 הגדלת סל"
+                title = f"הגדל עסקה ממוצעת ב-15%"
+                action = f"יעד: מ-₪{avg_transaction:.0f} ל-₪{avg_transaction + target_increase:.0f}"
+                impact = f"פוטנציאל: +₪{target_increase * 30:.0f}/חודש (30 עסקאות/יום)"
+                how_to = [
                     "הצע תוספות: 'רוצה להוסיף X?'",
                     "Upsell: 'במעט יותר תקבל גרסה גדולה'",
                     "מבצע 'קנה ב-X קבל Y חינם'",
                     "הכשר צוות למכירה אקטיבית"
                 ]
+            elif lang == "en":
+                category = "💰 Basket Increase"
+                title = f"Increase average transaction by 15%"
+                action = f"Target: from ₪{avg_transaction:.0f} to ₪{avg_transaction + target_increase:.0f}"
+                impact = f"Potential: +₪{target_increase * 30:.0f}/month (30 transactions/day)"
+                how_to = [
+                    "Suggest add-ons: 'Would you like to add X?'",
+                    "Upsell: 'For a bit more you get a large size'",
+                    "Promotion 'Buy X get Y free'",
+                    "Train staff for active selling"
+                ]
+            else:  # ru
+                category = "💰 Увеличение корзины"
+                title = f"Увеличьте среднюю транзакцию на 15%"
+                action = f"Цель: с ₪{avg_transaction:.0f} до ₪{avg_transaction + target_increase:.0f}"
+                impact = f"Потенциал: +₪{target_increase * 30:.0f}/месяц (30 транзакций/день)"
+                how_to = [
+                    "Предлагайте дополнения: 'Хотите добавить X?'",
+                    "Апселл: 'За немного больше получите большой размер'",
+                    "Акция 'Купите X получите Y бесплатно'",
+                    "Обучите персонал активным продажам"
+                ]
+            
+            actions.append({
+                "priority": 5,
+                "category": category,
+                "title": title,
+                "action": action,
+                "impact": impact,
+                "how_to": how_to
             })
     
     return sorted(actions, key=lambda x: x["priority"])
@@ -2852,9 +3067,19 @@ def index():
 
             fig, ax = plt.subplots(figsize=(9, 4))
             ax.bar(hourly[HOUR_COL], hourly[COL_SUM], align="center")
-            ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
-            ax.set_xlabel(rtl("שעה"))
-            ax.set_ylabel(rtl('סה"כ (₪)'))
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+                ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
+                ax.set_xlabel(rtl("שעה"))
+                ax.set_ylabel(rtl('סה"כ (₪)'))
+            elif current_lang == "en":
+                ax.set_title(f"Sales by Hour (₪) {hour_start}:00–{hour_end}:00")
+                ax.set_xlabel("Hour")
+                ax.set_ylabel("Total (₪)")
+            else:  # ru
+                ax.set_title(f"Продажи по часам (₪) {hour_start}:00–{hour_end}:00")
+                ax.set_xlabel(t("chart_axis_hour"))
+                ax.set_ylabel(t("chart_axis_total"))
             ax.set_xticks(list(range(hour_start, hour_end + 1)))
             ax.set_xlim(hour_start - 0.5, hour_end + 0.5)
             fname = _save_fig(fig, "hourly.png")
@@ -2914,9 +3139,19 @@ def index():
 
                 fig, ax = plt.subplots(figsize=(8, 4))
                 ax.bar(xpos, values)
-                ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
-                ax.set_xlabel(rtl("יום בשבוע"))
-                ax.set_ylabel(rtl('סה"כ (₪)'))
+                # Переводим заголовки и подписи осей
+                if current_lang == "he":
+                    ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
+                    ax.set_xlabel(rtl("יום בשבוע"))
+                    ax.set_ylabel(rtl('סה"כ (₪)'))
+                elif current_lang == "en":
+                    ax.set_title("Sales by Day of Week (₪)")
+                    ax.set_xlabel("Day of Week")
+                    ax.set_ylabel("Total (₪)")
+                else:  # ru
+                    ax.set_title(t("chart_sales_by_weekday") + " (₪)")
+                    ax.set_xlabel(t("chart_axis_day"))
+                    ax.set_ylabel(t("chart_axis_total"))
                 ax.set_xticks(xpos)
                 ax.set_xticklabels(names, rotation=0)
                 fname = _save_fig(fig, "by_weekday.png")
@@ -2950,9 +3185,23 @@ def index():
             daily = df.groupby(COL_DATE)[COL_SUM].sum().reset_index()
             fig = plt.figure(figsize=(10, 4))
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
-            plt.title(rtl("מכירות יומיות"))
-            plt.xlabel(rtl("תאריך"))
-            plt.ylabel(rtl("סה\"כ (₪)"))
+            # Переводим заголовок
+            if current_lang == "he":
+                plt.title(rtl("מכירות יומיות"))
+            elif current_lang == "en":
+                plt.title("Daily Sales")
+            else:  # ru
+                plt.title(t("chart_daily_sales"))
+            # Переводим подписи осей
+            if current_lang == "he":
+                plt.xlabel(rtl("תאריך"))
+                plt.ylabel(rtl("סה\"כ (₪)"))
+            elif current_lang == "en":
+                plt.xlabel("Date")
+                plt.ylabel("Total (₪)")
+            else:  # ru
+                plt.xlabel("Дата")
+                plt.ylabel(t("chart_axis_total"))
             plt.xticks(rotation=60)
             fname = _save_fig(fig, "daily.png")
 
@@ -2993,8 +3242,16 @@ def index():
 
                         fig, ax = plt.subplots(figsize=(9, 4))
                         ax.bar(xpos, qty[COL_QTY])
-                        ax.set_title(_rtl("Top 10 — כמות לפי מוצר"))
-                        ax.set_ylabel(_rtl("כמות"))
+                        # Переводим заголовки и подписи осей
+                        if current_lang == "he":
+                            ax.set_title(_rtl("Top 10 — כמות לפי מוצר"))
+                            ax.set_ylabel(_rtl("כמות"))
+                        elif current_lang == "en":
+                            ax.set_title("Top 10 — Quantity by Product")
+                            ax.set_ylabel("Quantity")
+                        else:  # ru
+                            ax.set_title("Top 10 — " + t("chart_top_quantity"))
+                            ax.set_ylabel(t("chart_axis_quantity"))
                         ax.set_xticks(xpos)
                         ax.set_xticklabels(names, rotation=40, ha="right")
                         fname = _save_fig(fig, "top_qty.png")
@@ -3027,8 +3284,16 @@ def index():
 
                     fig, ax = plt.subplots(figsize=(9, 4))
                     ax.bar(xpos_r, revenue[COL_SUM])
-                    ax.set_title(_rtl("Top 10 — הכנסות לפי מוצר"))
-                    ax.set_ylabel(_rtl('סה"כ (₪)'))
+                    # Переводим заголовки и подписи осей
+                    if current_lang == "he":
+                        ax.set_title(_rtl("Top 10 — הכנסות לפי מוצר"))
+                        ax.set_ylabel(_rtl('סה"כ (₪)'))
+                    elif current_lang == "en":
+                        ax.set_title("Top 10 — Revenue by Product")
+                        ax.set_ylabel("Total (₪)")
+                    else:  # ru
+                        ax.set_title("Top 10 — " + t("chart_top_revenue"))
+                        ax.set_ylabel(t("chart_axis_total"))
                     ax.set_xticks(xpos_r)
                     ax.set_xticklabels(names_r, rotation=40, ha="right")
                     fname = _save_fig(fig, "top_rev.png")
@@ -3075,7 +3340,13 @@ def index():
 
                     fig, ax = plt.subplots(figsize=(6, 6))
                     ax.pie(values, labels=labels, autopct="%1.0f%%", startangle=90)
-                    ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
+                    # Переводим заголовок
+                    if current_lang == "he":
+                        ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
+                    elif current_lang == "en":
+                        ax.set_title("Payment Methods Breakdown (₪)")
+                    else:  # ru
+                        ax.set_title(t("chart_payment_methods") + " (₪)")
 
                     fname = _save_fig(fig, "payments.png")
 
@@ -3126,9 +3397,19 @@ def index():
                 if not hourly_stats.empty:
                     fig, ax = plt.subplots(figsize=(10, 4))
                     bars = ax.bar(hourly_stats[HOUR_COL], hourly_stats['avg_ticket'], color='#2ecc71')
-                    ax.set_title(rtl(f"ממוצע קנייה לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
-                    ax.set_xlabel(rtl("שעה"))
-                    ax.set_ylabel(rtl("ממוצע צ'ק (₪)"))
+                    # Переводим заголовки и подписи осей
+                    if current_lang == "he":
+                        ax.set_title(rtl(f"ממוצע קנייה לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
+                        ax.set_xlabel(rtl("שעה"))
+                        ax.set_ylabel(rtl("ממוצע צ'ק (₪)"))
+                    elif current_lang == "en":
+                        ax.set_title(f"Average Ticket by Hour (₪) {hour_start}:00–{hour_end}:00")
+                        ax.set_xlabel("Hour")
+                        ax.set_ylabel("Average Ticket (₪)")
+                    else:  # ru
+                        ax.set_title(t("chart_avg_ticket") + f" (₪) {hour_start}:00–{hour_end}:00")
+                        ax.set_xlabel(t("chart_axis_hour"))
+                        ax.set_ylabel(t("chart_axis_avg_ticket"))
                     ax.set_xticks(list(range(hour_start, hour_end + 1)))
                     
                     # הוספת ערכים על העמודות
@@ -3150,8 +3431,8 @@ def index():
                     
                     plots.append({
                         "filename": fname,
-                        "title": "ממוצע קנייה לפי שעה",
-                        "note": "באיזו שעה מגיעים לקוחות עם קניות גדולות יותר",
+                        "title": chart_title,
+                        "note": "באיזו שעה מגיעים לקוחות עם קניות גדולות יותר" if current_lang == "he" else ("At what hour customers come with larger purchases" if current_lang == "en" else "В какое время приходят клиенты с крупными покупками"),
                         "ai": ai
                     })
             else:
@@ -3207,13 +3488,29 @@ def index():
                     ax.set_yticks(range(len(heatmap_data.index)))
                     ax.set_yticklabels([rtl(d) for d in heatmap_data.index])
                     
-                    ax.set_title(rtl("מפת חום: מכירות לפי שעה ויום"))
-                    ax.set_xlabel(rtl("שעה"))
-                    ax.set_ylabel(rtl("יום בשבוע"))
+                    # Переводим заголовки и подписи осей
+                    if current_lang == "he":
+                        ax.set_title(rtl("מפת חום: מכירות לפי שעה ויום"))
+                        ax.set_xlabel(rtl("שעה"))
+                        ax.set_ylabel(rtl("יום בשבוע"))
+                    elif current_lang == "en":
+                        ax.set_title("Heat Map: Sales by Hour and Day")
+                        ax.set_xlabel("Hour")
+                        ax.set_ylabel("Day of Week")
+                    else:  # ru
+                        ax.set_title(t("chart_heatmap") + ": " + t("chart_axis_sales") + " по " + t("chart_axis_hour") + " и " + t("chart_axis_day"))
+                        ax.set_xlabel(t("chart_axis_hour"))
+                        ax.set_ylabel(t("chart_axis_day"))
                     
                     # Colorbar
                     cbar = plt.colorbar(im, ax=ax)
-                    cbar.set_label(rtl('סה"כ מכירות (₪)'))
+                    # Переводим подпись colorbar
+                    if current_lang == "he":
+                        cbar.set_label(rtl('סה"כ מכירות (₪)'))
+                    elif current_lang == "en":
+                        cbar.set_label("Total Sales (₪)")
+                    else:  # ru
+                        cbar.set_label(t("summary_total_sales") + " (₪)")
                     
                     # הוספת ערכים בתאים
                     for i in range(len(heatmap_data.index)):
@@ -3238,8 +3535,8 @@ def index():
                     
                     plots.append({
                         "filename": fname,
-                        "title": "מפת חום מכירות",
-                        "note": "איפה הכסף מרוכז – שעות ×  ימים",
+                        "title": chart_title,
+                        "note": "איפה הכסף מרוכז – שעות ×  ימים" if current_lang == "he" else ("Where money is concentrated – hours × days" if current_lang == "en" else "Где сосредоточены деньги – часы × дни"),
                         "ai": ai
                     })
             else:
@@ -3273,15 +3570,36 @@ def index():
                 if len(compare) == 2:
                     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
                     
-                    labels = [rtl('ימי חול'), rtl('סופ"ש (שישי-שבת)')]
+                    # Переводим метки
+                    if current_lang == "he":
+                        labels = [rtl('ימי חול'), rtl('סופ"ש (שישי-שבת)')]
+                    elif current_lang == "en":
+                        labels = ["Weekdays", "Weekend (Fri-Sat)"]
+                    else:  # ru
+                        labels = ["Будни", "Выходные (Пт-Сб)"]
                     colors = ['#3498db', '#9b59b6']
                     
                     # גרף 1: סה"כ מכירות
                     weekday_total = compare[compare['is_weekend'] == False]['total'].values[0]
                     weekend_total = compare[compare['is_weekend'] == True]['total'].values[0]
                     ax1.bar(labels, [weekday_total, weekend_total], color=colors)
-                    ax1.set_title(rtl('סה"כ מכירות'))
-                    ax1.set_ylabel(rtl('₪'))
+                    # Переводим заголовки и подписи осей
+                    if current_lang == "he":
+                        ax1.set_title(rtl('סה"כ מכירות'))
+                        ax1.set_ylabel(rtl('₪'))
+                        ax2.set_title(rtl('ממוצע עסקה'))
+                        ax2.set_ylabel(rtl('₪'))
+                    elif current_lang == "en":
+                        ax1.set_title("Total Sales")
+                        ax1.set_ylabel("₪")
+                        ax2.set_title("Average Transaction")
+                        ax2.set_ylabel("₪")
+                    else:  # ru
+                        ax1.set_title(t("summary_total_sales"))
+                        ax1.set_ylabel(t("chart_axis_currency"))
+                        ax2.set_title("Средняя транзакция")
+                        ax2.set_ylabel(t("chart_axis_currency"))
+                    
                     for i, v in enumerate([weekday_total, weekend_total]):
                         ax1.text(i, v + v*0.02, f'₪{v:,.0f}', ha='center', fontsize=10)
                     
@@ -3289,8 +3607,6 @@ def index():
                     weekday_avg = compare[compare['is_weekend'] == False]['avg'].values[0]
                     weekend_avg = compare[compare['is_weekend'] == True]['avg'].values[0]
                     ax2.bar(labels, [weekday_avg, weekend_avg], color=colors)
-                    ax2.set_title(rtl('ממוצע עסקה'))
-                    ax2.set_ylabel(rtl('₪'))
                     for i, v in enumerate([weekday_avg, weekend_avg]):
                         ax2.text(i, v + v*0.02, f'₪{v:,.0f}', ha='center', fontsize=10)
                     
@@ -3351,14 +3667,31 @@ def index():
             best_day_sales = worst_day_sales = 0
         
         # בניית הסיכום
-        summary_lines = [
-            f"📊 סה\"כ מכירות: ₪{total_sum:,.0f}",
-            f"📅 ימים בדוח: {days} | ממוצע יומי: ₪{avg_day:,.0f}",
-            f"🧾 עסקאות: {transaction_count:,} | ממוצע לעסקה: ₪{avg_transaction:,.0f}",
-        ]
-        
-        if best_day and worst_day and days > 1:
-            summary_lines.append(f"🏆 היום הכי טוב: ₪{best_day_sales:,.0f} | היום הכי חלש: ₪{worst_day_sales:,.0f}")
+        # Переводим текст сводки
+        if current_lang == "he":
+            summary_lines = [
+                f"📊 סה\"כ מכירות: ₪{total_sum:,.0f}",
+                f"📅 ימים בדוח: {days} | ממוצע יומי: ₪{avg_day:,.0f}",
+                f"🧾 עסקאות: {transaction_count:,} | ממוצע לעסקה: ₪{avg_transaction:,.0f}",
+            ]
+            if best_day and worst_day and days > 1:
+                summary_lines.append(f"🏆 היום הכי טוב: ₪{best_day_sales:,.0f} | היום הכי חלש: ₪{worst_day_sales:,.0f}")
+        elif current_lang == "en":
+            summary_lines = [
+                f"📊 Total Sales: ₪{total_sum:,.0f}",
+                f"📅 Days in Report: {days} | Daily Average: ₪{avg_day:,.0f}",
+                f"🧾 Transactions: {transaction_count:,} | Average per Transaction: ₪{avg_transaction:,.0f}",
+            ]
+            if best_day and worst_day and days > 1:
+                summary_lines.append(f"🏆 Best Day: ₪{best_day_sales:,.0f} | Weakest Day: ₪{worst_day_sales:,.0f}")
+        else:  # ru
+            summary_lines = [
+                f"📊 {t('summary_total_sales')}: ₪{total_sum:,.0f}",
+                f"📅 {t('summary_days_in_report')}: {days} | {t('summary_daily_avg')}: ₪{avg_day:,.0f}",
+                f"🧾 {t('summary_transactions')}: {transaction_count:,} | {t('summary_avg_per_transaction')}: ₪{avg_transaction:,.0f}",
+            ]
+            if best_day and worst_day and days > 1:
+                summary_lines.append(f"🏆 {t('summary_best_day')}: ₪{best_day_sales:,.0f} | {t('summary_weakest_day')}: ₪{worst_day_sales:,.0f}")
         
         summary_txt = "\n".join(summary_lines)
     except Exception as e:
@@ -3573,7 +3906,13 @@ def demo_analysis():
     
     # --- סיכום ---
     total_sales = float(df[COL_SUM].sum()) if COL_SUM in df.columns else 0.0
-    summary_txt = f"📊 דוגמה לניתוח | סה\"כ מכירות: ₪{total_sales:,.0f} | {len(plots)} גרפים נוצרו"
+    # Переводим текст сводки для демо
+    if current_lang == "he":
+        summary_txt = f"📊 דוגמה לניתוח | סה\"כ מכירות: ₪{total_sales:,.0f} | {len(plots)} גרפים נוצרו"
+    elif current_lang == "en":
+        summary_txt = f"📊 Demo Analysis | Total Sales: ₪{total_sales:,.0f} | {len(plots)} graphs created"
+    else:  # ru
+        summary_txt = f"📊 Демо-анализ | {t('summary_total_sales')}: ₪{total_sales:,.0f} | Создано {len(plots)} графиков"
     
     # שמירה ב-LAST_EXPORT
     LAST_EXPORT["generated_at"] = datetime.now()
@@ -3600,8 +3939,19 @@ def demo_analysis():
             daily = df.groupby("תאריך")["סכום (₪)"].sum().reset_index()
             fig = plt.figure(figsize=(10,4))
             plt.bar(daily["תאריך"].astype(str), daily["סכום (₪)"])
-            plt.title("מכירות יומיות (₪)")
-            plt.xlabel("תאריך"); plt.ylabel("סה\"כ (₪)")
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+                plt.title("מכירות יומיות (₪)")
+                plt.xlabel("תאריך")
+                plt.ylabel("סה\"כ (₪)")
+            elif current_lang == "en":
+                plt.title("Daily Sales (₪)")
+                plt.xlabel("Date")
+                plt.ylabel("Total (₪)")
+            else:  # ru
+                plt.title(t("chart_daily_sales") + " (₪)")
+                plt.xlabel("Дата")
+                plt.ylabel(t("chart_axis_total"))
             plt.xticks(rotation=60)
             fname = _save_fig(fig, "daily.png")
             plots.append({"filename": fname, "title": "מכירות יומיות", "note": "תנודות יום־יומיות"})
@@ -3615,17 +3965,35 @@ def demo_analysis():
                 qty = df.groupby("מוצר")["כמות"].sum().sort_values(ascending=False).head(10).reset_index()
                 fig = plt.figure(figsize=(9,4))
                 plt.bar(qty["מוצר"], qty["כמות"])
-                plt.title("Top 10 — כמות לפי מוצר")
-                plt.xticks(rotation=40, ha="right"); plt.ylabel("כמות")
+                # Переводим заголовки и подписи осей
+                if current_lang == "he":
+                    plt.title("Top 10 — כמות לפי מוצר")
+                    plt.ylabel("כמות")
+                elif current_lang == "en":
+                    plt.title("Top 10 — Quantity by Product")
+                    plt.ylabel("Quantity")
+                else:  # ru
+                    plt.title("Top 10 — " + t("chart_top_quantity"))
+                    plt.ylabel(t("chart_axis_quantity"))
+                plt.xticks(rotation=40, ha="right")
                 fname = _save_fig(fig, "top_qty.png")
-                plots.append({"filename": fname, "title": "Top 10 כמות", "note": "המוצרים הנמכרים בכמות הגבוהה ביותר"})
+                plots.append({"filename": fname, "title": t("chart_top_quantity"), "note": t("chart_note_top_quantity")})
             revenue = df.groupby("מוצר")["סכום (₪)"].sum().sort_values(ascending=False).head(10).reset_index()
             fig = plt.figure(figsize=(9,4))
             plt.bar(revenue["מוצר"], revenue["סכום (₪)"])
-            plt.title("Top 10 — הכנסות לפי מוצר")
-            plt.xticks(rotation=40, ha="right"); plt.ylabel("סה\"כ (₪)")
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+                plt.title("Top 10 — הכנסות לפי מוצר")
+                plt.ylabel("סה\"כ (₪)")
+            elif current_lang == "en":
+                plt.title("Top 10 — Revenue by Product")
+                plt.ylabel("Total (₪)")
+            else:  # ru
+                plt.title("Top 10 — " + t("chart_top_revenue"))
+                plt.ylabel(t("chart_axis_total"))
+            plt.xticks(rotation=40, ha="right")
             fname = _save_fig(fig, "top_rev.png")
-            plots.append({"filename": fname, "title": "Top 10 הכנסות", "note": "המוצרים שמכניסים הכי הרבה כסף"})
+            plots.append({"filename": fname, "title": t("chart_top_revenue"), "note": t("chart_note_top_revenue")})
         except Exception as e:
             messages.append(f"שגיאה: מוצרים – כמות/רווח — {e}")
 
@@ -3636,9 +4004,15 @@ def demo_analysis():
                 pay = df.groupby("אמצעי תשלום")["סכום (₪)"].sum().reset_index()
                 fig = plt.figure(figsize=(6,6))
                 plt.pie(pay["סכום (₪)"], labels=pay["אמצעי תשלום"], autopct="%1.0f%%", startangle=90)
-                plt.title("פילוח אמצעי תשלום (₪)")
+                # Переводим заголовок
+                if current_lang == "he":
+                    plt.title("פילוח אמצעי תשלום (₪)")
+                elif current_lang == "en":
+                    plt.title("Payment Methods Breakdown (₪)")
+                else:  # ru
+                    plt.title(t("chart_payment_methods") + " (₪)")
                 fname = _save_fig(fig, "payments.png")
-                plots.append({"filename": fname, "title": "אמצעי תשלום", "note": "התפלגות לפי אמצעי תשלום"})
+                plots.append({"filename": fname, "title": t("chart_payment_methods"), "note": t("chart_note_payment_methods")})
             except Exception as e:
                 messages.append(f"שגיאה: פילוח אמצעי תשלום — {e}")
         else:
@@ -3659,8 +4033,19 @@ def demo_analysis():
             hourly = clip.groupby("שעה עגולה")[COL_SUM].sum().reset_index()
             fig = plt.figure(figsize=(9,4))
             plt.bar(hourly["שעה עגולה"], hourly[COL_SUM])
-            plt.title(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00")
-            plt.xlabel("שעה"); plt.ylabel('סה"כ (₪)')
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+                plt.title(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00")
+                plt.xlabel("שעה")
+                plt.ylabel('סה"כ (₪)')
+            elif current_lang == "en":
+                plt.title(f"Sales by Hour (₪) {hour_start}:00–{hour_end}:00")
+                plt.xlabel("Hour")
+                plt.ylabel("Total (₪)")
+            else:  # ru
+                plt.title(t("chart_sales_by_hour") + f" (₪) {hour_start}:00–{hour_end}:00")
+                plt.xlabel(t("chart_axis_hour"))
+                plt.ylabel(t("chart_axis_total"))
             fname = _save_fig(fig, "hourly.png")
 
             best_hour_row = hourly.loc[hourly[COL_SUM].idxmax()] if not hourly.empty else None
@@ -3687,8 +4072,19 @@ def demo_analysis():
             by_wd = df.groupby("יום בשבוע")[COL_SUM].sum().reindex(order).reset_index()
             fig = plt.figure(figsize=(8,4))
             plt.bar(by_wd["יום בשבוע"], by_wd[COL_SUM])
-            plt.title("מכירות לפי יום בשבוע (₪)")
-            plt.xlabel("יום"); plt.ylabel('סה"כ (₪)')
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+                plt.title("מכירות לפי יום בשבוע (₪)")
+                plt.xlabel("יום")
+                plt.ylabel('סה"כ (₪)')
+            elif current_lang == "en":
+                plt.title("Sales by Day of Week (₪)")
+                plt.xlabel("Day")
+                plt.ylabel("Total (₪)")
+            else:  # ru
+                plt.title(t("chart_sales_by_weekday") + " (₪)")
+                plt.xlabel(t("chart_axis_day"))
+                plt.ylabel(t("chart_axis_total"))
             fname = _save_fig(fig, "by_weekday.png")
 
             top = by_wd.sort_values(COL_SUM, ascending=False).iloc[0] if not by_wd.empty else None
@@ -3713,8 +4109,19 @@ def demo_analysis():
             daily = df.groupby(COL_DATE)[COL_SUM].sum().reset_index()
             fig = plt.figure(figsize=(10,4))
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
-            plt.title("מכירות יומיות (₪)")
-            plt.xlabel("תאריך"); plt.ylabel('סה"כ (₪)')
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+                plt.title("מכירות יומיות (₪)")
+                plt.xlabel("תאריך")
+                plt.ylabel('סה"כ (₪)')
+            elif current_lang == "en":
+                plt.title("Daily Sales (₪)")
+                plt.xlabel("Date")
+                plt.ylabel("Total (₪)")
+            else:  # ru
+                plt.title(t("chart_daily_sales") + " (₪)")
+                plt.xlabel("Дата")
+                plt.ylabel(t("chart_axis_total"))
             plt.xticks(rotation=60)
             fname = _save_fig(fig, "daily.png")
 
@@ -3739,8 +4146,17 @@ def demo_analysis():
                 qty = df.groupby(COL_ITEM)[COL_QTY].sum().sort_values(ascending=False).head(10).reset_index()
                 fig = plt.figure(figsize=(9,4))
                 plt.bar(qty[COL_ITEM], qty[COL_QTY])
-                plt.title("Top 10 — כמות לפי מוצר")
-                plt.xticks(rotation=40, ha="right"); plt.ylabel("כמות")
+                # Переводим заголовки и подписи осей
+                if current_lang == "he":
+                    plt.title("Top 10 — כמות לפי מוצר")
+                    plt.ylabel("כמות")
+                elif current_lang == "en":
+                    plt.title("Top 10 — Quantity by Product")
+                    plt.ylabel("Quantity")
+                else:  # ru
+                    plt.title("Top 10 — " + t("chart_top_quantity"))
+                    plt.ylabel(t("chart_axis_quantity"))
+                plt.xticks(rotation=40, ha="right")
                 fname1 = _save_fig(fig, "top_qty.png")
                 brief1 = {
                     "top_item": (None if qty.empty else str(qty.iloc[0][COL_ITEM])),
@@ -3757,8 +4173,19 @@ def demo_analysis():
             revenue = df.groupby(COL_ITEM)[COL_SUM].sum().sort_values(ascending=False).head(10).reset_index()
             fig = plt.figure(figsize=(9,4))
             plt.bar(revenue[COL_ITEM], revenue[COL_SUM])
-            plt.title("Top 10 — הכנסות לפי מוצר")
-            plt.xticks(rotation=40, ha="right"); plt.ylabel('סה"כ (₪)')
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
+                plt.title("Top 10 — הכנסות לפי מוצר")
+                plt.ylabel('סה"כ (₪)')
+            elif current_lang == "en":
+                plt.title("Top 10 — Revenue by Product")
+                plt.ylabel("Total (₪)")
+            else:  # ru
+                plt.title("Top 10 — " + t("chart_top_revenue"))
+                plt.ylabel(t("chart_axis_total"))
+            plt.xticks(rotation=40, ha="right")
             fname2 = _save_fig(fig, "top_rev.png")
             
             # מציאת מוצרים פחות נמכרים (למטרת קומבו)
@@ -3784,8 +4211,14 @@ def demo_analysis():
             pay = df.groupby(COL_PAY)[COL_SUM].sum().reset_index()
             fig = plt.figure(figsize=(6,6))
             plt.pie(pay[COL_SUM], labels=pay[COL_PAY], autopct="%1.0f%%", startangle=90)
-            plt.title("פילוח אמצעי תשלום (₪)")
-            fname = _save_fig(fig, "payments.png")
+                # Переводим заголовок
+                if current_lang == "he":
+                    plt.title("פילוח אמצעי תשלום (₪)")
+                elif current_lang == "en":
+                    plt.title("Payment Methods Breakdown (₪)")
+                else:  # ru
+                    plt.title(t("chart_payment_methods") + " (₪)")
+                fname = _save_fig(fig, "payments.png")
 
             total = float(pay[COL_SUM].sum()) or 1.0
             top3 = (pay.sort_values(COL_SUM, ascending=False).head(3)

@@ -282,6 +282,23 @@ TRANSLATIONS = {
         
         # Results
         "results_no_graphs_reload": "גרפים לא נמצאו. מפנים ללוח הבקרה שם תוכל לראות דוחות שמורים.",
+        
+        # Chart titles (Hebrew - same as original)
+        "chart_sales_by_hour": "מכירות לפי שעה",
+        "chart_sales_by_weekday": "מכירות לפי יום בשבוע",
+        "chart_daily_sales": "מכירות יומיות",
+        "chart_top_quantity": "Top 10 כמות",
+        "chart_top_revenue": "Top 10 הכנסות",
+        "chart_payment_methods": "אמצעי תשלום",
+        "chart_avg_ticket": "ממוצע קנייה לפי שעה",
+        "chart_heatmap": "מפת חום מכירות",
+        "chart_weekend_compare": "השוואת סופ״ש לימי חול",
+        "chart_note_sales_by_hour": "סכום המכירות לכל שעה בטווח שנבחר",
+        "chart_note_sales_by_weekday": "איזה ימים חזקים/חלשים",
+        "chart_note_daily_sales": "תנודות יום־יומיות",
+        "chart_note_top_quantity": "המוצרים הנמכרים בכמות הגבוהה ביותר",
+        "chart_note_top_revenue": "המוצרים שמכניסים הכי הרבה כסף",
+        "chart_note_payment_methods": "התפלגות לפי אמצעי תשלום",
     },
     "en": {  # English
         # Navigation
@@ -401,6 +418,23 @@ TRANSLATIONS = {
         
         # Results
         "results_no_graphs_reload": "Graphs not found. Redirecting to dashboard where you can view saved reports.",
+        
+        # Chart titles
+        "chart_sales_by_hour": "Sales by Hour",
+        "chart_sales_by_weekday": "Sales by Day of Week",
+        "chart_daily_sales": "Daily Sales",
+        "chart_top_quantity": "Top 10 Quantity",
+        "chart_top_revenue": "Top 10 Revenue",
+        "chart_payment_methods": "Payment Methods",
+        "chart_avg_ticket": "Average Ticket by Hour",
+        "chart_heatmap": "Sales Heat Map",
+        "chart_weekend_compare": "Weekend vs Weekdays",
+        "chart_note_sales_by_hour": "Total sales for each hour in the selected range",
+        "chart_note_sales_by_weekday": "Which days are strong/weak",
+        "chart_note_daily_sales": "Daily fluctuations",
+        "chart_note_top_quantity": "Products sold in the highest quantity",
+        "chart_note_top_revenue": "Products that bring in the most money",
+        "chart_note_payment_methods": "Distribution by payment method",
     },
     "ru": {  # Русский
         # Навигация
@@ -561,6 +595,23 @@ TRANSLATIONS = {
         "results_upgrade_for_ai": "Обновитесь до плана Pro, чтобы получить персонализированный план действий",
         "results_upgrade_to_pro": "Обновить до Pro",
         "results_download_image": "Скачать изображение",
+        
+        # Chart titles
+        "chart_sales_by_hour": "Продажи по часам",
+        "chart_sales_by_weekday": "Продажи по дням недели",
+        "chart_daily_sales": "Ежедневные продажи",
+        "chart_top_quantity": "Топ 10 по количеству",
+        "chart_top_revenue": "Топ 10 по выручке",
+        "chart_payment_methods": "Способы оплаты",
+        "chart_avg_ticket": "Средний чек по часам",
+        "chart_heatmap": "Тепловая карта продаж",
+        "chart_weekend_compare": "Сравнение выходных и будних",
+        "chart_note_sales_by_hour": "Сумма продаж за каждый час в выбранном диапазоне",
+        "chart_note_sales_by_weekday": "Какие дни сильные/слабые",
+        "chart_note_daily_sales": "Ежедневные колебания",
+        "chart_note_top_quantity": "Продукты, продаваемые в наибольшем количестве",
+        "chart_note_top_revenue": "Продукты, приносящие больше всего денег",
+        "chart_note_payment_methods": "Распределение по способам оплаты",
         
         # Pricing
         "pricing_title": "Выберите подходящий план",
@@ -1383,9 +1434,9 @@ def ai_enabled_for_user() -> bool:
     effective_plan = get_effective_plan(u)
     return effective_plan == "pro"
 
-def ai_explain(title: str, brief: dict) -> str:
+def ai_explain(title: str, brief: dict, lang: str = "he") -> str:
     """
-    2–3 משפטים בעברית + המלצה. מנסה כמה מסלולים:
+    2–3 משפטים בעברית/אנגלית/רוסית + המלצה. מנסה כמה מסלולים:
     1) chat.completions עם max_completion_tokens
     2) chat.completions בלי שום max_*
     3) responses.create עם max_output_tokens
@@ -1408,11 +1459,47 @@ def ai_explain(title: str, brief: dict) -> str:
 
         payload = json.dumps(compact, ensure_ascii=False, separators=(",", ":"))
         
+        # Определяем язык для промпта
+        lang_instructions = {
+            "he": {
+                "write_in": "עברית",
+                "example": "בעברית פשוטה וברורה",
+                "focus": "התמקד בתובנה העיקרית אחת",
+                "give": "תן המלצה מעשית אחת",
+                "length": "2-3 משפטים בלבד",
+                "dont": "אל תחזור על מספרים",
+                "combo_instruction": "הצע ליצור קומבו/חבילה של המוצר המוביל עם מוצר שפחות נמכר",
+                "weak_instruction": "התמקד בימים/שעות החלשים ביותר - אלה הזדמנות למשוך לקוחות חדשים",
+            },
+            "en": {
+                "write_in": "English",
+                "example": "in simple and clear English",
+                "focus": "Focus on the one main insight",
+                "give": "Give one practical recommendation",
+                "length": "2-3 sentences only",
+                "dont": "Don't repeat numbers",
+                "combo_instruction": "Suggest creating a combo/package of the leading product with a less popular product",
+                "weak_instruction": "Focus on the weakest days/hours - these are opportunities to attract new customers",
+            },
+            "ru": {
+                "write_in": "русском",
+                "example": "простым и понятным русским языком",
+                "focus": "Сосредоточься на одной главной идее",
+                "give": "Дай одну практическую рекомендацию",
+                "length": "только 2-3 предложения",
+                "dont": "Не повторяй числа",
+                "combo_instruction": "Предложи создать комбо/пакет из лидирующего продукта с менее популярным продуктом",
+                "weak_instruction": "Сосредоточься на самых слабых днях/часах - это возможности привлечь новых клиентов",
+            }
+        }
+        
+        lang_dict = lang_instructions.get(lang, lang_instructions["he"])
+        
         # הוספת הוראות ספציפיות לפי סוג הגרף
         specific_instructions = ""
         
         # Top 10 הכנסות - הצע קומבו עם מוצר לא נמכר
-        if "הכנסות" in title or "Top 10" in title or "מוצרים" in title:
+        if "הכנסות" in title or "Top 10" in title or "מוצרים" in title or "Revenue" in title or "Products" in title or "Выручка" in title or "Продукты" in title:
             bottom_items_text = ""
             if isinstance(compact, dict) and "bottom_items" in compact:
                 bottom_items = compact.get("bottom_items", {})
@@ -1420,49 +1507,127 @@ def ai_explain(title: str, brief: dict) -> str:
                     items_list = list(bottom_items.keys())[:3]  # Top 3 פחות נמכרים
                     bottom_items_text = f"\n• מוצרים פחות נמכרים (לשימוש בקומבו): {', '.join(items_list)}\n"
             
-            specific_instructions = (
-                "\n⚠️ הוראה מיוחדת לגרף זה:\n"
-                "• אם יש מוצר מוביל (הכי מכניס), אל תציע רק לקדם אותו עוד יותר\n"
-                "• במקום זה, הצע ליצור קומבו/חבילה של המוצר המוביל עם מוצר שפחות נמכר (ראה bottom_items בנתונים)\n"
-                "• המטרה: להגדיל מכירות של המוצר החלש תוך ניצול הפופולריות של המוצר החזק\n"
-                f"{bottom_items_text}"
-                "• דוגמה: '[מוצר מוביל] הוא המוצר הכי מכניס שלך. שקול להציע חבילה: [מוצר מוביל] + [אחד מהמוצרים הפחות נמכרים] במחיר מיוחד'\n"
-            )
+            if lang == "he":
+                specific_instructions = (
+                    "\n⚠️ הוראה מיוחדת לגרף זה:\n"
+                    "• אם יש מוצר מוביל (הכי מכניס), אל תציע רק לקדם אותו עוד יותר\n"
+                    f"• במקום זה, {lang_dict['combo_instruction']} (ראה bottom_items בנתונים)\n"
+                    "• המטרה: להגדיל מכירות של המוצר החלש תוך ניצול הפופולריות של המוצר החזק\n"
+                    f"{bottom_items_text}"
+                    "• דוגמה: '[מוצר מוביל] הוא המוצר הכי מכניס שלך. שקול להציע חבילה: [מוצר מוביל] + [אחד מהמוצרים הפחות נמכרים] במחיר מיוחד'\n"
+                )
+            elif lang == "en":
+                specific_instructions = (
+                    "\n⚠️ Special instruction for this chart:\n"
+                    "• If there is a leading product (highest revenue), don't just suggest promoting it more\n"
+                    f"• Instead, {lang_dict['combo_instruction']} (see bottom_items in data)\n"
+                    "• Goal: increase sales of weak product while leveraging popularity of strong product\n"
+                    f"{bottom_items_text}"
+                    "• Example: '[Leading product] is your top revenue product. Consider offering a package: [Leading product] + [one of less popular products] at a special price'\n"
+                )
+            else:  # ru
+                specific_instructions = (
+                    "\n⚠️ Специальная инструкция для этого графика:\n"
+                    "• Если есть лидирующий продукт (самый прибыльный), не просто предлагай продвигать его больше\n"
+                    f"• Вместо этого, {lang_dict['combo_instruction']} (см. bottom_items в данных)\n"
+                    "• Цель: увеличить продажи слабого продукта, используя популярность сильного продукта\n"
+                    f"{bottom_items_text}"
+                    "• Пример: '[Лидирующий продукт] - ваш самый прибыльный продукт. Рассмотрите предложение пакета: [Лидирующий продукт] + [один из менее популярных продуктов] по специальной цене'\n"
+                )
         
         # מכירות לפי יום/שעה - התמקד בימים/שעות חלשים
-        if "יום" in title or "שעה" in title or "שבוע" in title:
+        if "יום" in title or "שעה" in title or "שבוע" in title or "Day" in title or "Hour" in title or "Week" in title or "День" in title or "Час" in title or "Неделя" in title:
             weak_info = ""
             if isinstance(compact, dict):
                 if "weak_day" in compact:
                     weak_day = compact.get("weak_day")
                     weak_sum = compact.get("weak_day_sum", 0)
-                    weak_info = f"\n• היום החלש ביותר: {weak_day} (₪{weak_sum:.0f}) - זה הזמן למשוך לקוחות חדשים!\n"
+                    if lang == "he":
+                        weak_info = f"\n• היום החלש ביותר: {weak_day} (₪{weak_sum:.0f}) - זה הזמן למשוך לקוחות חדשים!\n"
+                    elif lang == "en":
+                        weak_info = f"\n• Weakest day: {weak_day} (₪{weak_sum:.0f}) - this is the time to attract new customers!\n"
+                    else:  # ru
+                        weak_info = f"\n• Самый слабый день: {weak_day} (₪{weak_sum:.0f}) - это время привлечь новых клиентов!\n"
                 elif "weak_hour" in compact:
                     weak_hour = compact.get("weak_hour")
-                    weak_info = f"\n• השעה החלשה ביותר: {weak_hour} - זה הזמן למשוך לקוחות חדשים!\n"
+                    if lang == "he":
+                        weak_info = f"\n• השעה החלשה ביותר: {weak_hour} - זה הזמן למשוך לקוחות חדשים!\n"
+                    elif lang == "en":
+                        weak_info = f"\n• Weakest hour: {weak_hour} - this is the time to attract new customers!\n"
+                    else:  # ru
+                        weak_info = f"\n• Самый слабый час: {weak_hour} - это время привлечь новых клиентов!\n"
             
-            specific_instructions = (
-                "\n⚠️ הוראה מיוחדת לגרף זה:\n"
-                "• אל תציע למשוך לקוחות בימים/שעות החזקים ביותר (יש כבר ביקוש גבוה)\n"
-                "• במקום זה, התמקד בימים/שעות החלשים ביותר - אלה הזדמנות למשוך לקוחות חדשים\n"
-                "• המטרה: למלא את הזמנים הריקים ולהגיע ללקוחות חדשים שלא מגיעים בשעות העמוסות\n"
-                f"{weak_info}"
-                "• דוגמה: '[יום/שעה חלש] הוא החלש ביותר. שקול להפעיל מבצע מיוחד ב[יום/שעה חלש] כדי למשוך לקוחות חדשים שלא מגיעים ב[ימים/שעות] החזקים'\n"
-            )
+            if lang == "he":
+                specific_instructions = (
+                    "\n⚠️ הוראה מיוחדת לגרף זה:\n"
+                    "• אל תציע למשוך לקוחות בימים/שעות החזקים ביותר (יש כבר ביקוש גבוה)\n"
+                    f"• במקום זה, {lang_dict['weak_instruction']}\n"
+                    "• המטרה: למלא את הזמנים הריקים ולהגיע ללקוחות חדשים שלא מגיעים בשעות העמוסות\n"
+                    f"{weak_info}"
+                    "• דוגמה: '[יום/שעה חלש] הוא החלש ביותר. שקול להפעיל מבצע מיוחד ב[יום/שעה חלש] כדי למשוך לקוחות חדשים שלא מגיעים ב[ימים/שעות] החזקים'\n"
+                )
+            elif lang == "en":
+                specific_instructions = (
+                    "\n⚠️ Special instruction for this chart:\n"
+                    "• Don't suggest attracting customers during the strongest days/hours (there's already high demand)\n"
+                    f"• Instead, {lang_dict['weak_instruction']}\n"
+                    "• Goal: fill empty times and reach new customers who don't come during busy hours\n"
+                    f"{weak_info}"
+                    "• Example: '[Weak day/hour] is the weakest. Consider running a special promotion on [weak day/hour] to attract new customers who don't come during [strong days/hours]'\n"
+                )
+            else:  # ru
+                specific_instructions = (
+                    "\n⚠️ Специальная инструкция для этого графика:\n"
+                    "• Не предлагай привлекать клиентов в самые сильные дни/часы (уже есть высокий спрос)\n"
+                    f"• Вместо этого, {lang_dict['weak_instruction']}\n"
+                    "• Цель: заполнить пустые времена и привлечь новых клиентов, которые не приходят в загруженные часы\n"
+                    f"{weak_info}"
+                    "• Пример: '[Слабый день/час] - самый слабый. Рассмотрите запуск специальной акции в [слабый день/час], чтобы привлечь новых клиентов, которые не приходят в [сильные дни/часы]'\n"
+                )
         
-        prompt = (
-            "אתה יועץ עסקי מומחה לחנויות קמעונאיות ומסעדות בישראל. "
-            "תפקידך לעזור לבעל העסק להבין את הנתונים ולקבל החלטות חכמות.\n\n"
-            "כללים:\n"
-            "• כתוב בעברית פשוטה וברורה, כאילו אתה מדבר עם בעל מכולת או בית קפה\n"
-            "• התמקד בתובנה העיקרית אחת — מה הכי חשוב לדעת מהגרף הזה?\n"
-            "• תן המלצה מעשית אחת שאפשר ליישם מחר בבוקר (לא תיאוריה!)\n"
-            "• אורך: 2-3 משפטים בלבד\n"
-            "• אל תחזור על מספרים שכבר מופיעים בגרף — תן פרשנות\n"
-            f"{specific_instructions}\n"
-            f"כותרת הגרף: {title}\n"
-            f"נתונים: {payload}"
-        )
+        # Создаем промпт на нужном языке
+        if lang == "he":
+            prompt = (
+                "אתה יועץ עסקי מומחה לחנויות קמעונאיות ומסעדות בישראל. "
+                "תפקידך לעזור לבעל העסק להבין את הנתונים ולקבל החלטות חכמות.\n\n"
+                "כללים:\n"
+                f"• כתוב {lang_dict['example']}, כאילו אתה מדבר עם בעל מכולת או בית קפה\n"
+                f"• {lang_dict['focus']} — מה הכי חשוב לדעת מהגרף הזה?\n"
+                f"• {lang_dict['give']} שאפשר ליישם מחר בבוקר (לא תיאוריה!)\n"
+                f"• אורך: {lang_dict['length']}\n"
+                f"• {lang_dict['dont']} שכבר מופיעים בגרף — תן פרשנות\n"
+                f"{specific_instructions}\n"
+                f"כותרת הגרף: {title}\n"
+                f"נתונים: {payload}"
+            )
+        elif lang == "en":
+            prompt = (
+                "You are a business consultant specializing in retail stores and restaurants in Israel. "
+                "Your role is to help the business owner understand the data and make smart decisions.\n\n"
+                "Rules:\n"
+                f"• Write {lang_dict['example']}, as if you're talking to a grocery store or cafe owner\n"
+                f"• {lang_dict['focus']} — what's the most important thing to know from this chart?\n"
+                f"• {lang_dict['give']} that can be implemented tomorrow morning (not theory!)\n"
+                f"• Length: {lang_dict['length']}\n"
+                f"• {lang_dict['dont']} that already appear in the chart — provide interpretation\n"
+                f"{specific_instructions}\n"
+                f"Chart title: {title}\n"
+                f"Data: {payload}"
+            )
+        else:  # ru
+            prompt = (
+                "Ты бизнес-консультант, специализирующийся на розничных магазинах и ресторанах в Израиле. "
+                "Твоя роль - помочь владельцу бизнеса понять данные и принимать умные решения.\n\n"
+                "Правила:\n"
+                f"• Пиши {lang_dict['example']}, как будто разговариваешь с владельцем магазина или кафе\n"
+                f"• {lang_dict['focus']} — что самое важное нужно знать из этого графика?\n"
+                f"• {lang_dict['give']}, которую можно реализовать завтра утром (не теорию!)\n"
+                f"• Длина: {lang_dict['length']}\n"
+                f"• {lang_dict['dont']}, которые уже есть в графике — дай интерпретацию\n"
+                f"{specific_instructions}\n"
+                f"Название графика: {title}\n"
+                f"Данные: {payload}"
+            )
 
         # ---- נסיון A1: Chat Completions עם max_completion_tokens ----
         try:
@@ -1578,7 +1743,7 @@ def _month_multiplier(df, month_days_assumption):
     d = _days_in_df(df)
     return (month_days_assumption / d) if d > 0 else 1.0
 
-def estimate_roi(df, params: ROIParams = ROIParams()) -> Dict[str, Any]:
+def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[str, Any]:
     """
     מחשב ROI משוער מהדוח:
     - העלאת יום חלש לרמת הימים הרגילים
@@ -1721,7 +1886,7 @@ def estimate_roi(df, params: ROIParams = ROIParams()) -> Dict[str, Any]:
     return out
 
 
-def generate_action_items(df, roi_data: dict) -> list:
+def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
     """
     יוצר רשימת פעולות קונקרטיות ומעשיות על בסיס ניתוח הנתונים.
     מחזיר רשימה של dicts: [{priority, category, action, impact, how_to}]
@@ -2593,6 +2758,7 @@ def set_language(lang):
 @app.route("/", methods=["GET", "POST"])
 def index():
     messages, plots = [], []
+    current_lang = get_language()  # Получаем текущий язык
 
     def _render():
         return render_template("index.html",
@@ -2704,12 +2870,14 @@ def index():
                 "weak_hour_sum": float(hourly[COL_SUM].min()) if not hourly.empty else 0.0,
                 "avg_hour": float(hourly[COL_SUM].mean()) if not hourly.empty else 0.0,
             }
-            ai = ai_explain("מכירות לפי שעה", brief)
+            chart_title_he = "מכירות לפי שעה"
+            chart_title = t("chart_sales_by_hour")
+            ai = ai_explain(chart_title_he, brief, current_lang)
 
             plots.append({
                 "filename": fname,
-                "title": "מכירות לפי שעה",
-                "note": "סכום המכירות לכל שעה בטווח שנבחר",
+                "title": chart_title,
+                "note": t("chart_note_sales_by_hour"),
                 "ai": ai,               # ← הוספת השדה
             })
         except Exception as e:
@@ -2764,10 +2932,12 @@ def index():
                     "avg_day": float(by_wd[COL_SUM].mean()) if not by_wd.empty else 0.0,
                     "dist": {str(k): float(v) for k, v in zip(by_wd["יום בשבוע"], by_wd[COL_SUM])}
                 }
-                ai = ai_explain("מכירות לפי יום בשבוע", brief)
+                chart_title_he = "מכירות לפי יום בשבוע"
+                chart_title = t("chart_sales_by_weekday")
+                ai = ai_explain(chart_title_he, brief, current_lang)
 
-                plots.append({"filename": fname, "title": "מכירות לפי יום בשבוע",
-                              "note": "איזה ימים חזקים/חלשים",
+                plots.append({"filename": fname, "title": t("chart_sales_by_weekday"),
+                              "note": t("chart_note_sales_by_weekday"),
                               "ai": ai})
         except Exception as e:
             messages.append(f"שגיאה: מכירות לפי יום בשבוע — {e}")
@@ -2793,10 +2963,12 @@ def index():
                 "best_sum": float(top[COL_SUM]) if top is not None else 0.0,
                 "avg_daily": float(daily[COL_SUM].mean()) if not daily.empty else 0.0,
             }
-            ai = ai_explain("מכירות יומיות", brief)
+            chart_title_he = "מכירות יומיות"
+            chart_title = t("chart_daily_sales")
+            ai = ai_explain(chart_title_he, brief, current_lang)
 
-            plots.append({"filename": fname, "title": "מכירות יומיות",
-                          "note": "תנודות יום־יומיות",
+            plots.append({"filename": fname, "title": chart_title,
+                          "note": t("chart_note_daily_sales"),
                           "ai": ai})
         except Exception as e:
             messages.append(f"שגיאה: מכירות יומיות — {e}")
@@ -2832,10 +3004,12 @@ def index():
                             "top_item": str(qty.iloc[0][COL_ITEM]),
                             "top_value": int(qty.iloc[0][COL_QTY]),
                         }
-                        ai = ai_explain("מוצרים – כמות", brief)
+                        chart_title_he = "מוצרים – כמות"
+                        chart_title = t("chart_top_quantity")
+                        ai = ai_explain(chart_title_he, brief, current_lang)
 
-                        plots.append({"filename": fname, "title": "Top 10 כמות",
-                                      "note": "המוצרים הנמכרים בכמות הגבוהה ביותר",
+                        plots.append({"filename": fname, "title": t("chart_top_quantity"),
+                                      "note": t("chart_note_top_quantity"),
                                       "ai": ai})
                 else:
                     messages.append("דילגנו על 'Top 10 לפי כמות' — אין עמודת 'כמות'.")
@@ -2870,10 +3044,12 @@ def index():
                         "bottom_items": {str(k): float(v) for k, v in bottom_items.items()},
                         "all_items": {str(k): float(v) for k, v in all_items.items()}
                     }
-                    ai = ai_explain("מוצרים – הכנסות", brief)
+                    chart_title_he = "מוצרים – הכנסות"
+                    chart_title = t("chart_top_revenue")
+                    ai = ai_explain(chart_title_he, brief, current_lang)
 
-                    plots.append({"filename": fname, "title": "Top 10 הכנסות",
-                                  "note": "המוצרים שמכניסים הכי הרבה כסף",
+                    plots.append({"filename": fname, "title": t("chart_top_revenue"),
+                                  "note": t("chart_note_top_revenue"),
                                   "ai": ai})
         except Exception as e:
             messages.append(f"שגיאה: מוצרים – כמות/הכנסות — {e}")
@@ -2910,12 +3086,14 @@ def index():
                                 [[pay_col, "share"]].to_dict(orient="records"))
 
                     brief = {"top_methods": top3}
-                    ai = ai_explain("פילוח אמצעי תשלום", brief)
+                    chart_title_he = "פילוח אמצעי תשלום"
+                    chart_title = t("chart_payment_methods")
+                    ai = ai_explain(chart_title_he, brief, current_lang)
 
                     plots.append({
                         "filename": fname,
-                        "title": "אמצעי תשלום",
-                        "note": "התפלגות לפי אמצעי תשלום",
+                        "title": t("chart_payment_methods"),
+                        "note": t("chart_note_payment_methods"),
                         "ai": ai
                     })
                 else:
@@ -2966,7 +3144,9 @@ def index():
                         "best_avg": float(best_hour['avg_ticket']),
                         "overall_avg": float(hourly_stats['avg_ticket'].mean()),
                     }
-                    ai = ai_explain("ממוצע קנייה לפי שעה", brief)
+                    chart_title_he = "ממוצע קנייה לפי שעה"
+                    chart_title = t("chart_avg_ticket")
+                    ai = ai_explain(chart_title_he, brief, current_lang)
                     
                     plots.append({
                         "filename": fname,
@@ -3052,7 +3232,9 @@ def index():
                         "best_hour": int(max_idx[1]),
                         "best_value": float(heatmap_data.loc[max_idx[0], max_idx[1]]),
                     }
-                    ai = ai_explain("מפת חום מכירות", brief)
+                    chart_title_he = "מפת חום מכירות"
+                    chart_title = t("chart_heatmap")
+                    ai = ai_explain(chart_title_he, brief, current_lang)
                     
                     plots.append({
                         "filename": fname,
@@ -3123,7 +3305,9 @@ def index():
                         "weekday_avg_ticket": float(weekday_avg),
                         "difference_pct": round(diff_pct, 1),
                     }
-                    ai = ai_explain("השוואת סופ״ש לימי חול", brief)
+                    chart_title_he = "השוואת סופ״ש לימי חול"
+                    chart_title = t("chart_weekend_compare")
+                    ai = ai_explain(chart_title_he, brief, current_lang)
                     
                     plots.append({
                         "filename": fname,
@@ -3183,26 +3367,12 @@ def index():
 
     # טקסט AI כללי
     try:
-        summary_ai_txt = ai_explain("סיכום כללי לעסק",
-                                    {"total": total_sum, "days": days, "avg_day": avg_day})
+        summary_title_he = "סיכום כללי לעסק"
+        summary_ai_txt = ai_explain(summary_title_he,
+                                    {"total": total_sum, "days": days, "avg_day": avg_day}, current_lang)
     except Exception:
         summary_ai_txt = ""
 
-
-    # --- ROI אישי לחודש (על בסיס הדוח) ---
-    try:
-        roi_data = estimate_roi(df, ROIParams(
-            service_cost=149.0,          # תעדכן לפי התמחור שלך
-            month_days_assumption=30.0,  # אם הדוח פחות מחודש – נשליך לחודש
-            evening_hours=(17, 20),      # אפשר לשנות
-            midday_hours=(11, 14),
-            evening_target_ratio=0.5,
-            weak_day_target="median",    # או "mean"
-            tail_boost_ratio=0.10,
-            tail_share_cutoff=0.50
-        ))
-    except Exception:
-        roi_data = {"text": "", "monthly_gain": 0.0, "roi_percent": 0.0, "components": {}}
 
     # --- ROI אישי לחודש (על בסיס הדוח) ---
     try:
@@ -3215,7 +3385,7 @@ def index():
             weak_day_target="median",
             tail_boost_ratio=0.10,
             tail_share_cutoff=0.50
-        ))
+        ), current_lang)
     except Exception:
         roi_data = {"text": "", "monthly_gain": 0.0, "roi_percent": 0.0, "components": {}}
 
@@ -3226,7 +3396,7 @@ def index():
     
     # --- 📋 יצירת רשימת פעולות מומלצות ---
     try:
-        action_items = generate_action_items(df, roi_data)
+        action_items = generate_action_items(df, roi_data, current_lang)
     except Exception as e:
         print(f"⚠️ Failed to generate action items: {e}")
         action_items = []
@@ -3297,6 +3467,7 @@ def demo_analysis():
     מאפשר למשתמשים לראות את התוצאות בלי להעלות קובץ משלהם.
     """
     import pandas as pd
+    current_lang = get_language()  # Получаем текущий язык
     
     print("➡ Demo analysis requested")
     
@@ -3335,10 +3506,12 @@ def demo_analysis():
         fname = _save_fig(hourly, "hourly.png")
         ai_text = ""
         if ai_enabled_for_user():
-            ai_text = ai_explain("מכירות לפי שעה", {"שעת שיא": max_hour})
+            chart_title_he = "מכירות לפי שעה"
+            chart_title = t("chart_sales_by_hour")
+            ai_text = ai_explain(chart_title_he, {"שעת שיא": max_hour}, current_lang)
         plots.append({
             "filename": fname, 
-            "title": "מכירות לפי שעה",
+            "title": t("chart_sales_by_hour"),
             "note": f"🕐 שעת השיא: {max_hour}",
             "ai": ai_text
         })
@@ -3351,10 +3524,12 @@ def demo_analysis():
         fname = _save_fig(weekday_fig, "by_weekday.png")
         ai_text = ""
         if ai_enabled_for_user():
-            ai_text = ai_explain("מכירות לפי יום", {"יום שיא": top_day})
+            chart_title_he = "מכירות לפי יום"
+            chart_title = t("chart_sales_by_weekday")
+            ai_text = ai_explain(chart_title_he, {"יום שיא": top_day}, current_lang)
         plots.append({
             "filename": fname,
-            "title": "מכירות לפי יום בשבוע",
+            "title": chart_title,
             "note": f"📅 יום השיא: {top_day}",
             "ai": ai_text
         })
@@ -3366,8 +3541,8 @@ def demo_analysis():
         fig_qty, fig_rev, top_item = _plot_top_products(df)
         fname_qty = _save_fig(fig_qty, "top_qty.png")
         fname_rev = _save_fig(fig_rev, "top_rev.png")
-        plots.append({"filename": fname_qty, "title": "Top 10 מוצרים (כמות)", "note": f"⭐ הכי נמכר: {top_item}"})
-        plots.append({"filename": fname_rev, "title": "Top 10 מוצרים (הכנסות)", "note": ""})
+        plots.append({"filename": fname_qty, "title": t("chart_top_quantity"), "note": f"⭐ הכי נמכר: {top_item}"})
+        plots.append({"filename": fname_rev, "title": t("chart_top_revenue"), "note": ""})
     except Exception as e:
         print(f"⚠️ Demo products error: {e}")
     
@@ -3375,7 +3550,7 @@ def demo_analysis():
     try:
         hm_fig = _plot_heatmap(df)
         fname = _save_fig(hm_fig, "heatmap.png")
-        plots.append({"filename": fname, "title": "מפת חום (שעה × יום)", "note": "🔥 צבע חם = מכירות גבוהות"})
+        plots.append({"filename": fname, "title": t("chart_heatmap"), "note": "🔥 צבע חם = מכירות גבוהות"})
     except Exception as e:
         print(f"⚠️ Demo heatmap error: {e}")
     
@@ -3385,13 +3560,13 @@ def demo_analysis():
             service_cost=149.0,
             month_days_assumption=30,
             tail_share_cutoff=0.50
-        ))
+        ), current_lang)
     except Exception:
         roi_data = {"text": "", "monthly_gain": 0.0, "roi_percent": 0.0, "components": {}}
     
     # --- Action Items ---
     try:
-        action_items = generate_action_items(df, roi_data)
+        action_items = generate_action_items(df, roi_data, current_lang)
     except Exception as e:
         print(f"⚠️ Demo action items error: {e}")
         action_items = []
@@ -3498,8 +3673,10 @@ def demo_analysis():
                 "avg_hour": float(hourly[COL_SUM].mean()) if not hourly.empty else 0.0,
                 "range": [hour_start, hour_end],
             }
-            ai = ai_explain("מכירות לפי שעה", brief)
-            plots.append({"filename": fname, "title": "מכירות לפי שעה", "note": "סכום המכירות לכל שעה בטווח שנבחר", "ai": ai})
+            chart_title_he = "מכירות לפי שעה"
+            chart_title = t("chart_sales_by_hour")
+            ai = ai_explain(chart_title_he, brief, current_lang)
+            plots.append({"filename": fname, "title": chart_title, "note": t("chart_note_sales_by_hour"), "ai": ai})
         except Exception as e:
             messages.append(f"שגיאה: מכירות לפי שעה — {e}")
 
@@ -3523,8 +3700,10 @@ def demo_analysis():
                 "weak_day_sum": float(weak[COL_SUM]) if weak is not None else 0.0,
                 "avg_day": float(by_wd[COL_SUM].mean()) if not by_wd.empty else 0.0,
             }
-            ai = ai_explain("מכירות לפי יום בשבוע", brief)
-            plots.append({"filename": fname, "title": "מכירות לפי יום בשבוע", "note": "איזה ימים חזקים/חלשים", "ai": ai})
+            chart_title_he = "מכירות לפי יום בשבוע"
+            chart_title = t("chart_sales_by_weekday")
+            ai = ai_explain(chart_title_he, brief, current_lang)
+            plots.append({"filename": fname, "title": chart_title, "note": t("chart_note_sales_by_weekday"), "ai": ai})
         except Exception as e:
             messages.append(f"שגיאה: מכירות לפי יום בשבוע — {e}")
 
@@ -3545,8 +3724,10 @@ def demo_analysis():
                 "best_sum": float(top[COL_SUM]) if top is not None else 0.0,
                 "avg_daily": float(daily[COL_SUM].mean()) if not daily.empty else 0.0,
             }
-            ai = ai_explain("מכירות יומיות", brief)
-            plots.append({"filename": fname, "title": "מכירות יומיות", "note": "תנודות יום־יומיות", "ai": ai})
+            chart_title_he = "מכירות יומיות"
+            chart_title = t("chart_daily_sales")
+            ai = ai_explain(chart_title_he, brief, current_lang)
+            plots.append({"filename": fname, "title": chart_title, "note": t("chart_note_daily_sales"), "ai": ai})
         except Exception as e:
             messages.append(f"שגיאה: מכירות יומיות — {e}")
 
@@ -3565,8 +3746,10 @@ def demo_analysis():
                     "top_item": (None if qty.empty else str(qty.iloc[0][COL_ITEM])),
                     "top_value": (0 if qty.empty else int(qty.iloc[0][COL_QTY])),
                 }
-                ai1 = ai_explain("מוצרים – כמות", brief1)
-                plots.append({"filename": fname1, "title": "Top 10 כמות", "note": "המוצרים הנמכרים בכמות הגבוהה ביותר", "ai": ai1})
+                chart_title_he1 = "מוצרים – כמות"
+                chart_title1 = t("chart_top_quantity")
+                ai1 = ai_explain(chart_title_he1, brief1, current_lang)
+                plots.append({"filename": fname1, "title": chart_title1, "note": t("chart_note_top_quantity"), "ai": ai1})
             else:
                 messages.append("אין עמודת 'כמות' — דילגנו על Top 10 לפי כמות.")
 
@@ -3588,8 +3771,10 @@ def demo_analysis():
                 "bottom_items": {str(k): float(v) for k, v in bottom_items.items()},
                 "all_items": {str(k): float(v) for k, v in all_items.items()}
             }
-            ai2 = ai_explain("מוצרים – הכנסות", brief2)
-            plots.append({"filename": fname2, "title": "Top 10 הכנסות", "note": "המוצרים שמכניסים הכי הרבה כסף", "ai": ai2})
+            chart_title_he2 = "מוצרים – הכנסות"
+            chart_title2 = t("chart_top_revenue")
+            ai2 = ai_explain(chart_title_he2, brief2, current_lang)
+            plots.append({"filename": fname2, "title": chart_title2, "note": t("chart_note_top_revenue"), "ai": ai2})
         except Exception as e:
             messages.append(f"שגיאה: מוצרים – כמות/רווח — {e}")
 
@@ -3607,8 +3792,10 @@ def demo_analysis():
                         .assign(share=lambda d: (d[COL_SUM] / total).round(3))
                         [[COL_PAY, "share"]].to_dict(orient="records"))
             brief = {"top_methods": top3}
-            ai = ai_explain("פילוח אמצעי תשלום", brief)
-            plots.append({"filename": fname, "title": "אמצעי תשלום", "note": "התפלגות לפי אמצעי תשלום", "ai": ai})
+            chart_title_he = "פילוח אמצעי תשלום"
+            chart_title = t("chart_payment_methods")
+            ai = ai_explain(chart_title_he, brief, current_lang)
+            plots.append({"filename": fname, "title": chart_title, "note": t("chart_note_payment_methods"), "ai": ai})
         except Exception as e:
             messages.append(f"שגיאה: פילוח אמצעי תשלום — {e}")
     elif opt_payments and COL_PAY not in df.columns:

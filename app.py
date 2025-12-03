@@ -4207,7 +4207,7 @@ def demo_analysis():
     if opt_payments and COL_PAY in df.columns:
         try:
             pay = df.groupby(COL_PAY)[COL_SUM].sum().reset_index()
-            fig = plt.figure(figsize=(6,6))
+            fig = plt.figure(figsize=(6, 6))
             plt.pie(pay[COL_SUM], labels=pay[COL_PAY], autopct="%1.0f%%", startangle=90)
             # Переводим заголовок
             if current_lang == "he":

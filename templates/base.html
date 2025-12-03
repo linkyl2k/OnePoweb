@@ -250,10 +250,18 @@
     <!-- Main Footer Content -->
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
       <nav class="footer-nav">
-        <a href="{{ url_for('about') }}">אודות</a>
-        <a href="{{ url_for('contact') }}">צור קשר</a>
-        <a href="{{ url_for('terms') }}">תנאי שימוש</a>
-        <a href="{{ url_for('privacy') }}">מדיניות פרטיות</a>
+        <a href="{{ url_for('about') }}">
+          {% if current_lang == 'he' %}אודות{% elif current_lang == 'en' %}About{% else %}О нас{% endif %}
+        </a>
+        <a href="{{ url_for('contact') }}">
+          {% if current_lang == 'he' %}צור קשר{% elif current_lang == 'en' %}Contact{% else %}Контакты{% endif %}
+        </a>
+        <a href="{{ url_for('terms') }}">
+          {% if current_lang == 'he' %}תנאי שימוש{% elif current_lang == 'en' %}Terms of Use{% else %}Условия использования{% endif %}
+        </a>
+        <a href="{{ url_for('privacy') }}">
+          {% if current_lang == 'he' %}מדיניות פרטיות{% elif current_lang == 'en' %}Privacy Policy{% else %}Политика конфиденциальности{% endif %}
+        </a>
       </nav>
 
       <div class="footer-copy">
@@ -268,7 +276,15 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
       <!-- Payment Methods -->
       <div class="d-flex align-items-center gap-3">
-        <span class="text-muted small">תשלום מאובטח:</span>
+        <span class="text-muted small">
+          {% if current_lang == 'he' %}
+            תשלום מאובטח:
+          {% elif current_lang == 'en' %}
+            Secure payment:
+          {% else %}
+            Безопасная оплата:
+          {% endif %}
+        </span>
         <div class="d-flex gap-2 align-items-center">
           <!-- PayPal -->
           <div style="background: rgba(255,255,255,0.08); padding: 6px 10px; border-radius: 6px;" title="PayPal">
@@ -301,7 +317,15 @@
       <!-- Security Badge -->
       <div class="d-flex align-items-center gap-2">
         <i class="bi bi-shield-lock-fill" style="color: #10b981;"></i>
-        <span class="text-muted small">SSL מאובטח 256-bit</span>
+        <span class="text-muted small">
+          {% if current_lang == 'he' %}
+            SSL מאובטח 256-bit
+          {% elif current_lang == 'en' %}
+            256-bit SSL secure
+          {% else %}
+            256-битное SSL‑шифрование
+          {% endif %}
+        </span>
       </div>
     </div>
   </div>

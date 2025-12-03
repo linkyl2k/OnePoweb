@@ -456,8 +456,12 @@
 <!-- TESTIMONIALS -->
 <section class="testimonials-section mb-5">
   <div class="section-header text-center mb-5">
-    <span class="section-badge">המלצות</span>
-    <h2 class="section-title">מה אומרים הלקוחות</h2>
+    <span class="section-badge">
+      {% if current_lang == 'he' %}המלצות{% elif current_lang == 'en' %}Testimonials{% else %}Отзывы клиентов{% endif %}
+    </span>
+    <h2 class="section-title">
+      {% if current_lang == 'he' %}מה אומרים הלקוחות{% elif current_lang == 'en' %}What our customers say{% else %}Что говорят наши клиенты{% endif %}
+    </h2>
   </div>
 
   <div class="row g-4">
@@ -471,13 +475,21 @@
           <i class="bi bi-star-fill"></i>
         </div>
         <p class="testimonial-text">
-          "סוף סוף הבנתי באילו שעות אנחנו מפסידים. אחרי שינוי משמרות — הרווח החודשי עלה."
+          {% if current_lang == 'he' %}
+            "סוף סוף הבנתי באילו שעות אנחנו מפסידים. אחרי שינוי משמרות — הרווח החודשי עלה."
+          {% elif current_lang == 'en' %}
+            "We finally understood in which hours we were losing money. After changing the shifts, our monthly profit went up."
+          {% else %}
+            "Наконец‑то стало понятно, в какие часы мы теряем деньги. После смены графика прибыль за месяц выросла."
+          {% endif %}
         </p>
         <div class="testimonial-author">
           <div class="author-avatar">ר</div>
           <div class="author-info">
-            <strong>רן</strong>
-            <span>בית קפה, תל אביב</span>
+            <strong>{% if current_lang == 'he' %}רן{% elif current_lang == 'en' %}Ran{% else %}Ран{% endif %}</strong>
+            <span>
+              {% if current_lang == 'he' %}בית קפה, תל אביב{% elif current_lang == 'en' %}Coffee shop, Tel Aviv{% else %}Кофейня, Тель‑Авив{% endif %}
+            </span>
           </div>
         </div>
       </div>
@@ -492,13 +504,21 @@
           <i class="bi bi-star-fill"></i>
         </div>
         <p class="testimonial-text">
-          "הסרנו מוצרים שלא נמכרים והדגשנו את המובילים. קיבלנו עוד 7% במחזור — בחודש הראשון."
+          {% if current_lang == 'he' %}
+            "הסרנו מוצרים שלא נמכרים והדגשנו את המובילים. קיבלנו עוד 7% במחזור — בחודש הראשון."
+          {% elif current_lang == 'en' %}
+            "We removed products that don’t sell and pushed the top ones. We saw +7% in revenue in the very first month."
+          {% else %}
+            "Мы убрали товары, которые почти не продаются, и сделали акцент на лидерах. Уже в первый месяц оборот вырос на 7%."
+          {% endif %}
         </p>
         <div class="testimonial-author">
           <div class="author-avatar">ד</div>
           <div class="author-info">
-            <strong>דנה</strong>
-            <span>חנות נוחות, רמת גן</span>
+            <strong>{% if current_lang == 'he' %}דנה{% elif current_lang == 'en' %}Dana{% else %}Дана{% endif %}</strong>
+            <span>
+              {% if current_lang == 'he' %}חנות נוחות, רמת גן{% elif current_lang == 'en' %}Convenience store, Ramat Gan{% else %}Магазин у дома, Рамат‑Ган{% endif %}
+            </span>
           </div>
         </div>
       </div>
@@ -513,13 +533,21 @@
           <i class="bi bi-star-half"></i>
         </div>
         <p class="testimonial-text">
-          "הדוחות נראים מקצועיים ומסודרים. חוסך לי שעות של עבודה באקסל כל חודש."
+          {% if current_lang == 'he' %}
+            "הדוחות נראים מקצועיים ומסודרים. חוסך לי שעות של עבודה באקסל כל חודש."
+          {% elif current_lang == 'en' %}
+            "The reports look professional and clean. It saves me hours of Excel work every month."
+          {% else %}
+            "Отчёты выглядят профессионально и аккуратно. Экономит мне часы работы в Excel каждый месяц."
+          {% endif %}
         </p>
         <div class="testimonial-author">
           <div class="author-avatar">מ</div>
           <div class="author-info">
-            <strong>מיכל</strong>
-            <span>מסעדה, ירושלים</span>
+            <strong>{% if current_lang == 'he' %}מיכל{% elif current_lang == 'en' %}Michal{% else %}Михаль{% endif %}</strong>
+            <span>
+              {% if current_lang == 'he' %}מסעדה, ירושלים{% elif current_lang == 'en' %}Restaurant, Jerusalem{% else %}Ресторан, Иерусалим{% endif %}
+            </span>
           </div>
         </div>
       </div>
@@ -532,46 +560,75 @@
   <div class="pricing-preview-inner">
     <div class="row align-items-center g-4">
       <div class="col-12 col-lg-6">
-        <span class="section-badge">תמחור</span>
-        <h2 class="section-title mb-3">תוכניות לכל גודל עסק</h2>
+        <span class="section-badge">
+          {% if current_lang == 'he' %}תמחור{% elif current_lang == 'en' %}Pricing{% else %}Тарифы{% endif %}
+        </span>
+        <h2 class="section-title mb-3">
+          {% if current_lang == 'he' %}תוכניות לכל גודל עסק{% elif current_lang == 'en' %}Plans for every business size{% else %}Тарифы для любого размера бизнеса{% endif %}
+        </h2>
         <p class="mb-4">
-          התחל בחינם וגדל כשאתה מוכן. בלי התחייבות, בלי הפתעות.
+          {% if current_lang == 'he' %}
+            התחל בחינם וגדל כשאתה מוכן. בלי התחייבות, בלי הפתעות.
+          {% elif current_lang == 'en' %}
+            Start free and upgrade when you’re ready. No commitment, no surprises.
+          {% else %}
+            Начните бесплатно и переходите на платный тариф, когда будете готовы. Никаких обязательств и скрытых условий.
+          {% endif %}
         </p>
         <div class="pricing-highlights">
           <div class="highlight-item">
             <i class="bi bi-check2-circle"></i>
-            <span>תוכנית חינמית לתמיד</span>
+            <span>
+              {% if current_lang == 'he' %}תוכנית חינמית לתמיד{% elif current_lang == 'en' %}Free plan forever{% else %}Бесплатный тариф навсегда{% endif %}
+            </span>
           </div>
           <div class="highlight-item">
             <i class="bi bi-check2-circle"></i>
-            <span>7 ימי ניסיון PRO חינם</span>
+            <span>
+              {% if current_lang == 'he' %}7 ימי ניסיון PRO חינם{% elif current_lang == 'en' %}7‑day PRO trial for free{% else %}7 дней PRO бесплатно{% endif %}
+            </span>
           </div>
           <div class="highlight-item">
             <i class="bi bi-check2-circle"></i>
-            <span>ביטול בכל עת</span>
+            <span>
+              {% if current_lang == 'he' %}ביטול בכל עת{% elif current_lang == 'en' %}Cancel anytime{% else %}Отмена в любой момент{% endif %}
+            </span>
           </div>
         </div>
         <a href="{{ url_for('pricing') }}" class="btn btn-hero-primary btn-lg mt-4">
-          <i class="bi bi-gem me-2"></i>צפה בתוכניות
+          <i class="bi bi-gem me-2"></i>
+          {% if current_lang == 'he' %}צפה בתוכניות{% elif current_lang == 'en' %}View plans{% else %}Посмотреть тарифы{% endif %}
         </a>
       </div>
       <div class="col-12 col-lg-6">
         <div class="pricing-cards-preview">
           <div class="mini-price-card">
-            <div class="mini-plan">FREE</div>
-            <div class="mini-price">חינם</div>
-            <div class="mini-desc">גרפים בסיסיים</div>
+          <div class="mini-plan">FREE</div>
+          <div class="mini-price">
+            {% if current_lang == 'he' %}חינם{% elif current_lang == 'en' %}Free{% else %}Бесплатно{% endif %}
+          </div>
+          <div class="mini-desc">
+            {% if current_lang == 'he' %}גרפים בסיסיים{% elif current_lang == 'en' %}Basic charts only{% else %}Базовые графики{% endif %}
+          </div>
           </div>
           <div class="mini-price-card featured">
             <div class="mini-badge">מומלץ</div>
             <div class="mini-plan">PRO</div>
-            <div class="mini-price">₪69<span>/חודש</span></div>
-            <div class="mini-desc">AI + הכל כלול</div>
+          <div class="mini-price">
+            ₪69<span>{% if current_lang == 'he' %}/חודש{% elif current_lang == 'en' %}/month{% else %}/месяц{% endif %}</span>
+          </div>
+          <div class="mini-desc">
+            {% if current_lang == 'he' %}AI + הכל כלול{% elif current_lang == 'en' %}AI + everything included{% else %}ИИ + все функции включены{% endif %}
+          </div>
           </div>
           <div class="mini-price-card">
-            <div class="mini-plan">BASIC</div>
-            <div class="mini-price">₪39<span>/חודש</span></div>
-            <div class="mini-desc">השוואת תקופות</div>
+          <div class="mini-plan">BASIC</div>
+          <div class="mini-price">
+            ₪39<span>{% if current_lang == 'he' %}/חודש{% elif current_lang == 'en' %}/month{% else %}/месяц{% endif %}</span>
+          </div>
+          <div class="mini-desc">
+            {% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Period comparison{% else %}Сравнение периодов{% endif %}
+          </div>
           </div>
         </div>
       </div>
@@ -582,56 +639,84 @@
 <!-- FAQ -->
 <section class="faq-section mb-5">
   <div class="section-header text-center mb-5">
-    <span class="section-badge">שאלות</span>
-    <h2 class="section-title">שאלות נפוצות</h2>
+    <span class="section-badge">
+      {% if current_lang == 'he' %}שאלות{% elif current_lang == 'en' %}FAQ{% else %}Вопросы{% endif %}
+    </span>
+    <h2 class="section-title">
+      {% if current_lang == 'he' %}שאלות נפוצות{% elif current_lang == 'en' %}Frequently asked questions{% else %}Частые вопросы{% endif %}
+    </h2>
   </div>
 
   <div class="accordion" id="lp_faq" style="max-width: 800px; margin: 0 auto;">
     <div class="accordion-item">
       <h2 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa1">
-          אילו קבצים נתמכים?
+          {% if current_lang == 'he' %}אילו קבצים נתמכים?{% elif current_lang == 'en' %}Which file types are supported?{% else %}Какие форматы файлов поддерживаются?{% endif %}
         </button>
       </h2>
       <div id="fa1" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
         <div class="accordion-body">
-          CSV, Excel (כולל xlsm, xlsb), JSON, XML, ODS ו-TXT מכל קופה בישראל. מעלים ומקבלים ניתוח תוך שניות.
+          {% if current_lang == 'he' %}
+            CSV, Excel (כולל xlsm, xlsb), JSON, XML, ODS ו‑TXT מכל קופה. מעלים ומקבלים ניתוח תוך שניות.
+          {% elif current_lang == 'en' %}
+            CSV, Excel (including xlsm, xlsb), JSON, XML, ODS and TXT from almost any POS system. Upload and get an analysis in seconds.
+          {% else %}
+            CSV, Excel (включая xlsm, xlsb), JSON, XML, ODS и TXT практически из любой кассовой системы. Загружаете файл — и через несколько секунд получаете анализ.
+          {% endif %}
         </div>
       </div>
     </div>
     <div class="accordion-item">
       <h2 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa2">
-          האם הנתונים שלי מאובטחים?
+          {% if current_lang == 'he' %}האם הנתונים שלי מאובטחים?{% elif current_lang == 'en' %}Is my data secure?{% else %}Насколько надёжно защищены мои данные?{% endif %}
         </button>
       </h2>
       <div id="fa2" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
         <div class="accordion-body">
-          בהחלט. הנתונים מאוחסנים באופן מאובטח ואינם משותפים עם גורמים שלישיים. אתה יכול למחוק את הנתונים בכל עת.
+          {% if current_lang == 'he' %}
+            בהחלט. הנתונים מאוחסנים באופן מאובטח ואינם משותפים עם גורמים שלישיים. אתה יכול למחוק את הנתונים בכל עת.
+          {% elif current_lang == 'en' %}
+            Absolutely. Your data is stored securely and never shared with third parties. You can delete your data at any time.
+          {% else %}
+            Да. Данные хранятся в защищённом виде и не передаются третьим лицам. Вы можете удалить свои данные в любой момент.
+          {% endif %}
         </div>
       </div>
     </div>
     <div class="accordion-item">
       <h2 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa3">
-          איך עובד התשלום?
+          {% if current_lang == 'he' %}איך עובד התשלום?{% elif current_lang == 'en' %}How does payment work?{% else %}Как устроена оплата?{% endif %}
         </button>
       </h2>
       <div id="fa3" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
         <div class="accordion-body">
-          התשלום דרך PayPal — מאובטח ונוח. אפשר לשלם גם בכרטיס אשראי. ביטול בכל עת, בלי התחייבות.
+          {% if current_lang == 'he' %}
+            התשלום דרך PayPal — מאובטח ונוח. אפשר לשלם גם בכרטיס אשראי. ביטול בכל עת, בלי התחייבות.
+          {% elif current_lang == 'en' %}
+            Payments are processed via PayPal and major credit cards — secure and convenient. You can cancel anytime, no long‑term commitment.
+          {% else %}
+            Оплата проходит через PayPal и банковские карты — это безопасно и удобно. Подписку можно отменить в любой момент, без долгосрочных обязательств.
+          {% endif %}
         </div>
       </div>
     </div>
     <div class="accordion-item">
       <h2 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fa4">
-          אפשר לראות דוגמה לפני הרשמה?
+          {% if current_lang == 'he' %}אפשר לראות דוגמה לפני הרשמה?{% elif current_lang == 'en' %}Can I see a demo before signing up?{% else %}Можно посмотреть пример до регистрации?{% endif %}
         </button>
       </h2>
       <div id="fa4" class="accordion-collapse collapse" data-bs-parent="#lp_faq">
         <div class="accordion-body">
-          כן! לחץ על "צפה בדוגמה" בראש העמוד כדי לראות ניתוח מלא עם נתונים לדוגמה — בלי הרשמה.
+          {% if current_lang == 'he' %}
+            כן! לחץ על "צפה בדוגמה" בראש העמוד כדי לראות ניתוח מלא עם נתונים לדוגמה — בלי הרשמה.
+          {% elif current_lang == 'en' %}
+            Yes! Click “See a live demo” at the top of the page to view a full analysis with sample data — no signup required.
+          {% else %}
+            Да! Нажмите «Посмотреть демо» вверху страницы, чтобы увидеть полный анализ на примере тестовых данных — без регистрации.
+          {% endif %}
         </div>
       </div>
     </div>
@@ -641,21 +726,45 @@
 <!-- FINAL CTA -->
 <section class="final-cta">
   <div class="cta-content text-center">
-    <h2 class="cta-title mb-3">מוכנים להפסיק לנחש ולהתחיל להרוויח?</h2>
-    <p class="cta-subtitle mb-4">הצטרפו למאות עסקים שכבר משתמשים ב-OnePoweb</p>
+    <h2 class="cta-title mb-3">
+      {% if current_lang == 'he' %}
+        מוכנים להפסיק לנחש ולהתחיל להרוויח?
+      {% elif current_lang == 'en' %}
+        Ready to stop guessing and start growing profits?
+      {% else %}
+        Готовы перестать угадывать и начать зарабатывать больше?
+      {% endif %}
+    </h2>
+    <p class="cta-subtitle mb-4">
+      {% if current_lang == 'he' %}
+        הצטרפו למאות עסקים שכבר משתמשים ב-OnePoweb
+      {% elif current_lang == 'en' %}
+        Join hundreds of businesses already using OnePoweb
+      {% else %}
+        Присоединяйтесь к сотням бизнесов, которые уже используют OnePoweb
+      {% endif %}
+    </p>
     <div class="d-flex flex-wrap justify-content-center gap-3">
       <a class="btn btn-hero-primary btn-lg" href="{{ url_for('index') }}">
-        <i class="bi bi-rocket-takeoff me-2"></i>להתחיל עכשיו — חינם
+        <i class="bi bi-rocket-takeoff me-2"></i>
+        {% if current_lang == 'he' %}להתחיל עכשיו — חינם{% elif current_lang == 'en' %}Get started now — free{% else %}Начать сейчас — бесплатно{% endif %}
       </a>
       {% if not session.uid %}
       <a class="btn btn-hero-secondary btn-lg" href="{{ url_for('signup') }}">
-        <i class="bi bi-person-plus me-2"></i>פתח חשבון
+        <i class="bi bi-person-plus me-2"></i>
+        {% if current_lang == 'he' %}פתח חשבון{% elif current_lang == 'en' %}Create account{% else %}Создать аккаунт{% endif %}
       </a>
       {% endif %}
     </div>
     <div class="cta-note mt-3">
       <i class="bi bi-shield-check me-1"></i>
-      ללא כרטיס אשראי · 7 ימי ניסיון PRO חינם
+      {% if current_lang == 'he' %}
+        ללא כרטיס אשראי · 7 ימי ניסיון PRO חינם
+      {% elif current_lang == 'en' %}
+        No credit card required · 7‑day PRO trial for free
+      {% else %}
+        Без банковской карты · 7 дней PRO бесплатно
+      {% endif %}
     </div>
   </div>
 </section>

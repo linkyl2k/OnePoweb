@@ -8,49 +8,89 @@
       <div class="col-12 col-lg-6">
         <div class="hero-badge mb-3">
           <i class="bi bi-lightning-charge-fill"></i>
-          ניתוח חכם לעסקים קטנים
+          {% if current_lang == 'he' %}
+            ניתוח חכם לעסקים קטנים
+          {% elif current_lang == 'en' %}
+            Smart analytics for small businesses
+          {% else %}
+            Умная аналитика для малого бизнеса
+          {% endif %}
         </div>
         <h1 class="hero-title mb-4">
-          גלה תוך <span class="highlight">10 שניות</span><br>
-          איפה העסק שלך מפסיד כסף
+          {% if current_lang == 'he' %}
+            גלה תוך <span class="highlight">10 שניות</span><br>
+            איפה העסק שלך מפסיד כסף
+          {% elif current_lang == 'en' %}
+            In just <span class="highlight">10 seconds</span><br>
+            see where your business is losing money
+          {% else %}
+            Всего за <span class="highlight">10 секунд</span><br>
+            узнайте, где бизнес теряет деньги
+          {% endif %}
         </h1>
         <p class="hero-subtitle mb-4">
-          העלה דוח קופה (CSV/Excel) וקבל מייד: גרפים חכמים, תובנות AI מעשיות, ו־PDF מקצועי לשיתוף.
+          {% if current_lang == 'he' %}
+            העלה דוח קופה (CSV/Excel) וקבל מייד: גרפים חכמים, תובנות AI מעשיות, ו־PDF מקצועי לשיתוף.
+          {% elif current_lang == 'en' %}
+            Upload a POS report (CSV/Excel) and instantly get smart charts, practical AI insights and a professional PDF report.
+          {% else %}
+            Загрузите отчёт с кассы (CSV/Excel) и мгновенно получите умные графики, практичные рекомендации ИИ и профессиональный PDF‑отчёт.
+          {% endif %}
         </p>
         
         <div class="hero-features mb-4">
           <div class="hero-feature">
             <i class="bi bi-check-circle-fill"></i>
-            <span>ניתוח אוטומטי — בלי אקסל</span>
+            <span>
+              {% if current_lang == 'he' %}ניתוח אוטומטי — בלי אקסל{% elif current_lang == 'en' %}Automatic analysis — no Excel needed{% else %}Автоматический анализ — без Excel{% endif %}
+            </span>
           </div>
           <div class="hero-feature">
             <i class="bi bi-check-circle-fill"></i>
-            <span>מזהה שעות חזקות ומוצרים מובילים</span>
+            <span>
+              {% if current_lang == 'he' %}מזהה שעות חזקות ומוצרים מובילים{% elif current_lang == 'en' %}Finds your peak hours and best‑selling items{% else %}Находит сильные часы и самые продаваемые товары{% endif %}
+            </span>
           </div>
           <div class="hero-feature">
             <i class="bi bi-check-circle-fill"></i>
-            <span>תובנות AI מותאמות לעסק שלך</span>
+            <span>
+              {% if current_lang == 'he' %}תובנות AI מותאמות לעסק שלך{% elif current_lang == 'en' %}AI insights tailored to your business{% else %}Персональные рекомендации ИИ для вашего бизнеса{% endif %}
+            </span>
           </div>
         </div>
 
         <div class="hero-cta d-flex flex-wrap gap-3">
           <a class="btn btn-hero-primary btn-lg" href="{{ url_for('index') }}">
-            <i class="bi bi-upload me-2"></i>העלה דוח עכשיו
+            <i class="bi bi-upload me-2"></i>
+            {% if current_lang == 'he' %}העלה דוח עכשיו{% elif current_lang == 'en' %}Upload a report now{% else %}Загрузить отчёт сейчас{% endif %}
           </a>
           <a class="btn btn-hero-secondary btn-lg" href="{{ url_for('demo_analysis') }}">
-            <i class="bi bi-play-circle me-2"></i>צפה בדוגמה
+            <i class="bi bi-play-circle me-2"></i>
+            {% if current_lang == 'he' %}צפה בדוגמה{% elif current_lang == 'en' %}See a live demo{% else %}Посмотреть демо{% endif %}
           </a>
         </div>
 
         {% if session.uid %}
           <div class="hero-note mt-3">
             <i class="bi bi-person-check me-1"></i>
-            מחובר בתור <strong>{{ current_user().first_name or "משתמש" }}</strong> · אפשר להתחיל מיד
+            {% if current_lang == 'he' %}
+              מחובר בתור <strong>{{ current_user().first_name or "משתמש" }}</strong> · אפשר להתחיל מיד
+            {% elif current_lang == 'en' %}
+              Logged in as <strong>{{ current_user().first_name or "User" }}</strong> · you can start right away
+            {% else %}
+              Вы вошли как <strong>{{ current_user().first_name or "пользователь" }}</strong> · можно сразу начинать анализ
+            {% endif %}
           </div>
         {% else %}
           <div class="hero-note mt-3">
             <i class="bi bi-gift me-1"></i>
-            7 ימי ניסיון PRO חינם · <a href="{{ url_for('signup') }}">הרשמה בחינם</a>
+            {% if current_lang == 'he' %}
+              7 ימי ניסיון PRO חינם · <a href="{{ url_for('signup') }}">הרשמה בחינם</a>
+            {% elif current_lang == 'en' %}
+              7‑day PRO trial for free · <a href="{{ url_for('signup') }}">Sign up free</a>
+            {% else %}
+              7 дней PRO бесплатно · <a href="{{ url_for('signup') }}">бесплатная регистрация</a>
+            {% endif %}
           </div>
         {% endif %}
       </div>
@@ -62,21 +102,27 @@
               <div class="visual-dots">
                 <span></span><span></span><span></span>
               </div>
-              <span class="visual-title">דוגמה לניתוח</span>
+              <span class="visual-title">
+                {% if current_lang == 'he' %}דוגמה לניתוח{% elif current_lang == 'en' %}Example analysis{% else %}Пример анализа{% endif %}
+              </span>
             </div>
             <img class="img-fluid" src="{{ url_for('static', filename='img/hero_demo.png') }}" alt="דוגמה לגרף" onerror="this.style.display='none'">
             <div class="visual-overlay">
               <div class="visual-stat">
                 <span class="stat-value">+18%</span>
-                <span class="stat-label">שיפור ברווח</span>
+                <span class="stat-label">
+                  {% if current_lang == 'he' %}שיפור ברווח{% elif current_lang == 'en' %}profit increase{% else %}рост прибыли{% endif %}
+                </span>
               </div>
             </div>
           </div>
           <div class="floating-badge badge-1">
-            <i class="bi bi-graph-up-arrow"></i> 📈 מכירות לפי שעה
+            <i class="bi bi-graph-up-arrow"></i>
+            {% if current_lang == 'he' %} 📈 מכירות לפי שעה{% elif current_lang == 'en' %} 📈 Sales by hour{% else %} 📈 Продажи по часам{% endif %}
           </div>
           <div class="floating-badge badge-2">
-            <i class="bi bi-stars"></i> תובנות AI
+            <i class="bi bi-stars"></i>
+            {% if current_lang == 'he' %} תובנות AI{% elif current_lang == 'en' %} AI insights{% else %} Инсайты ИИ{% endif %}
           </div>
         </div>
       </div>
@@ -90,25 +136,33 @@
     <div class="col-6 col-md-3">
       <div class="stat-item">
         <div class="stat-number">500+</div>
-        <div class="stat-text">עסקים משתמשים</div>
+        <div class="stat-text">
+          {% if current_lang == 'he' %}עסקים משתמשים{% elif current_lang == 'en' %}businesses using OnePoweb{% else %}бизнесов уже используют OnePoweb{% endif %}
+        </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="stat-item">
         <div class="stat-number">10K+</div>
-        <div class="stat-text">דוחות נותחו</div>
+        <div class="stat-text">
+          {% if current_lang == 'he' %}דוחות נותחו{% elif current_lang == 'en' %}reports analyzed{% else %}отчётов уже проанализировано{% endif %}
+        </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="stat-item">
         <div class="stat-number">15%</div>
-        <div class="stat-text">שיפור ממוצע ברווח</div>
+        <div class="stat-text">
+          {% if current_lang == 'he' %}שיפור ממוצע ברווח{% elif current_lang == 'en' %}average profit increase{% else %}средний рост прибыли{% endif %}
+        </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="stat-item">
-        <div class="stat-number">30 שנ'</div>
-        <div class="stat-text">זמן ניתוח ממוצע</div>
+        <div class="stat-number">30{% if current_lang == 'he' %} שנ'{% else %}s{% endif %}</div>
+        <div class="stat-text">
+          {% if current_lang == 'he' %}זמן ניתוח ממוצע{% elif current_lang == 'en' %}average analysis time{% else %}среднее время анализа{% endif %}
+        </div>
       </div>
     </div>
   </div>
@@ -122,12 +176,22 @@
         <div class="card-icon problem">
           <i class="bi bi-emoji-frown"></i>
         </div>
-        <h3>בלי OnePoweb</h3>
+        <h3>
+          {% if current_lang == 'he' %}בלי OnePoweb{% elif current_lang == 'en' %}Without OnePoweb{% else %}Без OnePoweb{% endif %}
+        </h3>
         <ul class="problem-list">
-          <li><i class="bi bi-x-circle"></i> שעות של עבודה באקסל</li>
-          <li><i class="bi bi-x-circle"></i> לא יודעים מה באמת עובד</li>
-          <li><i class="bi bi-x-circle"></i> החלטות על בסיס תחושות</li>
-          <li><i class="bi bi-x-circle"></i> מפסידים כסף בלי לדעת</li>
+          <li><i class="bi bi-x-circle"></i>
+            {% if current_lang == 'he' %}שעות של עבודה באקסל{% elif current_lang == 'en' %}Hours wasted in Excel{% else %}Часы, потраченные в Excel{% endif %}
+          </li>
+          <li><i class="bi bi-x-circle"></i>
+            {% if current_lang == 'he' %}לא יודעים מה באמת עובד{% elif current_lang == 'en' %}No clear picture of what really works{% else %}Нет чёткого понимания, что реально работает{% endif %}
+          </li>
+          <li><i class="bi bi-x-circle"></i>
+            {% if current_lang == 'he' %}החלטות על בסיס תחושות{% elif current_lang == 'en' %}Decisions based on gut feeling{% else %}Решения «на ощущениях», а не на данных{% endif %}
+          </li>
+          <li><i class="bi bi-x-circle"></i>
+            {% if current_lang == 'he' %}מפסידים כסף בלי לדעת{% elif current_lang == 'en' %}Losing money without noticing{% else %}Потеря денег, о которой вы даже не знаете{% endif %}
+          </li>
         </ul>
       </div>
     </div>
@@ -136,12 +200,22 @@
         <div class="card-icon solution">
           <i class="bi bi-emoji-smile"></i>
         </div>
-        <h3>עם OnePoweb</h3>
+        <h3>
+          {% if current_lang == 'he' %}עם OnePoweb{% elif current_lang == 'en' %}With OnePoweb{% else %}С OnePoweb{% endif %}
+        </h3>
         <ul class="solution-list">
-          <li><i class="bi bi-check-circle-fill"></i> ניתוח אוטומטי תוך שניות</li>
-          <li><i class="bi bi-check-circle-fill"></i> תובנות מבוססות נתונים</li>
-          <li><i class="bi bi-check-circle-fill"></i> החלטות חכמות שמביאות כסף</li>
-          <li><i class="bi bi-check-circle-fill"></i> מזהה הזדמנויות לשיפור</li>
+          <li><i class="bi bi-check-circle-fill"></i>
+            {% if current_lang == 'he' %}ניתוח אוטומטי תוך שניות{% elif current_lang == 'en' %}Automatic analysis in seconds{% else %}Автоматический анализ за секунды{% endif %}
+          </li>
+          <li><i class="bi bi-check-circle-fill"></i>
+            {% if current_lang == 'he' %}תובנות מבוססות נתונים{% elif current_lang == 'en' %}Insights based on real data{% else %}Инсайты, основанные на цифрах, а не догадках{% endif %}
+          </li>
+          <li><i class="bi bi-check-circle-fill"></i>
+            {% if current_lang == 'he' %}החלטות חכמות שמביאות כסף{% elif current_lang == 'en' %}Smarter decisions that bring more profit{% else %}Более умные решения, которые приносят прибыль{% endif %}
+          </li>
+          <li><i class="bi bi-check-circle-fill"></i>
+            {% if current_lang == 'he' %}מזהה הזדמנויות לשיפור{% elif current_lang == 'en' %}Detects opportunities to improve results{% else %}Находит точки роста и упущенные возможности{% endif %}
+          </li>
         </ul>
       </div>
     </div>
@@ -151,9 +225,27 @@
 <!-- FEATURES -->
 <section class="features-section mb-5">
   <div class="section-header text-center mb-5">
-    <span class="section-badge">יתרונות</span>
-    <h2 class="section-title">למה עסקים בוחרים ב-OnePoweb?</h2>
-    <p class="section-subtitle">כלים חזקים שעוזרים לך לקבל החלטות טובות יותר</p>
+    <span class="section-badge">
+      {% if current_lang == 'he' %}יתרונות{% elif current_lang == 'en' %}Benefits{% else %}Преимущества{% endif %}
+    </span>
+    <h2 class="section-title">
+      {% if current_lang == 'he' %}
+        למה עסקים בוחרים ב-OnePoweb?
+      {% elif current_lang == 'en' %}
+        Why businesses choose OnePoweb
+      {% else %}
+        Почему бизнесы выбирают OnePoweb
+      {% endif %}
+    </h2>
+    <p class="section-subtitle">
+      {% if current_lang == 'he' %}
+        כלים חזקים שעוזרים לך לקבל החלטות טובות יותר
+      {% elif current_lang == 'en' %}
+        Powerful tools that help you make better, data‑driven decisions
+      {% else %}
+        Мощные инструменты, которые помогают принимать более точные решения на основе данных
+      {% endif %}
+    </p>
   </div>
 
   <div class="row g-4">
@@ -162,18 +254,40 @@
         <div class="feature-icon">
           <i class="bi bi-bar-chart-line-fill"></i>
         </div>
-        <h4>גרפים חכמים</h4>
-        <p>מכירות לפי שעה, יום, מוצר ואמצעי תשלום. הכל ויזואלי וברור.</p>
+        <h4>
+          {% if current_lang == 'he' %}גרפים חכמים{% elif current_lang == 'en' %}Smart charts{% else %}Умные графики{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            מכירות לפי שעה, יום, מוצר ואמצעי תשלום. הכל ויזואלי וברור.
+          {% elif current_lang == 'en' %}
+            Sales by hour, day, product and payment method — visual and easy to read.
+          {% else %}
+            Продажи по часам, дням, товарам и способам оплаты — наглядно и понятно.
+          {% endif %}
+        </p>
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4">
       <div class="feature-card featured">
-        <div class="feature-badge">פופולרי</div>
+        <div class="feature-badge">
+          {% if current_lang == 'he' %}פופולרי{% elif current_lang == 'en' %}Popular{% else %}Популярно{% endif %}
+        </div>
         <div class="feature-icon ai">
           <i class="bi bi-stars"></i>
         </div>
-        <h4>תובנות AI</h4>
-        <p>בינה מלאכותית מנתחת את הנתונים ונותנת המלצות מעשיות מותאמות לעסק שלך.</p>
+        <h4>
+          {% if current_lang == 'he' %}תובנות AI{% elif current_lang == 'en' %}AI insights{% else %}Инсайты от ИИ{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            בינה מלאכותית מנתחת את הנתונים ונותנת המלצות מעשיות מותאמות לעסק שלך.
+          {% elif current_lang == 'en' %}
+            AI analyzes your data and gives practical, tailored recommendations for your business.
+          {% else %}
+            Искусственный интеллект анализирует ваши данные и даёт практические рекомендации, адаптированные под ваш бизнес.
+          {% endif %}
+        </p>
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4">
@@ -181,8 +295,18 @@
         <div class="feature-icon">
           <i class="bi bi-file-earmark-pdf-fill"></i>
         </div>
-        <h4>ייצוא PDF</h4>
-        <p>דוח מקצועי לשיתוף עם שותפים, מנהלים או רואה חשבון.</p>
+        <h4>
+          {% if current_lang == 'he' %}ייצוא PDF{% elif current_lang == 'en' %}PDF export{% else %}PDF‑отчёты{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            דוח מקצועי לשיתוף עם שותפים, מנהלים או רואה חשבון.
+          {% elif current_lang == 'en' %}
+            Professional PDF reports to share with partners, managers or your accountant.
+          {% else %}
+            Профессиональные PDF‑отчёты для партнёров, руководства или бухгалтера.
+          {% endif %}
+        </p>
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4">
@@ -190,8 +314,18 @@
         <div class="feature-icon">
           <i class="bi bi-graph-up-arrow"></i>
         </div>
-        <h4>הערכת ROI</h4>
-        <p>מחשב את הפוטנציאל הכספי של שיפורים אפשריים בעסק שלך.</p>
+        <h4>
+          {% if current_lang == 'he' %}הערכת ROI{% elif current_lang == 'en' %}ROI estimation{% else %}Оценка ROI{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            מחשב את הפוטנציאל הכספי של שיפורים אפשריים בעסק שלך.
+          {% elif current_lang == 'en' %}
+            Calculates the financial potential of improvements in your business.
+          {% else %}
+            Считает финансовый потенциал от возможных улучшений в вашем бизнесе.
+          {% endif %}
+        </p>
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4">
@@ -199,8 +333,18 @@
         <div class="feature-icon">
           <i class="bi bi-calendar3"></i>
         </div>
-        <h4>השוואת תקופות</h4>
-        <p>השווה חודש לחודש, שבוע לשבוע — וזהה מגמות ושינויים.</p>
+        <h4>
+          {% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Period comparison{% else %}Сравнение периодов{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            השווה חודש לחודש, שבוע לשבוע — וזהה מגמות ושינויים.
+          {% elif current_lang == 'en' %}
+            Compare month‑to‑month or week‑to‑week and spot trends and changes.
+          {% else %}
+            Сравнивайте месяцы и недели между собой и замечайте тренды и изменения.
+          {% endif %}
+        </p>
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4">
@@ -208,8 +352,18 @@
         <div class="feature-icon">
           <i class="bi bi-lightning-charge-fill"></i>
         </div>
-        <h4>תוכנית פעולה</h4>
-        <p>צעדים קונקרטיים ליישום מיידי — לא סתם נתונים, אלא מה לעשות איתם.</p>
+        <h4>
+          {% if current_lang == 'he' %}תוכנית פעולה{% elif current_lang == 'en' %}Action plan{% else %}План действий{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            צעדים קונקרטיים ליישום מיידי — לא סתם נתונים, אלא מה לעשות איתם.
+          {% elif current_lang == 'en' %}
+            Concrete next steps — not just data, but what to actually do with it.
+          {% else %}
+            Конкретные шаги — не просто цифры, а понятный план, что с ними делать.
+          {% endif %}
+        </p>
       </div>
     </div>
   </div>
@@ -218,9 +372,15 @@
 <!-- HOW IT WORKS -->
 <section class="how-section mb-5">
   <div class="section-header text-center mb-5">
-    <span class="section-badge">פשוט</span>
-    <h2 class="section-title">איך זה עובד?</h2>
-    <p class="section-subtitle">3 צעדים פשוטים לתובנות שמשנות את העסק</p>
+    <span class="section-badge">
+      {% if current_lang == 'he' %}פשוט{% elif current_lang == 'en' %}Simple{% else %}Просто{% endif %}
+    </span>
+    <h2 class="section-title">
+      {% if current_lang == 'he' %}איך זה עובד?{% elif current_lang == 'en' %}How does it work?{% else %}Как это работает?{% endif %}
+    </h2>
+    <p class="section-subtitle">
+      {% if current_lang == 'he' %}3 צעדים פשוטים לתובנות שמשנות את העסק{% elif current_lang == 'en' %}3 simple steps to insights that change your business{% else %}3 простых шага до инсайтов, которые меняют ваш бизнес{% endif %}
+    </p>
   </div>
 
   <div class="row g-4">
@@ -230,8 +390,18 @@
         <div class="step-icon">
           <i class="bi bi-cloud-arrow-up"></i>
         </div>
-        <h4>העלה דוח</h4>
-        <p>CSV או Excel מכל מערכת קופה. פשוט גרור ושחרר.</p>
+        <h4>
+          {% if current_lang == 'he' %}העלה דוח{% elif current_lang == 'en' %}Upload a report{% else %}Загрузите отчёт{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            CSV או Excel מכל מערכת קופה. פשוט גרור ושחרר.
+          {% elif current_lang == 'en' %}
+            CSV or Excel from any POS system. Just drag & drop.
+          {% else %}
+            CSV или Excel из любой кассовой системы. Просто перетащите файл.
+          {% endif %}
+        </p>
       </div>
     </div>
     <div class="col-12 col-md-4">
@@ -240,8 +410,18 @@
         <div class="step-icon">
           <i class="bi bi-cpu"></i>
         </div>
-        <h4>קבל ניתוח</h4>
-        <p>המערכת מנתחת אוטומטית ומייצרת גרפים ותובנות.</p>
+        <h4>
+          {% if current_lang == 'he' %}קבל ניתוח{% elif current_lang == 'en' %}Get the analysis{% else %}Получите анализ{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            המערכת מנתחת אוטומטית ומייצרת גרפים ותובנות.
+          {% elif current_lang == 'en' %}
+            The system automatically analyzes and generates charts and insights.
+          {% else %}
+            Система автоматически анализирует данные и строит графики и инсайты.
+          {% endif %}
+        </p>
       </div>
     </div>
     <div class="col-12 col-md-4">
@@ -250,8 +430,18 @@
         <div class="step-icon">
           <i class="bi bi-rocket-takeoff"></i>
         </div>
-        <h4>פעל ושפר</h4>
-        <p>יישם את ההמלצות וראה שיפור אמיתי בביצועים.</p>
+        <h4>
+          {% if current_lang == 'he' %}פעל ושפר{% elif current_lang == 'en' %}Act and improve{% else %}Действуйте и улучшайте{% endif %}
+        </h4>
+        <p>
+          {% if current_lang == 'he' %}
+            יישם את ההמלצות וראה שיפור אמיתי בביצועים.
+          {% elif current_lang == 'en' %}
+            Implement the recommendations and see real performance improvements.
+          {% else %}
+            Применяйте рекомендации и смотрите, как реально растут показатели.
+          {% endif %}
+        </p>
       </div>
     </div>
   </div>

@@ -281,6 +281,10 @@ TRANSLATIONS = {
         "error_generic": "משהו השתבש",
         
         # Results
+        "results_title": "תוצאות הניתוח",
+        "results_upload_new": "העלה דוח חדש",
+        "results_download_pdf": "הורדת PDF",
+        "results_no_graphs": "אין גרפים להצגה. חזור לעמוד הראשי והעלה דוח חדש.",
         "results_no_graphs_reload": "גרפים לא נמצאו. מפנים ללוח הבקרה שם תוכל לראות דוחות שמורים.",
         
         # Chart titles (Hebrew - same as original)
@@ -435,6 +439,10 @@ TRANSLATIONS = {
         "error_generic": "Something went wrong",
         
         # Results
+        "results_title": "Analysis results",
+        "results_upload_new": "Upload new report",
+        "results_download_pdf": "Download PDF",
+        "results_no_graphs": "No charts to display. Go back to the main page and upload a new report.",
         "results_no_graphs_reload": "Graphs not found. Redirecting to dashboard where you can view saved reports.",
         
         # Chart titles
@@ -4547,8 +4555,8 @@ def export_pdf():
     # ---------- 5) יצירת PDF באמצעות weasyprint (ללא דפדפן) ----------
     try:
         from weasyprint import HTML, CSS
-        from weasyprint.text.fonts import FontConfiguration
-        
+        # Используем стандартную конфигурацию шрифтов WeasyPrint,
+        # чтобы избежать проблем несовместимости версий
         print(f"📄 Creating PDF with weasyprint, {len(snap.get('plots', []))} plots")
         print(f"📄 PLOTS_DIR: {PLOTS_DIR}")
         
@@ -4565,7 +4573,7 @@ def export_pdf():
         font_config = FontConfiguration()
         # Use absolute path as base_url so WeasyPrint can find images
         base_url_abs = os.path.abspath(PLOTS_DIR)
-        pdf_bytes = HTML(string=html, base_url=base_url_abs).write_pdf(font_config=font_config)
+        pdf_bytes = HTML(string=html, base_url=base_url_abs).write_pdf()
         
         print(f"✅ PDF created, size: {len(pdf_bytes)} bytes")
         

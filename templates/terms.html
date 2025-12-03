@@ -2,136 +2,402 @@
 {% block content %}
 <div class="card shadow-sm">
   <div class="card-body">
-    <h3 class="mb-3">תנאי שימוש – OnePoweb</h3>
+    {% if current_lang == 'ru' %}
+      <h3 class="mb-3">Условия использования – OnePoweb</h3>
 
-    <p>ברוך הבא ל־<strong>OnePoweb</strong> ("החברה", "האתר", "השירות"). השימוש באתר והשירותים הנלווים לו מהווה הסכמה מלאה לתנאים שלהלן. אם אינך מסכים/ה, אנא הימנע/י משימוש בשירות.</p>
+      <p>Добро пожаловать в сервис <strong>OnePoweb</strong> («Компания», «Сайт», «Сервис»). Используя сайт и связанные с ним услуги, вы соглашаетесь со следующими условиями. Если вы не согласны с ними, пожалуйста, прекратите использование сервиса.</p>
 
-    <h5 class="mt-4">1. כללי</h5>
-    <ul>
-      <li>השירות מיועד לשימוש עסקי לצורך ניתוח דוחות מכירה וסטטיסטיקות תפעוליות.</li>
-      <li>המערכת מספקת כלי עזר טכנולוגי ואינה מהווה ייעוץ עסקי/פיננסי/משפטי.</li>
-      <li>תוצרים, גרפים או הסברי AI נועדו למידע בלבד ואינם מחליפים שיקול דעת עצמאי.</li>
-      <li>השירות ניתן "כמות שהוא" (AS IS) ו־"כפי שהוא זמין" (AS AVAILABLE).</li>
-    </ul>
+      <h5 class="mt-4">1. Общие положения</h5>
+      <ul>
+        <li>Сервис предназначен для бизнес‑пользователей для анализа кассовых/продажных отчётов и операционной статистики.</li>
+        <li>Платформа предоставляет технологический инструмент и не является финансовой, юридической или бизнес‑консультацией.</li>
+        <li>Графики, отчёты и рекомендации ИИ носят информационный характер и не заменяют ваше собственное профессиональное суждение.</li>
+        <li>Сервис предоставляется «как есть» (AS IS) и «по мере доступности» (AS AVAILABLE).</li>
+      </ul>
 
-    <h5 class="mt-4">2. רישום, חשבון ואבטחה</h5>
-    <ul>
-      <li>לצורך שימוש מלא בשירות תידרש הרשמה ויצירת חשבון.</li>
-      <li>את/ה אחראי/ת לשמירת סודיות פרטי ההתחברות לכל פעילות בחשבון.</li>
-      <li>החברה רשאית להשעות/לסגור חשבון עקב הפרת תנאים או חשד לפעילות בלתי חוקית.</li>
-    </ul>
+      <h5 class="mt-4">2. Регистрация, аккаунт и безопасность</h5>
+      <ul>
+        <li>Для полноценного использования сервиса требуется регистрация и создание аккаунта.</li>
+        <li>Вы несёте ответственность за сохранность логина и пароля и всех действий, выполняемых через ваш аккаунт.</li>
+        <li>Компания может приостановить или закрыть аккаунт при нарушении условий или подозрении на незаконную/злоумышленную активность.</li>
+      </ul>
 
-    <h5 class="mt-4">3. חבילות, מנויים וחיובים</h5>
-    <ul>
-      <li>השירות מוצע במודלים של מנוי (למשל: BASIC / PRO) בתשלום מחזורי.</li>
-      <li>החיוב מתבצע מראש לכל תקופת מנוי (למשל חודשית) ומתחדש אוטומטית עד לביטול.</li>
-      <li>עיבוד תשלומים נעשה באמצעות ספק סליקה חיצוני העומד בתקן PCI-DSS; <strong>פרטי כרטיס האשראי המלאים אינם נשמרים אצלנו</strong>.</li>
-      <li>ייתכן שנשמור מזהה אסימון (token) ומידע תפעולי (מצב מנוי, מועדי חיוב) לצורך ניהול המנוי.</li>
-      <li>כשל תשלום עשוי לגרור השעיית מנוי; אנו רשאים לבצע ניסיונות חיוב חוזרים ולפנות לעדכון אמצעי תשלום.</li>
-      <li>החברה רשאית לעדכן מחירים ותוכניות לפי שיקול דעתה; עדכונים יחולו מחידוש המחזור הבא ויינתנו הודעה סבירה מראש.</li>
-    </ul>
+      <h5 class="mt-4">3. Тарифы, подписки и платежи</h5>
+      <ul>
+        <li>Сервис предоставляется по подписке (например, BASIC / PRO) с регулярной оплатой.</li>
+        <li>Оплата списывается заранее за расчётный период (например, месяц) и автоматически продлевается до отмены.</li>
+        <li>Платежи обрабатываются внешним платёжным провайдером в соответствии со стандартом PCI‑DSS; <strong>полные данные карты у нас не хранятся</strong>.</li>
+        <li>Мы можем хранить токен и служебную информацию (статус подписки, даты списаний) для управления подпиской.</li>
+        <li>При неуспешном платеже подписка может быть приостановлена; мы вправе сделать повторные попытки списания и запросить обновление платёжных данных.</li>
+        <li>Компания может изменять цены и состав тарифов; изменения применяются с следующего платёжного периода и сопровождаются разумным уведомлением.</li>
+      </ul>
 
-    <h5 class="mt-4">4. ביטול מנוי והחזרים</h5>
-    <ul>
-      <li>ניתן לבטל מנוי בכל עת דרך עמוד הפרופיל. הביטול נכנס לתוקף בסוף מחזור החיוב הנוכחי.</li>
-      <li>אלא אם צוין אחרת במפורש, <strong>אין החזר רטרואקטיבי</strong> עבור תקופה שכבר שולמה.</li>
-      <li>ככל שקיימת תקופת ניסיון/הטבה, התנאים יפורטו בעמוד הרכישה ויחולו במדויק כפי שפורסם.</li>
-      <li>ביטול מנוי אינו מוחק נתונים היסטוריים באופן אוטומטי; ניתן לבקש מחיקה בהתאם למדיניות הפרטיות.</li>
-    </ul>
+      <h5 class="mt-4">4. Отмена подписки и возвраты</h5>
+      <ul>
+        <li>Вы можете отменить подписку в любой момент через страницу профиля. Отмена вступает в силу в конце текущего расчётного периода.</li>
+        <li>Если явно не указано иное, <strong>возвраты за уже оплаченные периоды не производятся</strong>.</li>
+        <li>Условия пробного периода и акций указываются на странице покупки и действуют точно в указанном виде.</li>
+        <li>Отмена подписки не приводит к автоматическому удалению исторических данных; удалить их можно по запросу в рамках политики конфиденциальности.</li>
+      </ul>
 
-    <h5 class="mt-4">5. העלאת נתונים ותוכן משתמש</h5>
-    <ul>
-      <li>מותר להעלות רק קבצים רלוונטיים לדוחות מכירה (CSV/Excel) ללא מידע אישי/רגיש שאינו נדרש.</li>
-      <li>את/ה מצהיר/ה שיש לך כל הזכויות הנדרשות לשימוש בחומרים שאת/ה מעלה.</li>
-      <li>החברה רשאית למחוק קבצים שנטענו לאחר עיבודם, לפי מדיניות תפעולית.</li>
-    </ul>
+      <h5 class="mt-4">5. Загрузка данных и пользовательский контент</h5>
+      <ul>
+        <li>Разрешается загружать только отчёты, относящиеся к продажам (CSV/Excel), без лишних чувствительных персональных данных.</li>
+        <li>Вы подтверждаете, что обладаете всеми правами на использование загружаемых материалов.</li>
+        <li>Компания может удалять загруженные файлы после обработки в соответствии с операционной политикой.</li>
+      </ul>
 
-    <h5 class="mt-4">6. רפררל (Referral)</h5>
-    <ul>
-      <li>הטבת רפררל תינתן רק כאשר נרשם חדש ביצע רישום דרך הקישור הייחודי שלך והשלים תשלום ראשון.</li>
-      <li>ההטבה היא <strong>50% הנחה על החודש הבא</strong> מהתוכנית הנוכחית שלך.</li>
-      <li>ההנחה היא <strong>חד-פעמית</strong> - ניתן לממש רק פעם אחת, גם אם הזמנת מספר חברים.</li>
-      <li>ההנחה תחול אוטומטית בחיוב הבא לאחר שחבר שהפנית השלים תשלום.</li>
-      <li>החברה רשאית לשנות/להשהות/לבטל את תוכנית הרפררל בכל עת, לרבות במקרים של שימוש לרעה או פעילות מטעה.</li>
-    </ul>
+      <h5 class="mt-4">6. Реферальная программа</h5>
+      <ul>
+        <li>Бонус по реферальной ссылке предоставляется только если новый пользователь перешёл по вашей уникальной ссылке и успешно оплатил первую подписку.</li>
+        <li>Бонус составляет <strong>скидку 50% на следующий месяц</strong> вашего текущего тарифа.</li>
+        <li>Скидка является <strong>однократной</strong> — её можно использовать только один раз, даже если вы пригласили несколько друзей.</li>
+        <li>Скидка применяется автоматически к следующему списанию после того, как приглашённый вами пользователь оплатил подписку.</li>
+        <li>Компания может изменять, приостанавливать или отменять реферальную программу, в том числе при злоупотреблениях или вводящей в заблуждение активности.</li>
+      </ul>
 
-    <h5 class="mt-4">7. קניין רוחני</h5>
-    <ul>
-      <li>כל הזכויות באתר, הקוד, העיצוב, הלוגו והתכנים שייכות לחברה בלבד.</li>
-      <li>אין להעתיק, לשכפל, להפיץ, לתרגם או לעשות שימוש מסחרי בתכנים ללא רשות בכתב.</li>
-    </ul>
+      <h5 class="mt-4">7. Интеллектуальная собственность</h5>
+      <ul>
+        <li>Все права на сайт, программный код, дизайн, логотип и контент принадлежат Компании.</li>
+        <li>Запрещено копирование, распространение, перевод и коммерческое использование материалов без письменного разрешения.</li>
+      </ul>
 
-    <h5 class="mt-4">8. פרטיות והגנת מידע</h5>
-    <ul>
-      <li>הטיפול במידע כפוף ל־<a href="{{ url_for('privacy') }}">מדיניות הפרטיות</a> שלנו, שהיא חלק בלתי נפרד מן התנאים.</li>
-      <li>החברה נוקטת באמצעי אבטחה מקובלים; עם זאת, לא ניתן להבטיח אבטחה מוחלטת.</li>
-    </ul>
+      <h5 class="mt-4">8. Конфиденциальность и защита данных</h5>
+      <ul>
+        <li>Обработка данных регулируется нашей <a href="{{ url_for('privacy') }}">Политикой конфиденциальности</a>, которая является неотъемлемой частью этих условий.</li>
+        <li>Компания применяет стандартные меры безопасности, однако стопроцентная защита не может быть гарантирована.</li>
+      </ul>
 
-    <h5 class="mt-4">9. הגבלת אחריות</h5>
-    <ul>
-      <li>החברה לא תהיה אחראית לכל נזק ישיר/עקיף/משני/תפעולי/כספי/אובדן רווחים הנובע מהשימוש בשירות או מאי־זמינותו.</li>
-      <li>אין התחייבות לדיוק/שלמות/עדכניות של תוצרים או תובנות.</li>
-      <li>מקסימום האחריות הכוללת – ככל שנקבעה – לא יעלה על הסכום ששולם בפועל בגין חודש השירות האחרון.</li>
-    </ul>
+      <h5 class="mt-4">9. Ограничение ответственности</h5>
+      <ul>
+        <li>Компания не несёт ответственности за прямые, косвенные, побочные, сопутствующие, финансовые убытки и упущенную прибыль, связанные с использованием сервиса или его недоступностью.</li>
+        <li>Мы не гарантируем абсолютную точность, полноту или актуальность любых отчётов и рекомендаций.</li>
+        <li>Максимальный совокупный объём ответственности, если он вообще возникает, ограничен суммой, фактически уплаченной за последний месяц использования сервиса.</li>
+      </ul>
 
-    <h5 class="mt-4">10. השהיה, סיום ושינויים בשירות</h5>
-    <ul>
-      <li>החברה רשאית להשעות/לסיים גישה לשירות עקב הפרת תנאים, פעילות אסורה או שיקולים תפעוליים/אבטחתיים.</li>
-      <li>החברה רשאית לעדכן, לשנות או להפסיק את השירות (לרבות תכונות/חבילות/מחירים) בכל עת, ובמידת הצורך בהודעה סבירה.</li>
-    </ul>
+      <h5 class="mt-4">10. Приостановка, прекращение и изменения сервиса</h5>
+      <ul>
+        <li>Компания может приостановить или прекратить доступ к сервису при нарушении условий, запрещённой активности либо по техническим/безопасностным причинам.</li>
+        <li>Мы можем изменять или прекращать сервис (включая функции, тарифы и цены) в любое время, при необходимости с разумным уведомлением.</li>
+      </ul>
 
-    <h5 class="mt-4">11. עדכון תנאים</h5>
-    <ul>
-      <li>החברה רשאית לעדכן את תנאי השימוש מעת לעת. נפרסם תאריך עדכון, ושימוש מתמשך באתר מהווה הסכמה לנוסח המעודכן.</li>
-    </ul>
+      <h5 class="mt-4">11. Обновление условий</h5>
+      <ul>
+        <li>Компания может время от времени обновлять данные Условия. Мы укажем дату обновления; продолжение использования сервиса означает согласие с новой редакцией.</li>
+      </ul>
 
-    <h5 class="mt-4">12. גיל מינימלי</h5>
-    <ul>
-      <li>השירות מיועד לבעלי עסקים ומשתמשים מעל גיל <strong>18</strong> בלבד.</li>
-      <li>בהרשמה, המשתמש מאשר כי מלאו לו 18 שנים לפחות.</li>
-    </ul>
+      <h5 class="mt-4">12. Минимальный возраст</h5>
+      <ul>
+        <li>Сервис предназначен только для владельцев бизнеса и пользователей старше <strong>18</strong> лет.</li>
+        <li>Регистрируясь, вы подтверждаете, что вам не менее 18 лет.</li>
+      </ul>
 
-    <h5 class="mt-4">13. שיפוי (Indemnification)</h5>
-    <ul>
-      <li>המשתמש מתחייב לשפות את החברה, עובדיה, מנהליה ובעליה כנגד כל תביעה, נזק, הפסד, הוצאות (לרבות שכ"ט עו"ד) הנובעים מ:
-        <ul>
-          <li>הפרת תנאי שימוש אלה;</li>
-          <li>תוכן שהועלה על ידי המשתמש;</li>
-          <li>פעילות בלתי חוקית או הפרת זכויות צד שלישי.</li>
-        </ul>
-      </li>
-    </ul>
+      <h5 class="mt-4">13. Возмещение убытков (Indemnification)</h5>
+      <ul>
+        <li>Пользователь обязуется возместить Компании, её сотрудникам и владельцам любые претензии, убытки и расходы (включая расходы на юристов), возникающие из:
+          <ul>
+            <li>нарушения этих Условий;</li>
+            <li>контента, загруженного пользователем;</li>
+            <li>незаконной деятельности или нарушения прав третьих лиц.</li>
+          </ul>
+        </li>
+      </ul>
 
-    <h5 class="mt-4">14. איסור הנדסה לאחור</h5>
-    <ul>
-      <li>חל איסור מוחלט על פירוק, הנדסה לאחור (reverse engineering), העתקת קוד, ניסיון לפצח את המערכת או לנצל פגיעויות אבטחה.</li>
-      <li>הפרת סעיף זה תגרור סגירת חשבון מיידית וייתכנו הליכים משפטיים.</li>
-    </ul>
+      <h5 class="mt-4">14. Запрет на обратную разработку</h5>
+      <ul>
+        <li>Строго запрещены декомпиляция, обратная инженерия, попытки взлома или эксплуатации уязвимостей системы.</li>
+        <li>Нарушение этого пункта может привести к немедленному блокированию аккаунта и юридическим действиям.</li>
+      </ul>
 
-    <h5 class="mt-4">15. כוח עליון (Force Majeure)</h5>
-    <ul>
-      <li>החברה לא תישא באחריות לעיכובים או אי־ביצוע הנובעים מנסיבות שמחוץ לשליטתה הסבירה, לרבות: אסונות טבע, מלחמה, טרור, מגפות, תקלות תשתית אינטרנט, פעולות ממשלתיות או שביתות.</li>
-    </ul>
+      <h5 class="mt-4">15. Форс‑мажор</h5>
+      <ul>
+        <li>Компания не отвечает за задержки или невозможность исполнения обязательств по причинам, находящимся вне её разумного контроля (стихийные бедствия, война, кибератаки, сбои инфраструктуры и т.п.).</li>
+      </ul>
 
-    <h5 class="mt-4">16. פרידות סעיפים (Severability)</h5>
-    <ul>
-      <li>אם סעיף כלשהו בתנאי שימוש אלה ייקבע כבלתי תקף, יתר הסעיפים יישארו בתוקף מלא.</li>
-    </ul>
+      <h5 class="mt-4">16. Делимость положений</h5>
+      <ul>
+        <li>Если какое‑либо положение этих Условий будет признано недействительным, остальные положения остаются в силе.</li>
+      </ul>
 
-    <h5 class="mt-4">17. ויתור (Waiver)</h5>
-    <ul>
-      <li>אי אכיפת זכות כלשהי על ידי החברה לא תהווה ויתור עליה, והחברה שומרת לעצמה את הזכות לאוכפה בעתיד.</li>
-    </ul>
+      <h5 class="mt-4">17. Отказ от права</h5>
+      <ul>
+        <li>Неосуществление какого‑либо права Компании не считается отказом от него; Компания вправе реализовать это право позднее.</li>
+      </ul>
 
-    <h5 class="mt-4">18. סמכות שיפוט</h5>
-    <ul>
-      <li>תנאי שימוש אלה כפופים לדין הישראלי בלבד.</li>
-      <li>לבתי המשפט המוסמכים בעיר תל אביב־יפו תהיה הסמכות הבלעדית לדון בכל מחלוקת.</li>
-    </ul>
+      <h5 class="mt-4">18. Применимое право и юрисдикция</h5>
+      <ul>
+        <li>Эти Условия регулируются исключительно законодательством Израиля.</li>
+        <li>Эксклюзивная юрисдикция по любым спорам принадлежит компетентным судам города Тель‑Авив‑Яффо.</li>
+      </ul>
 
-    <p class="mt-4"><strong>באמצעות ההרשמה והשימוש באתר אתה מאשר כי קראת והסכמת לכל התנאים. לא תחול על החברה כל אחריות מעבר לקבוע במפורש בתנאים אלה ובדין החל.</strong></p>
+      <p class="mt-4"><strong>Регистрируясь и используя сайт, вы подтверждаете, что прочитали и приняли все условия и что ответственность Компании ограничена объёмом, прямо предусмотренным настоящими Условиями и применимым правом.</strong></p>
 
-    <p class="text-muted mt-3"><small>עודכן לאחרונה: נובמבר 2025.</small></p>
+      <p class="text-muted mt-3"><small>Последнее обновление: ноябрь 2025.</small></p>
+
+    {% elif current_lang == 'en' %}
+      <h3 class="mb-3">Terms of Use – OnePoweb</h3>
+
+      <p>Welcome to <strong>OnePoweb</strong> (the “Company”, “Site”, “Service”). By using the Site and related services you agree to the following terms. If you do not agree, please refrain from using the Service.</p>
+
+      <h5 class="mt-4">1. General</h5>
+      <ul>
+        <li>The Service is intended for business use to analyze sales reports and operational statistics.</li>
+        <li>The platform provides a technological tool and is not financial, legal or business advice.</li>
+        <li>Charts, reports and AI explanations are for information only and do not replace independent judgment.</li>
+        <li>The Service is provided “as is” and “as available”.</li>
+      </ul>
+
+      <h5 class="mt-4">2. Registration, account and security</h5>
+      <ul>
+        <li>Full use of the Service requires registration and creation of an account.</li>
+        <li>You are responsible for keeping your login details confidential and for all activities under your account.</li>
+        <li>The Company may suspend or close accounts due to violations or suspected unlawful activity.</li>
+      </ul>
+
+      <h5 class="mt-4">3. Plans, subscriptions and billing</h5>
+      <ul>
+        <li>The Service is offered on a subscription basis (e.g., BASIC / PRO) with recurring payments.</li>
+        <li>Fees are charged in advance for each subscription period and renew automatically until cancelled.</li>
+        <li>Payments are processed by an external provider compliant with PCI‑DSS; <strong>full card details are not stored by us</strong>.</li>
+        <li>We may store a token and operational data (plan status, billing dates) for subscription management.</li>
+        <li>Payment failures may result in suspension; we may attempt re‑billing and contact you to update payment details.</li>
+        <li>We may update prices and plans; changes apply from the next billing cycle with reasonable prior notice.</li>
+      </ul>
+
+      <h5 class="mt-4">4. Cancellation and refunds</h5>
+      <ul>
+        <li>You may cancel at any time via the profile page; cancellation takes effect at the end of the current billing period.</li>
+        <li>Unless explicitly stated otherwise, <strong>no retroactive refunds</strong> are given for already paid periods.</li>
+        <li>Trial periods and promotions will be described on the purchase page and apply exactly as stated.</li>
+        <li>Cancelling a subscription does not automatically delete historical data; deletion can be requested according to the Privacy Policy.</li>
+      </ul>
+
+      <h5 class="mt-4">5. Uploaded data and user content</h5>
+      <ul>
+        <li>You may upload only relevant sales reports (CSV/Excel) without unnecessary sensitive personal data.</li>
+        <li>You confirm that you have all rights to use the materials you upload.</li>
+        <li>The Company may delete uploaded files after processing in line with operational policy.</li>
+      </ul>
+
+      <h5 class="mt-4">6. Referral program</h5>
+      <ul>
+        <li>A referral bonus is granted only when a new user signs up via your unique link and completes the first payment.</li>
+        <li>The bonus is a <strong>50% discount on your next month</strong> of the current plan.</li>
+        <li>The discount is <strong>one‑time only</strong> – it can be used once, even if you invited multiple friends.</li>
+        <li>The discount is applied automatically to the next charge after the referred user has paid.</li>
+        <li>The Company may modify, suspend or cancel the referral program at any time, especially in cases of abuse or misleading activity.</li>
+      </ul>
+
+      <h5 class="mt-4">7. Intellectual property</h5>
+      <ul>
+        <li>All rights in the Site, code, design, logo and content belong exclusively to the Company.</li>
+        <li>You may not copy, reproduce, distribute, translate or commercially use any content without prior written consent.</li>
+      </ul>
+
+      <h5 class="mt-4">8. Privacy and data protection</h5>
+      <ul>
+        <li>Data processing is governed by our <a href="{{ url_for('privacy') }}">Privacy Policy</a>, which forms an integral part of these terms.</li>
+        <li>We implement standard security measures; nevertheless, absolute security cannot be guaranteed.</li>
+      </ul>
+
+      <h5 class="mt-4">9. Limitation of liability</h5>
+      <ul>
+        <li>The Company is not liable for any direct, indirect, incidental, consequential, operational or financial damage or loss of profit arising from use or unavailability of the Service.</li>
+        <li>No warranty is given as to the accuracy, completeness or timeliness of any outputs or insights.</li>
+        <li>The maximum aggregate liability, if any, will not exceed the amount actually paid for the last month of Service.</li>
+      </ul>
+
+      <h5 class="mt-4">10. Suspension, termination and changes</h5>
+      <ul>
+        <li>The Company may suspend or terminate access due to violations, prohibited activity or operational/security reasons.</li>
+        <li>We may change or discontinue the Service (including features/plans/pricing) at any time, with reasonable notice where required.</li>
+      </ul>
+
+      <h5 class="mt-4">11. Changes to these terms</h5>
+      <ul>
+        <li>We may update these Terms from time to time; we will indicate the update date, and continued use constitutes acceptance.</li>
+      </ul>
+
+      <h5 class="mt-4">12. Minimum age</h5>
+      <ul>
+        <li>The Service is intended only for business users aged <strong>18+</strong>.</li>
+        <li>By registering, you confirm that you are at least 18 years old.</li>
+      </ul>
+
+      <h5 class="mt-4">13. Indemnification</h5>
+      <ul>
+        <li>You agree to indemnify the Company, its employees, officers and owners against any claims, losses and expenses (including legal fees) arising from:
+          <ul>
+            <li>breach of these Terms;</li>
+            <li>content uploaded by you;</li>
+            <li>unlawful activity or violation of third‑party rights.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h5 class="mt-4">14. Reverse engineering</h5>
+      <ul>
+        <li>Any attempt at reverse engineering, decompilation, code copying, hacking or exploiting vulnerabilities is strictly prohibited.</li>
+        <li>Violation may result in immediate account termination and possible legal action.</li>
+      </ul>
+
+      <h5 class="mt-4">15. Force majeure</h5>
+      <ul>
+        <li>The Company is not liable for delays or non‑performance caused by events beyond reasonable control (natural disasters, war, cyber‑attacks, infrastructure failures, etc.).</li>
+      </ul>
+
+      <h5 class="mt-4">16. Severability</h5>
+      <ul>
+        <li>If any provision is held invalid, the remaining provisions will remain in full force and effect.</li>
+      </ul>
+
+      <h5 class="mt-4">17. Waiver</h5>
+      <ul>
+        <li>Failure to enforce any right does not constitute a waiver; the Company may enforce it later.</li>
+      </ul>
+
+      <h5 class="mt-4">18. Governing law</h5>
+      <ul>
+        <li>These Terms are governed exclusively by the laws of Israel.</li>
+        <li>Courts in Tel Aviv‑Yafo shall have exclusive jurisdiction over any dispute.</li>
+      </ul>
+
+      <p class="mt-4"><strong>By registering and using the Site you confirm that you have read and agreed to all of these Terms, and that the Company’s liability is limited as explicitly stated herein and under applicable law.</strong></p>
+
+      <p class="text-muted mt-3"><small>Last updated: November 2025.</small></p>
+
+    {% else %}
+      <h3 class="mb-3">תנאי שימוש – OnePoweb</h3>
+
+      <p>ברוך הבא ל־<strong>OnePoweb</strong> ("החברה", "האתר", "השירות"). השימוש באתר והשירותים הנלווים לו מהווה הסכמה מלאה לתנאים שלהלן. אם אינך מסכים/ה, אנא הימנע/י משימוש בשירות.</p>
+
+      <h5 class="mt-4">1. כללי</h5>
+      <ul>
+        <li>השירות מיועד לשימוש עסקי לצורך ניתוח דוחות מכירה וסטטיסטיקות תפעוליות.</li>
+        <li>המערכת מספקת כלי עזר טכנולוגי ואינה מהווה ייעוץ עסקי/פיננסי/משפטי.</li>
+        <li>תוצרים, גרפים או הסברי AI נועדו למידע בלבד ואינם מחליפים שיקול דעת עצמאי.</li>
+        <li>השירות ניתן "כמות שהוא" (AS IS) ו־"כפי שהוא זמין" (AS AVAILABLE).</li>
+      </ul>
+
+      <h5 class="mt-4">2. רישום, חשבון ואבטחה</h5>
+      <ul>
+        <li>לצורך שימוש מלא בשירות תידרש הרשמה ויצירת חשבון.</li>
+        <li>את/ה אחראי/ת לשמירת סודיות פרטי ההתחברות לכל פעילות בחשבון.</li>
+        <li>החברה רשאית להשעות/לסגור חשבון עקב הפרת תנאים או חשד לפעילות בלתי חוקית.</li>
+      </ul>
+
+      <h5 class="mt-4">3. חבילות, מנויים וחיובים</h5>
+      <ul>
+        <li>השירות מוצע במודלים של מנוי (למשל: BASIC / PRO) בתשלום מחזורי.</li>
+        <li>החיוב מתבצע מראש לכל תקופת מנוי (למשל חודשית) ומתחדש אוטומטית עד לביטול.</li>
+        <li>עיבוד תשלומים נעשה באמצעות ספק סליקה חיצוני העומד בתקן PCI-DSS; <strong>פרטי כרטיס האשראי המלאים אינם נשמרים אצלנו</strong>.</li>
+        <li>ייתכן שנשמור מזהה אסימון (token) ומידע תפעולי (מצב מנוי, מועדי חיוב) לצורך ניהול המנוי.</li>
+        <li>כשל תשלום עשוי לגרור השעיית מנוי; אנו רשאים לבצע ניסיונות חיוב חוזרים ולפנות לעדכון אמצעי תשלום.</li>
+        <li>החברה רשאית לעדכן מחירים ותוכניות לפי שיקול דעתה; עדכונים יחולו מחידוש המחזור הבא ויינתנו הודעה סבירה מראש.</li>
+      </ul>
+
+      <h5 class="mt-4">4. ביטול מנוי והחזרים</h5>
+      <ul>
+        <li>ניתן לבטל מנוי בכל עת דרך עמוד הפרופיל. הביטול נכנס לתוקף בסוף מחזור החיוב הנוכחי.</li>
+        <li>אלא אם צוין אחרת במפורש, <strong>אין החזר רטרואקטיבי</strong> עבור תקופה שכבר שולמה.</li>
+        <li>ככל שקיימת תקופת ניסיון/הטבה, התנאים יפורטו בעמוד הרכישה ויחולו במדויק כפי שפורסם.</li>
+        <li>ביטול מנוי אינו מוחק נתונים היסטוריים באופן אוטומטי; ניתן לבקש מחיקה בהתאם למדיניות הפרטיות.</li>
+      </ul>
+
+      <h5 class="mt-4">5. העלאת נתונים ותוכן משתמש</h5>
+      <ul>
+        <li>מותר להעלות רק קבצים רלוונטיים לדוחות מכירה (CSV/Excel) ללא מידע אישי/רגיש שאינו נדרש.</li>
+        <li>את/ה מצהיר/ה שיש לך כל הזכויות הנדרשות לשימוש בחומרים שאת/ה מעלה.</li>
+        <li>החברה רשאית למחוק קבצים שנטענו לאחר עיבודם, לפי מדיניות תפעולית.</li>
+      </ul>
+
+      <h5 class="mt-4">6. רפררל (Referral)</h5>
+      <ul>
+        <li>הטבת רפררל תינתן רק כאשר נרשם חדש ביצע רישום דרך הקישור הייחודי שלך והשלים תשלום ראשון.</li>
+        <li>ההטבה היא <strong>50% הנחה על החודש הבא</strong> מהתוכנית הנוכחית שלך.</li>
+        <li>ההנחה היא <strong>חד-פעמית</strong> - ניתן לממש רק פעם אחת, גם אם הזמנת מספר חברים.</li>
+        <li>ההנחה תחול אוטומטית בחיוב הבא לאחר שחבר שהפנית השלים תשלום.</li>
+        <li>החברה רשאית לשנות/להשהות/לבטל את תוכנית הרפררל בכל עת, לרבות במקרים של שימוש לרעה או פעילות מטעה.</li>
+      </ul>
+
+      <h5 class="mt-4">7. קניין רוחני</h5>
+      <ul>
+        <li>כל הזכויות באתר, הקוד, העיצוב, הלוגו והתכנים שייכות לחברה בלבד.</li>
+        <li>אין להעתיק, לשכפל, להפיץ, לתרגם או לעשות שימוש מסחרי בתכנים ללא רשות בכתב.</li>
+      </ul>
+
+      <h5 class="mt-4">8. פרטיות והגנת מידע</h5>
+      <ul>
+        <li>הטיפול במידע כפוף ל־<a href="{{ url_for('privacy') }}">מדיניות הפרטיות</a> שלנו, שהיא חלק בלתי נפרד מן התנאים.</li>
+        <li>החברה נוקטת באמצעי אבטחה מקובלים; עם זאת, לא ניתן להבטיח אבטחה מוחלטת.</li>
+      </ul>
+
+      <h5 class="mt-4">9. הגבלת אחריות</h5>
+      <ul>
+        <li>החברה לא תהיה אחראית לכל נזק ישיר/עקיף/משני/תפעולי/כספי/אובדן רווחים הנובע מהשימוש בשירות או מאי־זמינותו.</li>
+        <li>אין התחייבות לדיוק/שלמות/עדכניות של תוצרים או תובנות.</li>
+        <li>מקסימום האחריות הכוללת – ככל שנקבעה – לא יעלה על הסכום ששולם בפועל בגין חודש השירות האחרון.</li>
+      </ul>
+
+      <h5 class="mt-4">10. השהיה, סיום ושינויים בשירות</h5>
+      <ul>
+        <li>החברה רשאית להשעות/לסיים גישה לשירות עקב הפרת תנאים, פעילות אסורה או שיקולים תפעוליים/אבטחתיים.</li>
+        <li>החברה רשאית לעדכן, לשנות או להפסיק את השירות (לרבות תכונות/חבילות/מחירים) בכל עת, ובמידת הצורך בהודעה סבירה.</li>
+      </ul>
+
+      <h5 class="mt-4">11. עדכון תנאים</h5>
+      <ul>
+        <li>החברה רשאית לעדכן את תנאי השימוש מעת לעת. נפרסם תאריך עדכון, ושימוש מתמשך באתר מהווה הסכמה לנוסח המעודכן.</li>
+      </ul>
+
+      <h5 class="mt-4">12. גיל מינימלי</h5>
+      <ul>
+        <li>השירות מיועד לבעלי עסקים ומשתמשים מעל גיל <strong>18</strong> בלבד.</li>
+        <li>בהרשמה, המשתמש מאשר כי מלאו לו 18 שנים לפחות.</li>
+      </ul>
+
+      <h5 class="mt-4">13. שיפוי (Indemnification)</h5>
+      <ul>
+        <li>המשתמש מתחייב לשפות את החברה, עובדיה, מנהליה ובעליה כנגד כל תביעה, נזק, הפסד, הוצאות (לרבות שכ"ט עו"ד) הנובעים מ:
+          <ul>
+            <li>הפרת תנאי שימוש אלה;</li>
+            <li>תוכן שהועלה על ידי המשתמש;</li>
+            <li>פעילות בלתי חוקית או הפרת זכויות צד שלישי.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h5 class="mt-4">14. איסור הנדסה לאחור</h5>
+      <ul>
+        <li>חל איסור מוחלט על פירוק, הנדסה לאחור (reverse engineering), העתקת קוד, ניסיון לפצח את המערכת או לנצל פגיעויות אבטחה.</li>
+        <li>הפרת סעיף זה תגרור סגירת חשבון מיידית וייתכנו הליכים משפטיים.</li>
+      </ul>
+
+      <h5 class="mt-4">15. כוח עליון (Force Majeure)</h5>
+      <ul>
+        <li>החברה לא תישא באחריות לעיכובים או אי־ביצוע הנובעים מנסיבות שמחוץ לשליטתה הסבירה, לרבות: אסונות טבע, מלחמה, טרור, מגפות, תקלות תשתית אינטרנט, פעולות ממשלתיות או שביתות.</li>
+      </ul>
+
+      <h5 class="mt-4">16. פרידות סעיפים (Severability)</h5>
+      <ul>
+        <li>אם סעיף כלשהו בתנאי שימוש אלה ייקבע כבלתי תקף, יתר הסעיפים יישארו בתוקף מלא.</li>
+      </ul>
+
+      <h5 class="mt-4">17. ויתור (Waiver)</h5>
+      <ul>
+        <li>אי אכיפת זכות כלשהי על ידי החברה לא תהווה ויתור עליה, והחברה שומרת לעצמה את הזכות לאוכפה בעתיד.</li>
+      </ul>
+
+      <h5 class="mt-4">18. סמכות שיפוט</h5>
+      <ul>
+        <li>תנאי שימוש אלה כפופים לדין הישראלי בלבד.</li>
+        <li>לבתי המשפט המוסמכים בעיר תל אביב־יפו תהיה הסמכות הבלעדית לדון בכל מחלוקת.</li>
+      </ul>
+
+      <p class="mt-4"><strong>באמצעות ההרשמה והשימוש באתר אתה מאשר כי קראת והסכמת לכל התנאים. לא תחול על החברה כל אחריות מעבר לקבוע במפורש בתנאים אלה ובדין החל.</strong></p>
+
+      <p class="text-muted mt-3"><small>עודכן לאחרונה: נובמבר 2025.</small></p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

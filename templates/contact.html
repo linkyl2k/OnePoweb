@@ -66,7 +66,13 @@
         
         <p class="form-note">
           <span class="note-icon">🔒</span>
-          המידע שלך מאובטח ולא יועבר לצד שלישי
+          {% if current_lang == 'he' %}
+            המידע שלך מאובטח ולא יועבר לצד שלישי
+          {% elif current_lang == 'en' %}
+            Your information is secure and will not be shared with third parties
+          {% else %}
+            Ваша информация надёжно защищена и не передаётся третьим лицам
+          {% endif %}
         </p>
       </form>
     </div>
@@ -76,15 +82,21 @@
       <div class="info-card">
         <div class="info-icon">⏰</div>
         <div class="info-content">
-          <div class="info-label">זמן תגובה</div>
-          <div class="info-value">עד 24 שעות</div>
+          <div class="info-label">
+            {% if current_lang == 'he' %}זמן תגובה{% elif current_lang == 'en' %}Response time{% else %}Время ответа{% endif %}
+          </div>
+          <div class="info-value">
+            {% if current_lang == 'he' %}עד 24 שעות{% elif current_lang == 'en' %}up to 24 hours{% else %}до 24 часов{% endif %}
+          </div>
         </div>
       </div>
       
       <div class="info-card">
         <div class="info-icon">🌍</div>
         <div class="info-content">
-          <div class="info-label">שפות</div>
+          <div class="info-label">
+            {% if current_lang == 'he' %}שפות{% elif current_lang == 'en' %}Languages{% else %}Языки{% endif %}
+          </div>
           <div class="info-value">עברית • English • Русский</div>
         </div>
       </div>
@@ -92,15 +104,28 @@
       <div class="info-card">
         <div class="info-icon">🛡️</div>
         <div class="info-content">
-          <div class="info-label">תמיכה</div>
-          <div class="info-value">PRO מקבל עדיפות</div>
+          <div class="info-label">
+            {% if current_lang == 'he' %}תמיכה{% elif current_lang == 'en' %}Support{% else %}Поддержка{% endif %}
+          </div>
+          <div class="info-value">
+            {% if current_lang == 'he' %}PRO מקבל עדיפות{% elif current_lang == 'en' %}PRO users get priority{% else %}Пользователи PRO обслуживаются в приоритете{% endif %}
+          </div>
         </div>
       </div>
       
       <div class="faq-hint">
         <span class="hint-icon">💡</span>
         <div class="hint-content">
-          <strong>טיפ:</strong> בדוק גם את ה<a href="{{ url_for('landing') }}#faq">שאלות נפוצות</a> — ייתכן שהתשובה כבר שם!
+          <strong>
+            {% if current_lang == 'he' %}טיפ:{% elif current_lang == 'en' %}Tip:{% else %}Совет:{% endif %}
+          </strong>
+          {% if current_lang == 'he' %}
+            בדוק גם את ה<a href="{{ url_for('landing') }}#faq">שאלות נפוצות</a> — ייתכן שהתשובה כבר שם!
+          {% elif current_lang == 'en' %}
+            Check the <a href="{{ url_for('landing') }}#faq">FAQ</a> section as well — the answer may already be there!
+          {% else %}
+            Загляните также в раздел <a href="{{ url_for('landing') }}#faq">Частые вопросы</a> — возможно, нужный ответ уже там!
+          {% endif %}
         </div>
       </div>
     </div>

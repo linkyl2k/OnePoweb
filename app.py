@@ -1303,6 +1303,10 @@ COLUMN_MAP = {
     "תאריך מכירה": COL_DATE,
     "transaction date": COL_DATE,
     "sale date": COL_DATE,
+    # Русские варианты
+    "дата": COL_DATE,
+    "Дата": COL_DATE,
+    "ДАТА": COL_DATE,
 
     # שעה - כל הווריאציות
     "שעה": COL_TIME,
@@ -1312,6 +1316,11 @@ COLUMN_MAP = {
     "שעת עסקה": COL_TIME,
     "שעת מכירה": COL_TIME,
     "transaction time": COL_TIME,
+    # Русские варианты
+    "время": COL_TIME,
+    "Время": COL_TIME,
+    "ВРЕМЯ": COL_TIME,
+    "время транзакции": COL_TIME,
 
     # סכום (מחיר כולל) - כל הווריאציות הנפוצות בקופות ישראליות
     "סכום": COL_SUM,
@@ -1328,6 +1337,13 @@ COLUMN_MAP = {
     "sum": COL_SUM,
     "total amount": COL_SUM,
     "grand total": COL_SUM,
+    # Русские варианты
+    "сумма": COL_SUM,
+    "Сумма": COL_SUM,
+    "СУММА": COL_SUM,
+    "сумма транзакции": COL_SUM,
+    "итого": COL_SUM,
+    "Итого": COL_SUM,
 
     # מחיר ליחידה
     "מחיר": COL_UNIT,
@@ -1337,6 +1353,13 @@ COLUMN_MAP = {
     "price": COL_UNIT,
     "unit price": COL_UNIT,
     "unit_price": COL_UNIT,
+    # Русские варианты
+    "цена": COL_UNIT,
+    "Цена": COL_UNIT,
+    "ЦЕНА": COL_UNIT,
+    "цена за единицу": COL_UNIT,
+    "Цена_за_единицу": COL_UNIT,
+    "цена за единицу": COL_UNIT,
 
     # כמות
     "כמות": COL_QTY,
@@ -1345,6 +1368,14 @@ COLUMN_MAP = {
     "יחידות": COL_QTY,
     "כמות שנמכרה": COL_QTY,
     "units": COL_QTY,
+    # Русские варианты
+    "количество": COL_QTY,
+    "Количество": COL_QTY,
+    "КОЛИЧЕСТВО": COL_QTY,
+    "кол-во": COL_QTY,
+    "Кол-во": COL_QTY,
+    "Кол-во": COL_QTY,
+    "количество товара": COL_QTY,
 
     # מוצר / פריט
     "מוצר": COL_ITEM,
@@ -1357,6 +1388,14 @@ COLUMN_MAP = {
     "description": COL_ITEM,
     "product name": COL_ITEM,
     "item name": COL_ITEM,
+    # Русские варианты
+    "товар": COL_ITEM,
+    "Товар": COL_ITEM,
+    "ТОВАР": COL_ITEM,
+    "название товара": COL_ITEM,
+    "продукт": COL_ITEM,
+    "Продукт": COL_ITEM,
+    "наименование": COL_ITEM,
 
     # מספר עסקה
     "מס' עסקה": COL_TXN,
@@ -1369,6 +1408,15 @@ COLUMN_MAP = {
     "receipt": COL_TXN,
     "קבלה": COL_TXN,
     "מס' קבלה": COL_TXN,
+    # Русские варианты
+    "транзакция": COL_TXN,
+    "Транзакция": COL_TXN,
+    "ТРАНЗАКЦИЯ": COL_TXN,
+    "номер транзакции": COL_TXN,
+    "№_транзакции": COL_TXN,
+    "№ транзакции": COL_TXN,
+    "номер": COL_TXN,
+    "№": COL_TXN,
 
     # אמצעי תשלום
     "אמצעי תשלום": COL_PAY,
@@ -1379,6 +1427,14 @@ COLUMN_MAP = {
     "payment method": COL_PAY,
     "payment_method": COL_PAY,
     "payment type": COL_PAY,
+    # Русские варианты
+    "способ оплаты": COL_PAY,
+    "Способ_оплаты": COL_PAY,
+    "Способ оплаты": COL_PAY,
+    "способ оплаты": COL_PAY,
+    "оплата": COL_PAY,
+    "Оплата": COL_PAY,
+    "тип оплаты": COL_PAY,
 }
 
 
@@ -2533,6 +2589,8 @@ def _read_report(file_storage_or_path):
         s = s.replace("_", " ").replace("-", " ")
         # מסיר סוגריים וסימני מטבע
         s = re.sub(r'[₪$€\(\)\[\]]', '', s)
+        # מסיר символы № и другие специальные символы
+        s = re.sub(r'[№#]', '', s)
         # מסיר רווחים כפולים
         s = re.sub(r'\s+', ' ', s).strip()
         return s
@@ -2573,6 +2631,36 @@ def _read_report(file_storage_or_path):
         dt = pd.to_datetime(df[col], errors="coerce")
         df[COL_DATE] = dt.dt.date
         df[COL_TIME] = dt.dt.time
+    
+    # 3.1) Объединение отдельных колонок "Дата" и "Время" в COL_TIME
+    # Если есть COL_DATE и отдельная колонка "Время", но нет COL_TIME
+    if COL_DATE in df.columns and COL_TIME not in df.columns:
+        # Ищем колонку с временем (может быть "Время", "time", "שעה" и т.д.)
+        time_col = None
+        for col in df.columns:
+            col_lower = str(col).lower().strip()
+            if col_lower in ["время", "time", "שעה", "hour", "זמן"]:
+                time_col = col
+                break
+        
+        if time_col:
+            # Объединяем дату и время
+            try:
+                date_str = df[COL_DATE].astype(str)
+                time_str = df[time_col].astype(str).str.strip()
+                # Пробуем создать datetime
+                datetime_str = date_str + " " + time_str
+                dt = pd.to_datetime(datetime_str, errors="coerce")
+                # Если успешно, используем это как COL_TIME
+                if dt.notna().any():
+                    df[COL_TIME] = dt.dt.time if hasattr(dt.dt, 'time') else dt
+                else:
+                    # Если не получилось, просто используем колонку времени
+                    df[COL_TIME] = df[time_col]
+            except Exception as e:
+                print(f"⚠️ Не удалось объединить дату и время: {e}")
+                # Используем только колонку времени
+                df[COL_TIME] = df[time_col]
 
     # -------------------------------------------------------
     # 3.5) חישוב עמודת סכום אם חסרה אבל יש מחיר וכמות

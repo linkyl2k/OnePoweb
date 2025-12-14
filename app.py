@@ -2898,7 +2898,7 @@ with app.app_context():
 def ensure_user_ref_code(user_id):
     db = get_db()
     row = db.execute("SELECT ref_code FROM users WHERE id=?", (user_id,)).fetchone()
-    if not row["ref_code"]:
+    if not row or not row["ref_code"]:
         code = _rand_ref()
         # לוודא ייחודיות
         while db.execute("SELECT 1 FROM users WHERE ref_code=?", (code,)).fetchone():
@@ -4678,14 +4678,31 @@ def subscribe():
         plan = "basic"
 
     u = current_user()
-    ensure_user_ref_code(u["id"])
-
+    if not u:
+        flash_t("msg_login_required", "warning")
+        return redirect(url_for("login"))
+    
+    try:
+        ensure_user_ref_code(u["id"])
+    except Exception as e:
+        print(f"⚠️ Error ensuring ref_code: {e}")
+        # Continue anyway - not critical
+    
     # Calculate price with referral discount (50% off, one time)
     base_price_ils = PLAN_PRICES[plan]["ils"]
     base_price_usd = PLAN_PRICES[plan]["usd"]
     
     # Check for referral discount (50% off next month)
-    referral_discount = int(u["referral_discount"] or 0) if "referral_discount" in u.keys() else 0
+    # Handle both dict-like access and Row access
+    try:
+        if hasattr(u, 'keys') and "referral_discount" in u.keys():
+            referral_discount = int(u["referral_discount"] or 0)
+        elif "referral_discount" in dict(u).keys():
+            referral_discount = int(dict(u)["referral_discount"] or 0)
+        else:
+            referral_discount = 0
+    except (KeyError, TypeError, AttributeError):
+        referral_discount = 0
     
     if referral_discount > 0:
         # 50% discount on current plan
@@ -4725,10 +4742,21 @@ def paypal_create_order():
             return jsonify({"error": "Invalid plan"}), 400
         
         u = current_user()
+        if not u:
+            return jsonify({"error": "User not found"}), 401
         
         # Calculate price with referral discount
         base_price_usd = PLAN_PRICES[plan]["usd"]
-        referral_discount = int(u["referral_discount"] or 0) if "referral_discount" in u.keys() else 0
+        # Handle both dict-like access and Row access
+        try:
+            if hasattr(u, 'keys') and "referral_discount" in u.keys():
+                referral_discount = int(u["referral_discount"] or 0)
+            elif "referral_discount" in dict(u).keys():
+                referral_discount = int(dict(u)["referral_discount"] or 0)
+            else:
+                referral_discount = 0
+        except (KeyError, TypeError, AttributeError):
+            referral_discount = 0
         
         if referral_discount > 0:
             discount_percent = min(referral_discount, 50)
@@ -4967,8 +4995,13 @@ def referrals():
     
     # הנחת רפרל (50% חד-פעמי)
     try:
-        referral_discount = int(user["referral_discount"] or 0) if "referral_discount" in user.keys() else 0
-    except Exception:
+        if hasattr(user, 'keys') and "referral_discount" in user.keys():
+            referral_discount = int(user["referral_discount"] or 0)
+        elif "referral_discount" in dict(user).keys():
+            referral_discount = int(dict(user)["referral_discount"] or 0)
+        else:
+            referral_discount = 0
+    except (KeyError, TypeError, AttributeError):
         referral_discount = 0
 
     return render_template(

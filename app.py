@@ -934,26 +934,49 @@ def forgot_password():
 
 
 # ---------- Password Validation ----------
-def validate_password(password: str) -> tuple:
+def validate_password(password: str, lang: str = "en") -> tuple:
     """
-    בדיקת תקינות סיסמה:
-    - 8-32 תווים
-    - רק אותיות אנגליות וספרות
-    - לפחות אות גדולה אחת
-    - לפחות ספרה אחת
-    מחזיר (תקין, הודעת שגיאה)
+    Password validation:
+    - 8-32 characters
+    - Only English letters and numbers
+    - At least one uppercase letter
+    - At least one digit
+    Returns (is_valid, error_message)
     """
     import re
-    if len(password) < 8:
-        return False, "הסיסמה חייבת להכיל לפחות 8 תווים"
-    if len(password) > 32:
-        return False, "הסיסמה יכולה להכיל עד 32 תווים"
-    if not re.match(r'^[A-Za-z0-9]+$', password):
-        return False, "הסיסמה יכולה להכיל רק אותיות אנגליות (A-Z, a-z) וספרות (0-9)"
-    if not any(c.isupper() for c in password):
-        return False, "הסיסמה חייבת להכיל לפחות אות גדולה אחת (A-Z)"
-    if not any(c.isdigit() for c in password):
-        return False, "הסיסמה חייבת להכיל לפחות ספרה אחת (0-9)"
+    if lang == "he":
+        if len(password) < 8:
+            return False, "הסיסמה חייבת להכיל לפחות 8 תווים"
+        if len(password) > 32:
+            return False, "הסיסמה יכולה להכיל עד 32 תווים"
+        if not re.match(r'^[A-Za-z0-9]+$', password):
+            return False, "הסיסמה יכולה להכיל רק אותיות אנגליות (A-Z, a-z) וספרות (0-9)"
+        if not any(c.isupper() for c in password):
+            return False, "הסיסמה חייבת להכיל לפחות אות גדולה אחת (A-Z)"
+        if not any(c.isdigit() for c in password):
+            return False, "הסיסמה חייבת להכיל לפחות ספרה אחת (0-9)"
+    elif lang == "ru":
+        if len(password) < 8:
+            return False, "Пароль должен содержать не менее 8 символов"
+        if len(password) > 32:
+            return False, "Пароль может содержать до 32 символов"
+        if not re.match(r'^[A-Za-z0-9]+$', password):
+            return False, "Пароль может содержать только английские буквы (A-Z, a-z) и цифры (0-9)"
+        if not any(c.isupper() for c in password):
+            return False, "Пароль должен содержать хотя бы одну заглавную букву (A-Z)"
+        if not any(c.isdigit() for c in password):
+            return False, "Пароль должен содержать хотя бы одну цифру (0-9)"
+    else:  # en
+        if len(password) < 8:
+            return False, "Password must contain at least 8 characters"
+        if len(password) > 32:
+            return False, "Password can contain up to 32 characters"
+        if not re.match(r'^[A-Za-z0-9]+$', password):
+            return False, "Password can only contain English letters (A-Z, a-z) and numbers (0-9)"
+        if not any(c.isupper() for c in password):
+            return False, "Password must contain at least one uppercase letter (A-Z)"
+        if not any(c.isdigit() for c in password):
+            return False, "Password must contain at least one digit (0-9)"
     return True, ""
 
 
@@ -988,7 +1011,8 @@ def reset_password(token):
             flash("הסיסמאות אינן תואמות.", "warning")
         else:
             # בדיקת תקינות סיסמה
-            is_valid, error_msg = validate_password(p1)
+            current_lang = session.get('lang', 'en')
+            is_valid, error_msg = validate_password(p1, current_lang)
             if not is_valid:
                 flash(error_msg, "warning")
             else:
@@ -2687,16 +2711,16 @@ def save_report(user_id: int, df: pd.DataFrame, name: str = None, period_type: s
             period_start = dates.min().strftime('%Y-%m-%d')
             period_end = dates.max().strftime('%Y-%m-%d')
     
-    # שמות לפי סוג תקופה
+    # Period type names - use English by default, will be translated in templates
     period_type_names = {
-        "month": "חודש",
-        "week": "שבוע", 
-        "day": "יום",
-        "custom": "תקופה"
+        "month": "Month",
+        "week": "Week", 
+        "day": "Day",
+        "custom": "Period"
     }
-    type_label = period_type_names.get(period_type, "תקופה")
+    type_label = period_type_names.get(period_type, "Period")
     
-    # שם אוטומטי אם לא סופק
+    # Auto name if not provided
     if not name:
         if period_start:
             from datetime import datetime as dt_cls
@@ -2708,7 +2732,7 @@ def save_report(user_id: int, df: pd.DataFrame, name: str = None, period_type: s
             else:
                 name = f"{type_label} {d.strftime('%d/%m/%Y')}"
         else:
-            name = f"דוח {datetime.now().strftime('%Y-%m-%d')}"
+            name = f"Report {datetime.now().strftime('%Y-%m-%d')}"
     
     # הצפנה של הנתונים
     import io
@@ -5750,8 +5774,9 @@ def profile_edit():
         if password != confirm:
             flash("האימות לא תואם את הסיסמה החדשה", "danger")
             return render_template("profile_edit.html", user=u)
-        # בדיקת תקינות סיסמה
-        is_valid, error_msg = validate_password(password)
+        # Password validation
+        current_lang = session.get('lang', 'en')
+        is_valid, error_msg = validate_password(password, current_lang)
         if not is_valid:
             flash(error_msg, "danger")
             return render_template("profile_edit.html", user=u)
@@ -5831,8 +5856,9 @@ def signup():
         flash("הסיסמאות אינן תואמות", "danger")
         return render_template("signup.html", **form_data)
 
-    # בדיקת תקינות סיסמה
-    is_valid, error_msg = validate_password(password)
+    # Password validation
+    current_lang = session.get('lang', 'en')
+    is_valid, error_msg = validate_password(password, current_lang)
     if not is_valid:
         flash(error_msg, "danger")
         return render_template("signup.html", **form_data)

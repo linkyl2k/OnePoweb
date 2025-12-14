@@ -1,23 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container my-4" dir="rtl" style="text-align:right">
+<div class="container my-4" {% if current_lang == 'he' %}dir="rtl" style="text-align:right"{% endif %}>
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">פוטנציאל שיפור (חודשי)</h3>
+    <h3 class="mb-0">{% if current_lang == 'he' %}פוטנציאל שיפור (חודשי){% elif current_lang == 'en' %}Improvement Potential (Monthly){% else %}Потенциал улучшения (месячный){% endif %}</h3>
     <div class="d-flex gap-2">
-      <a class="btn btn-outline-secondary" href="{{ url_for('result') }}">חזרה לתוצאות</a>
-      <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">הורדת PDF</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('result') }}">{% if current_lang == 'he' %}חזרה לתוצאות{% elif current_lang == 'en' %}Back to Results{% else %}Вернуться к результатам{% endif %}</a>
+      <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">{% if current_lang == 'he' %}הורדת PDF{% elif current_lang == 'en' %}Download PDF{% else %}Скачать PDF{% endif %}</a>
     </div>
   </div>
 
   {% if not has_any %}
-    <div class="alert alert-warning">לא חושב פוטנציאל לדוח הזה. נסה לטעון דוח מחדש מהדף הראשי.</div>
+    <div class="alert alert-warning">{% if current_lang == 'he' %}לא חושב פוטנציאל לדוח הזה. נסה לטעון דוח מחדש מהדף הראשי.{% elif current_lang == 'en' %}No potential calculated for this report. Try uploading a new report from the main page.{% else %}Потенциал для этого отчета не рассчитан. Попробуйте загрузить новый отчет с главной страницы.{% endif %}</div>
   {% else %}
     <!-- Disclaimer -->
     <div class="alert alert-info mb-4" style="border-radius: 12px;">
       <i class="bi bi-info-circle me-2"></i>
-      <strong>חשוב:</strong> הנתונים מציגים <u>פוטנציאל תיאורטי</u> על בסיס ניתוח הדוח.
-      התוצאות בפועל תלויות בפעולות שתנקטו ובתנאי השוק.
-      אנחנו מספקים תובנות — ההצלחה תלויה ביישום שלכם.
+      <strong>{% if current_lang == 'he' %}חשוב:{% elif current_lang == 'en' %}Important:{% else %}Важно:{% endif %}</strong> 
+      {% if current_lang == 'he' %}
+        הנתונים מציגים <u>פוטנציאל תיאורטי</u> על בסיס ניתוח הדוח. התוצאות בפועל תלויות בפעולות שתנקטו ובתנאי השוק. אנחנו מספקים תובנות — ההצלחה תלויה ביישום שלכם.
+      {% elif current_lang == 'en' %}
+        The data shows <u>theoretical potential</u> based on report analysis. Actual results depend on actions taken and market conditions. We provide insights — success depends on your implementation.
+      {% else %}
+        Данные показывают <u>теоретический потенциал</u> на основе анализа отчета. Фактические результаты зависят от предпринятых действий и рыночных условий. Мы предоставляем инсайты — успех зависит от вашей реализации.
+      {% endif %}
     </div>
 
     <div class="card mb-4" style="border-color: rgba(16,185,129,0.3);">
@@ -27,7 +32,7 @@
 
         <h5 class="mb-3">
           <i class="bi bi-lightbulb me-2" style="color: #fbbf24;"></i>
-          הזדמנויות שזיהינו בדוח שלך
+          {% if current_lang == 'he' %}הזדמנויות שזיהינו בדוח שלך{% elif current_lang == 'en' %}Opportunities We Found in Your Report{% else %}Возможности, которые мы нашли в вашем отчете{% endif %}
         </h5>
 
         {% if roi.components %}
@@ -37,13 +42,13 @@
               <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>יום '{{ c.day }}' חלש יחסית</strong>
+                    <strong>{% if current_lang == 'he' %}יום '{{ c.day }}' חלש יחסית{% elif current_lang == 'en' %}Weak '{{ c.day }}' day{% else %}Слабый день '{{ c.day }}'{% endif %}</strong>
                     <div class="small text-muted">
-                      אם תצליחו לסגור {{ c.achievable_percent or 30 }}% מהפער לימים רגילים
+                      {% if current_lang == 'he' %}אם תצליחו לסגור {{ c.achievable_percent or 30 }}% מהפער לימים רגילים{% elif current_lang == 'en' %}If you can close {{ c.achievable_percent or 30 }}% of the gap to regular days{% else %}Если вы сможете закрыть {{ c.achievable_percent or 30 }}% разрыва с обычными днями{% endif %}
                     </div>
                   </div>
                   <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399;">
-                    עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש
+                    {% if current_lang == 'he' %}עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
                   </span>
                 </div>
               </div>
@@ -54,13 +59,13 @@
               <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>שעות ערב חלשות</strong>
+                    <strong>{% if current_lang == 'he' %}שעות ערב חלשות{% elif current_lang == 'en' %}Weak Evening Hours{% else %}Слабые вечерние часы{% endif %}</strong>
                     <div class="small text-muted">
-                      פוטנציאל אם תחזקו פעילות בשעות 17:00-20:00
+                      {% if current_lang == 'he' %}פוטנציאל אם תחזקו פעילות בשעות 17:00-20:00{% elif current_lang == 'en' %}Potential if you strengthen activity during 17:00-20:00{% else %}Потенциал, если усилите активность в 17:00-20:00{% endif %}
                     </div>
                   </div>
                   <span class="badge" style="background: rgba(46,160,255,0.15); color: #34c3ff;">
-                    עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש
+                    {% if current_lang == 'he' %}עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
                   </span>
                 </div>
               </div>
@@ -71,13 +76,13 @@
               <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>מוצרים בעלי מכירות נמוכות</strong>
+                    <strong>{% if current_lang == 'he' %}מוצרים בעלי מכירות נמוכות{% elif current_lang == 'en' %}Products with Low Sales{% else %}Товары с низкими продажами{% endif %}</strong>
                     <div class="small text-muted">
-                      קידום קל (+5%) של מוצרים בתחתית הסל
+                      {% if current_lang == 'he' %}קידום קל (+5%) של מוצרים בתחתית הסל{% elif current_lang == 'en' %}Easy promotion (+5%) of bottom products{% else %}Легкое продвижение (+5%) товаров внизу списка{% endif %}
                     </div>
                   </div>
                   <span class="badge" style="background: rgba(251,191,36,0.15); color: #fbbf24;">
-                    עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש
+                    {% if current_lang == 'he' %}עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
                   </span>
                 </div>
               </div>
@@ -90,23 +95,23 @@
         <div class="row g-3">
           <div class="col-6 col-md-4">
             <div class="text-center p-3" style="background: rgba(16,185,129,0.08); border-radius: 10px;">
-              <div class="small text-muted">פוטנציאל מקסימלי</div>
-              <div style="font-size: 1.5rem; font-weight: bold; color: #34d399;">~₪{{ "{:,.0f}".format(_gain) }}</div>
-              <div class="small text-muted">לחודש</div>
+              <div class="small text-muted">{% if current_lang == 'he' %}פוטנציאל מקסימלי{% elif current_lang == 'en' %}Maximum Potential{% else %}Максимальный потенциал{% endif %}</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #34d399;">~${% if current_lang == 'he' %}₪{% endif %}{{ "{:,.0f}".format(_gain) }}</div>
+              <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}per month{% else %}в месяц{% endif %}</div>
             </div>
           </div>
           <div class="col-6 col-md-4">
             <div class="text-center p-3" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
-              <div class="small text-muted">עלות השירות</div>
-              <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">₪{{ "{:,.0f}".format(roi.service_cost or 149) }}</div>
-              <div class="small text-muted">לחודש</div>
+              <div class="small text-muted">{% if current_lang == 'he' %}עלות השירות{% elif current_lang == 'en' %}Service Cost{% else %}Стоимость услуги{% endif %}</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">${% if current_lang == 'he' %}₪{% endif %}{{ "{:,.0f}".format(roi.service_cost or 149) }}</div>
+              <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}per month{% else %}в месяц{% endif %}</div>
             </div>
           </div>
           <div class="col-12 col-md-4">
             <div class="text-center p-3" style="background: rgba(251,191,36,0.08); border-radius: 10px;">
-              <div class="small text-muted">ROI תיאורטי</div>
+              <div class="small text-muted">{% if current_lang == 'he' %}ROI תיאורטי{% elif current_lang == 'en' %}Theoretical ROI{% else %}Теоретический ROI{% endif %}</div>
               <div style="font-size: 1.5rem; font-weight: bold; color: #fbbf24;">{{ "{:,.0f}".format(_roi) }}%</div>
-              <div class="small text-muted">אם מיישמים הכל</div>
+              <div class="small text-muted">{% if current_lang == 'he' %}אם מיישמים הכל{% elif current_lang == 'en' %}if everything is implemented{% else %}если всё реализовано{% endif %}</div>
             </div>
           </div>
         </div>
@@ -114,8 +119,14 @@
         <div class="mt-4 p-3" style="background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1);">
           <div class="small text-muted">
             <i class="bi bi-lightbulb me-1"></i>
-            <strong>מה אנחנו מציעים:</strong> תובנות מבוססות נתונים שמראות לכם היכן יש הזדמנויות.
-            ההחלטה והביצוע — בידיים שלכם. אנחנו לא מבטיחים תוצאות, אלא מספקים כלים לקבלת החלטות חכמות יותר.
+            <strong>{% if current_lang == 'he' %}מה אנחנו מציעים:{% elif current_lang == 'en' %}What we offer:{% else %}Что мы предлагаем:{% endif %}</strong> 
+            {% if current_lang == 'he' %}
+              תובנות מבוססות נתונים שמראות לכם היכן יש הזדמנויות. ההחלטה והביצוע — בידיים שלכם. אנחנו לא מבטיחים תוצאות, אלא מספקים כלים לקבלת החלטות חכמות יותר.
+            {% elif current_lang == 'en' %}
+              Data-driven insights that show you where opportunities exist. The decision and implementation are in your hands. We don't promise results, but provide tools for smarter decision-making.
+            {% else %}
+              Инсайты на основе данных, которые показывают, где есть возможности. Решение и реализация — в ваших руках. Мы не обещаем результатов, а предоставляем инструменты для более умных решений.
+            {% endif %}
           </div>
         </div>
       </div>

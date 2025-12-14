@@ -4646,7 +4646,6 @@ def export_pdf():
         
         # Create PDF from HTML
         # WeasyPrint will resolve relative image paths using base_url
-        font_config = FontConfiguration()
         # Use absolute path as base_url so WeasyPrint can find images
         base_url_abs = os.path.abspath(PLOTS_DIR)
         pdf_bytes = HTML(string=html, base_url=base_url_abs).write_pdf()

@@ -4733,30 +4733,32 @@ def export_pdf():
     has_roi      = bool(roi_text or roi_gain or roi_pct)
 
     # Build table rows - translate based on current language
-    current_lang = session.get('lang', 'en')
+    current_lang = get_language()
+    currency_info = get_currency(current_lang)
+    currency_symbol = currency_info["symbol"]
     roi_rows = ""
     if weak_gain:
         if current_lang == 'he':
-            roi_rows += f"<tr><td>יום חלש ↗︎</td><td>העלאה לרמת ימים רגילים</td><td>₪{weak_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>יום חלש ↗︎</td><td>העלאה לרמת ימים רגילים</td><td>{currency_symbol}{weak_gain:,.0f}</td></tr>"
         elif current_lang == 'ru':
-            roi_rows += f"<tr><td>Слабый день ↗︎</td><td>Поднятие до уровня обычных дней</td><td>${weak_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>Слабый день ↗︎</td><td>Поднятие до уровня обычных дней</td><td>{currency_symbol}{weak_gain:,.0f}</td></tr>"
         else:  # en
-            roi_rows += f"<tr><td>Weak Day ↗︎</td><td>Raise to regular days level</td><td>${weak_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>Weak Day ↗︎</td><td>Raise to regular days level</td><td>{currency_symbol}{weak_gain:,.0f}</td></tr>"
     if evening_gain:
         evening_note_esc = _esc(evening_note)
         if current_lang == 'he':
-            roi_rows += f"<tr><td>שעות ערב ↗︎</td><td>{evening_note_esc}</td><td>₪{evening_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>שעות ערב ↗︎</td><td>{evening_note_esc}</td><td>{currency_symbol}{evening_gain:,.0f}</td></tr>"
         elif current_lang == 'ru':
-            roi_rows += f"<tr><td>Вечерние часы ↗︎</td><td>{evening_note_esc}</td><td>${evening_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>Вечерние часы ↗︎</td><td>{evening_note_esc}</td><td>{currency_symbol}{evening_gain:,.0f}</td></tr>"
         else:  # en
-            roi_rows += f"<tr><td>Evening Hours ↗︎</td><td>{evening_note_esc}</td><td>${evening_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>Evening Hours ↗︎</td><td>{evening_note_esc}</td><td>{currency_symbol}{evening_gain:,.0f}</td></tr>"
     if tail_gain:
         if current_lang == 'he':
-            roi_rows += f"<tr><td>זנב מוצרים ↗︎</td><td>קידום תחתית סל המוצרים</td><td>₪{tail_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>זנב מוצרים ↗︎</td><td>קידום תחתית סל המוצרים</td><td>{currency_symbol}{tail_gain:,.0f}</td></tr>"
         elif current_lang == 'ru':
-            roi_rows += f"<tr><td>Хвост продуктов ↗︎</td><td>Продвижение нижней части корзины</td><td>${tail_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>Хвост продуктов ↗︎</td><td>Продвижение нижней части корзины</td><td>{currency_symbol}{tail_gain:,.0f}</td></tr>"
         else:  # en
-            roi_rows += f"<tr><td>Tail Products ↗︎</td><td>Promote bottom of product basket</td><td>${tail_gain:,.0f}</td></tr>"
+            roi_rows += f"<tr><td>Tail Products ↗︎</td><td>Promote bottom of product basket</td><td>{currency_symbol}{tail_gain:,.0f}</td></tr>"
 
     # Table headers
     if current_lang == 'he':
@@ -4774,24 +4776,23 @@ def export_pdf():
     ) if roi_rows else ""
 
     # ROI card for first page - translate based on current language
-    current_lang = session.get('lang', 'en')
+    current_lang = get_language()
+    currency_info = get_currency(current_lang)
+    currency_symbol = currency_info["symbol"]
     roi_inline_html = ""
     if has_roi:
         if current_lang == 'he':
             roi_header = "הערכת ROI (חודשי)"
             badge_label_monthly = "תוספת חודשית מוערכת"
             badge_label_roi = "ROI משוער"
-            currency_symbol = "₪"
         elif current_lang == 'ru':
             roi_header = "Оценка ROI (месячная)"
             badge_label_monthly = "Потенциальная месячная добавка"
             badge_label_roi = "Теоретический ROI"
-            currency_symbol = "$"
         else:  # en
             roi_header = "ROI Estimation (Monthly)"
             badge_label_monthly = "Estimated Monthly Addition"
             badge_label_roi = "Estimated ROI"
-            currency_symbol = "$"
         
         roi_inline_html = (
             f"<section class='roi-card' dir={'rtl' if current_lang == 'he' else 'ltr'}>"
@@ -4815,7 +4816,9 @@ def export_pdf():
 
     # ---------- 4) HTML מלא ----------
     # Get current language for PDF
-    current_lang = session.get('lang', 'en')
+    current_lang = get_language()
+    currency_info = get_currency(current_lang)
+    currency_symbol = currency_info["symbol"]
     
     if current_lang == 'he':
         pdf_title = "דו״ח ניתוח מכירות"
@@ -5024,7 +5027,7 @@ def export_pdf():
         
     except ImportError as e:
         print(f"❌ WeasyPrint import error: {e}")
-        current_lang = session.get('lang', 'en')
+        current_lang = get_language()
         if current_lang == 'he':
             return "ספריית WeasyPrint לא מותקנת. אנא עדכן את requirements.txt.", 500
         elif current_lang == 'ru':
@@ -5035,7 +5038,7 @@ def export_pdf():
         print(f"⚠️ PDF Export Error: {e}")
         import traceback
         traceback.print_exc()
-        current_lang = session.get('lang', 'en')
+        current_lang = get_language()
         if current_lang == 'he':
             error_msg = f"שגיאה ביצירת PDF: {str(e)}"
         elif current_lang == 'ru':

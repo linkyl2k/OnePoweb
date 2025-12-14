@@ -109,17 +109,58 @@
             <i class="bi bi-currency-exchange" style="font-size: 1.3rem; color: #06b6d4; filter: drop-shadow(0 0 8px rgba(6,182,212,0.5));"></i>
             <span style="font-weight: 600; color: #e6e9ef; font-size: 1rem;">{% if current_lang == 'he' %}בחר מטבע:{% elif current_lang == 'en' %}Select Currency:{% else %}Выберите валюту:{% endif %}</span>
           </div>
-          <div class="currency-dropdown-wrapper">
-            <select class="form-select currency-select" style="background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(30,30,30,0.6) 100%); border: 2px solid rgba(6,182,212,0.4); color: #e6e9ef; border-radius: 10px; padding: 0.65rem 1.25rem; min-width: 280px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.2);" onchange="window.location.href='{{ url_for('set_currency', currency_code='') }}' + this.value + '?return_url={{ request.url }}'" onmouseover="this.style.borderColor='rgba(6,182,212,0.6)'; this.style.boxShadow='0 4px 15px rgba(6,182,212,0.3)';" onmouseout="this.style.borderColor='rgba(6,182,212,0.4)'; this.style.boxShadow='0 2px 10px rgba(0,0,0,0.2)';">
+          <div class="currency-dropdown-wrapper" style="position: relative;">
+            <div class="currency-select-trigger" id="currencyTrigger" style="background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(30,30,30,0.6) 100%); border: 2px solid rgba(6,182,212,0.4); color: #e6e9ef; border-radius: 10px; padding: 0.65rem 1.25rem; min-width: 280px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between;" onclick="document.getElementById('currencyDropdown').classList.toggle('show')">
+              <span style="display: flex; align-items: center; gap: 0.5rem;">
+                {% for curr in available_currencies %}
+                  {% if curr.is_selected %}
+                    <span style="font-size: 1.2em;">{{ curr.flag }}</span>
+                    <span>{{ curr.symbol }} {{ curr.label }} ({{ curr.code }})</span>
+                  {% endif %}
+                {% endfor %}
+              </span>
+              <i class="bi bi-chevron-down" style="transition: transform 0.3s;"></i>
+            </div>
+            <div class="currency-dropdown-menu" id="currencyDropdown" style="position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.5rem; background: linear-gradient(135deg, rgba(20,20,30,0.98) 0%, rgba(30,30,40,0.98) 100%); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); max-height: 400px; overflow-y: auto; z-index: 1000; display: none;">
               {% for curr in available_currencies %}
-              <option value="{{ curr.code }}" {% if curr.is_selected %}selected{% endif %} style="background: rgba(20,20,30,0.95); color: #e6e9ef; padding: 0.75rem;">
-                {{ curr.flag }} {{ curr.symbol }} {{ curr.label }} ({{ curr.code }})
-              </option>
+              <div class="currency-option {% if curr.is_selected %}selected{% endif %}" 
+                   onclick="window.location.href='{{ url_for('set_currency', currency_code=curr.code, return_url=request.url) }}'"
+                   style="padding: 0.85rem 1.25rem; cursor: pointer; display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s ease; border-bottom: 1px solid rgba(255,255,255,0.05); {% if curr.is_selected %}background: linear-gradient(135deg, rgba(6,182,212,0.25), rgba(59,130,246,0.15)); border-left: 3px solid #06b6d4;{% endif %}"
+                   onmouseover="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.1))'; this.style.borderLeft='3px solid #06b6d4';"
+                   onmouseout="{% if curr.is_selected %}this.style.background='linear-gradient(135deg, rgba(6,182,212,0.25), rgba(59,130,246,0.15))'; this.style.borderLeft='3px solid #06b6d4';{% else %}this.style.background='transparent'; this.style.borderLeft='3px solid transparent';{% endif %}">
+                <span style="font-size: 1.5em; line-height: 1;">{{ curr.flag }}</span>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: #e6e9ef; font-size: 0.95rem;">{{ curr.symbol }} {{ curr.label }}</div>
+                  <div style="font-size: 0.8rem; color: #8b93a7; margin-top: 0.1rem;">{{ curr.code }}</div>
+                </div>
+                {% if curr.is_selected %}<i class="bi bi-check-circle-fill" style="color: #06b6d4; font-size: 1.1rem;"></i>{% endif %}
+              </div>
               {% endfor %}
-            </select>
+            </div>
           </div>
         </div>
       </div>
+      
+      <script>
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        const trigger = document.getElementById('currencyTrigger');
+        const dropdown = document.getElementById('currencyDropdown');
+        if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+      
+      // Update chevron rotation
+      document.getElementById('currencyTrigger').addEventListener('click', function() {
+        const chevron = this.querySelector('.bi-chevron-down');
+        if (document.getElementById('currencyDropdown').classList.contains('show')) {
+          chevron.style.transform = 'rotate(180deg)';
+        } else {
+          chevron.style.transform = 'rotate(0deg)';
+        }
+      });
+      </script>
       
       <div class="graphs-grid">
         <!-- זמנים ומגמות -->
@@ -734,32 +775,35 @@
   opacity: 1;
 }
 
-.currency-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2306b6d4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 12px;
-  padding-right: 2.5rem !important;
+.currency-select-trigger:hover {
+  border-color: rgba(6,182,212,0.6) !important;
+  box-shadow: 0 4px 15px rgba(6,182,212,0.3) !important;
 }
 
-.currency-select option {
-  background: rgba(20,20,30,0.98);
-  color: #e6e9ef;
-  padding: 0.75rem 1rem;
-  font-size: 0.95rem;
+.currency-dropdown-menu.show {
+  display: block !important;
 }
 
-.currency-select option:hover {
-  background: rgba(6,182,212,0.2);
+.currency-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
 }
 
-.currency-select option:checked {
-  background: linear-gradient(135deg, rgba(6,182,212,0.3), rgba(59,130,246,0.2));
-  color: #06b6d4;
-  font-weight: 600;
+.currency-dropdown-menu::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+.currency-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(6,182,212,0.4);
+  border-radius: 4px;
+}
+
+.currency-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(6,182,212,0.6);
+}
+
+.currency-option:last-child {
+  border-bottom: none !important;
 }
 
 /* ===== Submit Button ===== */

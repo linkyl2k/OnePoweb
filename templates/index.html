@@ -263,20 +263,92 @@
       </div>
 
       <!-- Hour Range -->
-      <div class="hour-range-section">
-        <div class="hour-range-label">{% if current_lang == 'he' %}טווח שעות לגרף "לפי שעה"{% elif current_lang == 'en' %}Hour range for "Sales by Hour" graph{% else %}Диапазон часов для графика "Продажи по часам"{% endif %}</div>
-        <div class="hour-range-inputs">
-          <div class="hour-input">
-            <label>{% if current_lang == 'he' %}התחלה{% elif current_lang == 'en' %}Start{% else %}Начало{% endif %}</label>
-            <input type="number" name="hour_start" value="8" min="0" max="23">
+      <div class="hour-range-section" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(6,182,212,0.08) 0%, rgba(59,130,246,0.05) 100%); border-radius: 14px; border: 2px solid rgba(6,182,212,0.2); margin-top: 1.5rem;">
+        <div class="hour-range-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <i class="bi bi-clock" style="font-size: 1.3rem; color: #06b6d4; filter: drop-shadow(0 0 8px rgba(6,182,212,0.5));"></i>
+          <div class="hour-range-label" style="font-size: 0.95rem; color: #e6e9ef; font-weight: 600;">{% if current_lang == 'he' %}טווח שעות לגרף "לפי שעה"{% elif current_lang == 'en' %}Hour range for "Sales by Hour" graph{% else %}Диапазон часов для графика "Продажи по часам"{% endif %}</div>
+        </div>
+        <div class="hour-range-inputs" style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+          <div class="hour-input-wrapper" style="flex: 1; min-width: 200px;">
+            <label style="display: block; font-size: 0.85rem; color: #8b93a7; margin-bottom: 0.5rem; font-weight: 500;">{% if current_lang == 'he' %}התחלה{% elif current_lang == 'en' %}Start Hour{% else %}Начало{% endif %}</label>
+            <div class="hour-input-control" style="display: flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(30,30,30,0.5) 100%); border: 2px solid rgba(6,182,212,0.3); border-radius: 12px; padding: 0.5rem; transition: all 0.3s ease;">
+              <button type="button" class="hour-btn hour-btn-minus" data-hour="start" data-action="decrease" style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15)); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; color: #06b6d4; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0;" onmouseover="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.3), rgba(59,130,246,0.25))'; this.style.borderColor='rgba(6,182,212,0.6)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15))'; this.style.borderColor='rgba(6,182,212,0.4)'; this.style.transform='scale(1)';">
+                <i class="bi bi-dash-lg"></i>
+              </button>
+              <input type="number" name="hour_start" id="hourStart" value="8" min="0" max="23" style="flex: 1; background: transparent; border: none; color: #e6e9ef; font-size: 1.3rem; font-weight: 600; text-align: center; padding: 0.5rem; outline: none; -moz-appearance: textfield;" onfocus="this.parentElement.style.borderColor='rgba(6,182,212,0.6)'; this.parentElement.style.boxShadow='0 0 0 3px rgba(6,182,212,0.1)';" onblur="this.parentElement.style.borderColor='rgba(6,182,212,0.3)'; this.parentElement.style.boxShadow='none';">
+              <button type="button" class="hour-btn hour-btn-plus" data-hour="start" data-action="increase" style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15)); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; color: #06b6d4; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0;" onmouseover="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.3), rgba(59,130,246,0.25))'; this.style.borderColor='rgba(6,182,212,0.6)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15))'; this.style.borderColor='rgba(6,182,212,0.4)'; this.style.transform='scale(1)';">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem; text-align: center;">0-23</div>
           </div>
-          <div class="hour-separator">—</div>
-          <div class="hour-input">
-            <label>{% if current_lang == 'he' %}סיום{% elif current_lang == 'en' %}End{% else %}Конец{% endif %}</label>
-            <input type="number" name="hour_end" value="20" min="0" max="23">
+          <div class="hour-separator" style="display: flex; align-items: center; font-size: 1.5rem; color: #06b6d4; font-weight: bold; margin-top: 1.8rem;">→</div>
+          <div class="hour-input-wrapper" style="flex: 1; min-width: 200px;">
+            <label style="display: block; font-size: 0.85rem; color: #8b93a7; margin-bottom: 0.5rem; font-weight: 500;">{% if current_lang == 'he' %}סיום{% elif current_lang == 'en' %}End Hour{% else %}Конец{% endif %}</label>
+            <div class="hour-input-control" style="display: flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(30,30,30,0.5) 100%); border: 2px solid rgba(6,182,212,0.3); border-radius: 12px; padding: 0.5rem; transition: all 0.3s ease;">
+              <button type="button" class="hour-btn hour-btn-minus" data-hour="end" data-action="decrease" style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15)); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; color: #06b6d4; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0;" onmouseover="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.3), rgba(59,130,246,0.25))'; this.style.borderColor='rgba(6,182,212,0.6)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15))'; this.style.borderColor='rgba(6,182,212,0.4)'; this.style.transform='scale(1)';">
+                <i class="bi bi-dash-lg"></i>
+              </button>
+              <input type="number" name="hour_end" id="hourEnd" value="20" min="0" max="23" style="flex: 1; background: transparent; border: none; color: #e6e9ef; font-size: 1.3rem; font-weight: 600; text-align: center; padding: 0.5rem; outline: none; -moz-appearance: textfield;" onfocus="this.parentElement.style.borderColor='rgba(6,182,212,0.6)'; this.parentElement.style.boxShadow='0 0 0 3px rgba(6,182,212,0.1)';" onblur="this.parentElement.style.borderColor='rgba(6,182,212,0.3)'; this.parentElement.style.boxShadow='none';">
+              <button type="button" class="hour-btn hour-btn-plus" data-hour="end" data-action="increase" style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15)); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; color: #06b6d4; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0;" onmouseover="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.3), rgba(59,130,246,0.25))'; this.style.borderColor='rgba(6,182,212,0.6)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15))'; this.style.borderColor='rgba(6,182,212,0.4)'; this.style.transform='scale(1)';">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem; text-align: center;">0-23</div>
           </div>
         </div>
       </div>
+      
+      <script>
+      // Hour range controls
+      document.addEventListener('DOMContentLoaded', function() {
+        const hourButtons = document.querySelectorAll('.hour-btn');
+        const hourStart = document.getElementById('hourStart');
+        const hourEnd = document.getElementById('hourEnd');
+        
+        hourButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const hourType = this.getAttribute('data-hour');
+            const action = this.getAttribute('data-action');
+            const input = hourType === 'start' ? hourStart : hourEnd;
+            let value = parseInt(input.value) || 0;
+            
+            if (action === 'increase') {
+              value = Math.min(23, value + 1);
+            } else {
+              value = Math.max(0, value - 1);
+            }
+            
+            input.value = value;
+            
+            // Validate range
+            if (hourType === 'start' && parseInt(hourEnd.value) < value) {
+              hourEnd.value = value;
+            }
+            if (hourType === 'end' && parseInt(hourStart.value) > value) {
+              hourStart.value = value;
+            }
+          });
+        });
+        
+        // Remove spinner arrows for number inputs
+        hourStart.addEventListener('wheel', function(e) {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? 1 : -1;
+          let value = parseInt(this.value) || 0;
+          value = Math.max(0, Math.min(23, value + delta));
+          this.value = value;
+        });
+        
+        hourEnd.addEventListener('wheel', function(e) {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? 1 : -1;
+          let value = parseInt(this.value) || 0;
+          value = Math.max(0, Math.min(23, value + delta));
+          this.value = value;
+        });
+      });
+      </script>
     </div>
 
     <!-- Progress Bar (hidden by default) -->
@@ -778,6 +850,17 @@
 
 .hour-separator {
   color: #6b7280;
+}
+
+/* Hide number input spinners */
+.hour-input-control input[type="number"]::-webkit-inner-spin-button,
+.hour-input-control input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hour-input-control input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 /* ===== Currency Selector ===== */

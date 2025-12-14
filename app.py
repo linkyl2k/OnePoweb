@@ -4395,12 +4395,14 @@ def export_pdf():
         return "file:///" + p.replace("\\", "/")
 
     def _img_url(fname):
-        """Returns just filename for weasyprint (will use base_url)"""
+        """Returns absolute file:// URL for weasyprint"""
         if not fname:
             return ""
         path = os.path.join(PLOTS_DIR, fname)
-        # Return just filename - WeasyPrint will resolve it using base_url
-        return fname if os.path.exists(path) else ""
+        if os.path.exists(path):
+            abs_path = os.path.abspath(path).replace("\\", "/")
+            return f"file:///{abs_path}"
+        return ""
 
     def _font_face_block():
         fonts_dir = os.path.join(STATIC_DIR, "fonts")
@@ -4645,10 +4647,9 @@ def export_pdf():
                 print(f"📄 Image: {filename} -> {img_path} exists={exists}")
         
         # Create PDF from HTML
-        # WeasyPrint will resolve relative image paths using base_url
-        # Use absolute path as base_url so WeasyPrint can find images
-        base_url_abs = os.path.abspath(PLOTS_DIR)
-        pdf_bytes = HTML(string=html, base_url=base_url_abs).write_pdf()
+        # _img_url already returns absolute file:// URLs, so no base_url needed
+        # Using simple approach without base_url to avoid 'transform' errors in WeasyPrint
+        pdf_bytes = HTML(string=html).write_pdf()
         
         print(f"✅ PDF created, size: {len(pdf_bytes)} bytes")
         

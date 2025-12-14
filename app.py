@@ -4648,7 +4648,7 @@ def export_pdf():
         
         # Create PDF from HTML
         # _img_url already returns absolute file:// URLs, so no base_url needed
-        # Using simple approach without base_url to avoid 'transform' errors in WeasyPrint
+        # Using simple approach without base_url
         pdf_bytes = HTML(string=html).write_pdf()
         
         print(f"✅ PDF created, size: {len(pdf_bytes)} bytes")
@@ -4660,12 +4660,25 @@ def export_pdf():
         
     except ImportError as e:
         print(f"❌ WeasyPrint import error: {e}")
-        return "ספריית WeasyPrint לא מותקנת. אנא עדכן את requirements.txt.", 500
+        current_lang = session.get('lang', 'en')
+        if current_lang == 'he':
+            return "ספריית WeasyPrint לא מותקנת. אנא עדכן את requirements.txt.", 500
+        elif current_lang == 'ru':
+            return "Библиотека WeasyPrint не установлена. Пожалуйста, обновите requirements.txt.", 500
+        else:
+            return "WeasyPrint library is not installed. Please update requirements.txt.", 500
     except Exception as e:
         print(f"⚠️ PDF Export Error: {e}")
         import traceback
         traceback.print_exc()
-        return f"שגיאה ביצירת PDF: {str(e)}", 500
+        current_lang = session.get('lang', 'en')
+        if current_lang == 'he':
+            error_msg = f"שגיאה ביצירת PDF: {str(e)}"
+        elif current_lang == 'ru':
+            error_msg = f"Ошибка создания PDF: {str(e)}"
+        else:
+            error_msg = f"Error creating PDF: {str(e)}"
+        return error_msg, 500
 
 
 

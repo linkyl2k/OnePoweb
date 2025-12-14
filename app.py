@@ -35,28 +35,28 @@ PLAN_PRICES = {
 # Список доступных валют (упорядочены по популярности)
 AVAILABLE_CURRENCIES = {
     # Основные мировые валюты
-    "USD": {"symbol": "$", "name": "USD", "code": "USD", "display": "$", "label_he": "דולר", "label_en": "Dollar", "label_ru": "Доллар"},
-    "EUR": {"symbol": "€", "name": "EUR", "code": "EUR", "display": "€", "label_he": "אירו", "label_en": "Euro", "label_ru": "Евро"},
-    "GBP": {"symbol": "£", "name": "GBP", "code": "GBP", "display": "£", "label_he": "פאונד", "label_en": "Pound", "label_ru": "Фунт"},
-    "JPY": {"symbol": "¥", "name": "JPY", "code": "JPY", "display": "¥", "label_he": "ין", "label_en": "Yen", "label_ru": "Йена"},
-    "CNY": {"symbol": "¥", "name": "CNY", "code": "CNY", "display": "¥", "label_he": "יואן", "label_en": "Yuan", "label_ru": "Юань"},
-    "INR": {"symbol": "₹", "name": "INR", "code": "INR", "display": "₹", "label_he": "רופי", "label_en": "Rupee", "label_ru": "Рупия"},
-    "CAD": {"symbol": "C$", "name": "CAD", "code": "CAD", "display": "C$", "label_he": "דולר קנדי", "label_en": "Canadian Dollar", "label_ru": "Канадский доллар"},
-    "AUD": {"symbol": "A$", "name": "AUD", "code": "AUD", "display": "A$", "label_he": "דולר אוסטרלי", "label_en": "Australian Dollar", "label_ru": "Австралийский доллар"},
-    "CHF": {"symbol": "CHF", "name": "CHF", "code": "CHF", "display": "CHF", "label_he": "פרנק שוויצרי", "label_en": "Swiss Franc", "label_ru": "Швейцарский франк"},
-    "ILS": {"symbol": "₪", "name": "ILS", "code": "ILS", "display": "₪", "label_he": "שקל", "label_en": "Shekel", "label_ru": "Шекель"},
-    "RUB": {"symbol": "₽", "name": "RUB", "code": "RUB", "display": "₽", "label_he": "רובל", "label_en": "Ruble", "label_ru": "Рубль"},
+    "USD": {"symbol": "$", "name": "USD", "code": "USD", "display": "$", "label_he": "דולר", "label_en": "Dollar", "label_ru": "Доллар", "flag": "🇺🇸"},
+    "EUR": {"symbol": "€", "name": "EUR", "code": "EUR", "display": "€", "label_he": "אירו", "label_en": "Euro", "label_ru": "Евро", "flag": "🇪🇺"},
+    "GBP": {"symbol": "£", "name": "GBP", "code": "GBP", "display": "£", "label_he": "פאונד", "label_en": "Pound", "label_ru": "Фунт", "flag": "🇬🇧"},
+    "JPY": {"symbol": "¥", "name": "JPY", "code": "JPY", "display": "¥", "label_he": "ין", "label_en": "Yen", "label_ru": "Йена", "flag": "🇯🇵"},
+    "CNY": {"symbol": "¥", "name": "CNY", "code": "CNY", "display": "¥", "label_he": "יואן", "label_en": "Yuan", "label_ru": "Юань", "flag": "🇨🇳"},
+    "INR": {"symbol": "₹", "name": "INR", "code": "INR", "display": "₹", "label_he": "רופי", "label_en": "Rupee", "label_ru": "Рупия", "flag": "🇮🇳"},
+    "CAD": {"symbol": "C$", "name": "CAD", "code": "CAD", "display": "C$", "label_he": "דולר קנדי", "label_en": "Canadian Dollar", "label_ru": "Канадский доллар", "flag": "🇨🇦"},
+    "AUD": {"symbol": "A$", "name": "AUD", "code": "AUD", "display": "A$", "label_he": "דולר אוסטרלי", "label_en": "Australian Dollar", "label_ru": "Австралийский доллар", "flag": "🇦🇺"},
+    "CHF": {"symbol": "CHF", "name": "CHF", "code": "CHF", "display": "CHF", "label_he": "פרנק שוויצרי", "label_en": "Swiss Franc", "label_ru": "Швейцарский франк", "flag": "🇨🇭"},
+    "ILS": {"symbol": "₪", "name": "ILS", "code": "ILS", "display": "₪", "label_he": "שקל", "label_en": "Shekel", "label_ru": "Шекель", "flag": "🇮🇱"},
+    "RUB": {"symbol": "₽", "name": "RUB", "code": "RUB", "display": "₽", "label_he": "רובל", "label_en": "Ruble", "label_ru": "Рубль", "flag": "🇷🇺"},
     # Европейские валюты
-    "PLN": {"symbol": "zł", "name": "PLN", "code": "PLN", "display": "zł", "label_he": "זלוטי", "label_en": "Zloty", "label_ru": "Злотый"},
-    "SEK": {"symbol": "kr", "name": "SEK", "code": "SEK", "display": "kr", "label_he": "כתר שוודי", "label_en": "Swedish Krona", "label_ru": "Шведская крона"},
-    "NOK": {"symbol": "kr", "name": "NOK", "code": "NOK", "display": "kr", "label_he": "כתר נורווגי", "label_en": "Norwegian Krone", "label_ru": "Норвежская крона"},
-    "DKK": {"symbol": "kr", "name": "DKK", "code": "DKK", "display": "kr", "label_he": "כתר דני", "label_en": "Danish Krone", "label_ru": "Датская крона"},
-    "CZK": {"symbol": "Kč", "name": "CZK", "code": "CZK", "display": "Kč", "label_he": "קורונה צ'כית", "label_en": "Czech Koruna", "label_ru": "Чешская крона"},
-    "HUF": {"symbol": "Ft", "name": "HUF", "code": "HUF", "display": "Ft", "label_he": "פורינט", "label_en": "Forint", "label_ru": "Форинт"},
+    "PLN": {"symbol": "zł", "name": "PLN", "code": "PLN", "display": "zł", "label_he": "זלוטי", "label_en": "Zloty", "label_ru": "Злотый", "flag": "🇵🇱"},
+    "SEK": {"symbol": "kr", "name": "SEK", "code": "SEK", "display": "kr", "label_he": "כתר שוודי", "label_en": "Swedish Krona", "label_ru": "Шведская крона", "flag": "🇸🇪"},
+    "NOK": {"symbol": "kr", "name": "NOK", "code": "NOK", "display": "kr", "label_he": "כתר נורווגי", "label_en": "Norwegian Krone", "label_ru": "Норвежская крона", "flag": "🇳🇴"},
+    "DKK": {"symbol": "kr", "name": "DKK", "code": "DKK", "display": "kr", "label_he": "כתר דני", "label_en": "Danish Krone", "label_ru": "Датская крона", "flag": "🇩🇰"},
+    "CZK": {"symbol": "Kč", "name": "CZK", "code": "CZK", "display": "Kč", "label_he": "קורונה צ'כית", "label_en": "Czech Koruna", "label_ru": "Чешская крона", "flag": "🇨🇿"},
+    "HUF": {"symbol": "Ft", "name": "HUF", "code": "HUF", "display": "Ft", "label_he": "פורינט", "label_en": "Forint", "label_ru": "Форинт", "flag": "🇭🇺"},
     # Валюты СНГ
-    "UAH": {"symbol": "₴", "name": "UAH", "code": "UAH", "display": "₴", "label_he": "גריבנה", "label_en": "Hryvnia", "label_ru": "Гривна"},
-    "KZT": {"symbol": "₸", "name": "KZT", "code": "KZT", "display": "₸", "label_he": "טנגה", "label_en": "Tenge", "label_ru": "Тенге"},
-    "KGS": {"symbol": "сом", "name": "KGS", "code": "KGS", "display": "сом", "label_he": "סום", "label_en": "Som", "label_ru": "Сом"},
+    "UAH": {"symbol": "₴", "name": "UAH", "code": "UAH", "display": "₴", "label_he": "גריבנה", "label_en": "Hryvnia", "label_ru": "Гривна", "flag": "🇺🇦"},
+    "KZT": {"symbol": "₸", "name": "KZT", "code": "KZT", "display": "₸", "label_he": "טנגה", "label_en": "Tenge", "label_ru": "Тенге", "flag": "🇰🇿"},
+    "KGS": {"symbol": "сом", "name": "KGS", "code": "KGS", "display": "сом", "label_he": "סום", "label_en": "Som", "label_ru": "Сом", "flag": "🇰🇬"},
 }
 
 def get_currency(lang: str = None) -> dict:
@@ -876,6 +876,7 @@ def inject_translations():
                 "symbol": info["symbol"],
                 "name": info["name"],
                 "label": label,
+                "flag": info.get("flag", ""),
                 "is_selected": is_selected
             })
     

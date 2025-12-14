@@ -2268,18 +2268,35 @@ LAST_EXPORT = {
 
 # -----------------------------------------------------------------------------------
 def _clean_plots_dir():
+    """Clean old plot files, but keep recent ones (last 5 minutes)"""
     if os.path.exists(PLOTS_DIR):
+        import time
+        current_time = time.time()
         for f in os.listdir(PLOTS_DIR):
             try:
-                os.remove(os.path.join(PLOTS_DIR, f))
-            except:
-                pass
+                file_path = os.path.join(PLOTS_DIR, f)
+                # Keep files that are less than 5 minutes old
+                if os.path.isfile(file_path):
+                    file_age = current_time - os.path.getmtime(file_path)
+                    if file_age > 300:  # 5 minutes
+                        os.remove(file_path)
+                        print(f"🗑️ Removed old plot: {f} (age: {file_age:.0f}s)")
+            except Exception as e:
+                print(f"⚠️ Error removing {f}: {e}")
 
 def _save_fig(fig, filename):
     path = os.path.join(PLOTS_DIR, filename)
+    # Ensure directory exists
+    os.makedirs(PLOTS_DIR, exist_ok=True)
     fig.tight_layout()
     fig.savefig(path, dpi=130, bbox_inches="tight")
     plt.close(fig)
+    # Verify file was saved
+    if os.path.exists(path):
+        file_size = os.path.getsize(path)
+        print(f"✅ Saved plot: {filename} ({file_size} bytes) to {path}")
+    else:
+        print(f"❌ Failed to save plot: {filename} to {path}")
     return filename
 
 def _read_report(file_storage_or_path):
@@ -4407,21 +4424,54 @@ def export_pdf():
     def _img_base64(fname):
         """Returns base64 encoded image for embedding in HTML"""
         if not fname:
+            print(f"⚠️ _img_base64: empty filename")
             return ""
         path = os.path.join(PLOTS_DIR, fname)
+        print(f"🔍 _img_base64: checking {fname} at {path}")
         if os.path.exists(path):
             try:
                 import base64
                 with open(path, 'rb') as img_file:
                     img_data = img_file.read()
+                    if len(img_data) == 0:
+                        print(f"⚠️ _img_base64: {fname} is empty file")
+                        return ""
                     img_base64 = base64.b64encode(img_data).decode('utf-8')
                     # Detect image type from extension
                     ext = os.path.splitext(fname)[1].lower()
                     mime_type = 'image/png' if ext == '.png' else 'image/jpeg' if ext in ['.jpg', '.jpeg'] else 'image/png'
-                    return f"data:{mime_type};base64,{img_base64}"
+                    result = f"data:{mime_type};base64,{img_base64}"
+                    print(f"✅ _img_base64: {fname} encoded, length={len(result)}")
+                    return result
             except Exception as e:
                 print(f"⚠️ Error encoding image {fname}: {e}")
-                return _img_url(fname)  # Fallback to file:// URL
+                import traceback
+                traceback.print_exc()
+                return ""
+        else:
+            print(f"❌ _img_base64: file not found: {path}")
+            # Try alternative paths
+            alt_paths = [
+                os.path.join(STATIC_DIR, "plots", fname),
+                os.path.join(os.getcwd(), "static", "plots", fname),
+                fname  # Maybe it's already a full path
+            ]
+            for alt_path in alt_paths:
+                if os.path.exists(alt_path):
+                    print(f"✅ Found at alternative path: {alt_path}")
+                    try:
+                        import base64
+                        with open(alt_path, 'rb') as img_file:
+                            img_data = img_file.read()
+                            if len(img_data) == 0:
+                                continue
+                            img_base64 = base64.b64encode(img_data).decode('utf-8')
+                            ext = os.path.splitext(fname)[1].lower()
+                            mime_type = 'image/png' if ext == '.png' else 'image/jpeg' if ext in ['.jpg', '.jpeg'] else 'image/png'
+                            return f"data:{mime_type};base64,{img_base64}"
+                    except Exception as e:
+                        print(f"⚠️ Error with alternative path {alt_path}: {e}")
+                        continue
         return ""
 
     def _font_face_block():

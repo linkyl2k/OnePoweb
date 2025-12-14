@@ -1388,7 +1388,8 @@ document.addEventListener('DOMContentLoaded', function() {
         progressContainer: !!progressContainer,
         progressBarFill: !!progressBarFill
       });
-      return; // Allow form to submit normally
+      // Don't prevent form submission, just allow it to proceed normally
+      return true;
     }
     
     console.log('Showing progress bar...');

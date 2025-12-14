@@ -2403,8 +2403,14 @@ def _read_report(file_storage_or_path):
     # פונקציות עזר לקידודים עבריים
     # -------------------------------------------------
     def _read_text_with_encoding(data_bytes):
-        """ניסיון לקרוא עם קידודים שונים לעברית"""
-        encodings = ['utf-8-sig', 'utf-8', 'windows-1255', 'iso-8859-8', 'cp1255', 'latin-1']
+        """ניסיון לקרוא עם קידודים שונים לעברית, רוסית ואנגלית"""
+        encodings = [
+            'utf-8-sig', 'utf-8',  # UTF-8 с BOM и без
+            'windows-1251', 'cp1251',  # Русская кодировка
+            'windows-1255', 'iso-8859-8', 'cp1255',  # Иврит
+            'latin-1', 'iso-8859-1',  # Западноевропейская
+            'cp866', 'koi8-r'  # Дополнительные русские кодировки
+        ]
         for enc in encodings:
             try:
                 return data_bytes.decode(enc)
@@ -3216,8 +3222,19 @@ def index():
     up_path = os.path.join(UPLOAD_DIR, safe_name)
     try:
         file.save(up_path)
+        print(f"✅ קובץ נשמר: {up_path}")
     except Exception as e:
-        messages.append(f"שגיאה בשמירת הקובץ: {e}")
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"❌ שגיאה בשמירת הקובץ: {e}")
+        print(f"📋 Traceback:\n{error_trace}")
+        # Сообщение об ошибке на соответствующем языке
+        if current_lang == "he":
+            messages.append(f"שגיאה בשמירת הקובץ: {str(e)}")
+        elif current_lang == "en":
+            messages.append(f"Error saving file: {str(e)}")
+        else:  # ru
+            messages.append(f"Ошибка сохранения файла: {str(e)}")
         return _render()
 
     # ===== פרמטרים מהטופס =====
@@ -3247,7 +3264,17 @@ def index():
     try:
         df = _read_report(up_path)
     except Exception as e:
-        messages.append(f"שגיאה בקריאת הקובץ: {e}")
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"❌ שגיאה בקריאת הקובץ: {e}")
+        print(f"📋 Traceback:\n{error_trace}")
+        # Сообщение об ошибке на соответствующем языке
+        if current_lang == "he":
+            messages.append(f"שגיאה בקריאת הקובץ: {str(e)}")
+        elif current_lang == "en":
+            messages.append(f"Error reading file: {str(e)}")
+        else:  # ru
+            messages.append(f"Ошибка чтения файла: {str(e)}")
         return _render()
 
     # ------------------------------------------------------------------

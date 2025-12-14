@@ -51,8 +51,8 @@
       <div class="step-header">
         <div class="step-number">2</div>
         <div>
-          <h3 class="step-title">סוג תקופה</h3>
-          <p class="step-desc">בחר לצורך השוואה בדשבורד</p>
+          <h3 class="step-title">{% if current_lang == 'he' %}סוג תקופה{% elif current_lang == 'en' %}Period Type{% else %}Тип периода{% endif %}</h3>
+          <p class="step-desc">{% if current_lang == 'he' %}בחר לצורך השוואה בדשבורד{% elif current_lang == 'en' %}Choose for dashboard comparison{% else %}Выберите для сравнения в дашборде{% endif %}</p>
         </div>
       </div>
       
@@ -1082,11 +1082,15 @@ document.addEventListener('DOMContentLoaded', function() {
       fileLabel.textContent = `✅ ${file.name} (${sizeMB} MB)`;
       fileLabel.classList.add('active');
       btn.disabled = false;
-      document.querySelector('.submit-hint').textContent = 'מוכן לניתוח!';
+      const lang = '{{ current_lang }}';
+      const readyText = lang === 'he' ? 'מוכן לניתוח!' : lang === 'en' ? 'Ready for analysis!' : 'Готово к анализу!';
+      document.querySelector('.submit-hint').textContent = readyText;
     } else {
       fileLabel.classList.remove('active');
       btn.disabled = true;
-      document.querySelector('.submit-hint').textContent = 'הכפתור יופעל לאחר בחירת קובץ';
+      const lang = '{{ current_lang }}';
+      const hintText = lang === 'he' ? 'הכפתור יופעל לאחר בחירת קובץ' : lang === 'en' ? 'Button will be enabled after selecting a file' : 'Кнопка будет активирована после выбора файла';
+      document.querySelector('.submit-hint').textContent = hintText;
     }
   }
 

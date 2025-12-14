@@ -62,22 +62,22 @@
         <div class="mission-item">
           <div class="mission-icon"><i class="bi bi-lightning-charge-fill"></i></div>
           <div>
-            <strong>מהיר</strong>
-            <p>ניתוח תוך 30 שניות, לא שעות</p>
+            <strong>{% if current_lang == 'he' %}מהיר{% elif current_lang == 'en' %}Fast{% else %}Быстро{% endif %}</strong>
+            <p>{% if current_lang == 'he' %}ניתוח תוך 30 שניות, לא שעות{% elif current_lang == 'en' %}Analysis in 30 seconds, not hours{% else %}Анализ за 30 секунд, а не за часы{% endif %}</p>
           </div>
         </div>
         <div class="mission-item">
           <div class="mission-icon"><i class="bi bi-hand-thumbs-up-fill"></i></div>
           <div>
-            <strong>פשוט</strong>
-            <p>בלי ידע טכני, בלי הדרכה</p>
+            <strong>{% if current_lang == 'he' %}פשוט{% elif current_lang == 'en' %}Simple{% else %}Просто{% endif %}</strong>
+            <p>{% if current_lang == 'he' %}בלי ידע טכני, בלי הדרכה{% elif current_lang == 'en' %}Without technical knowledge, without guidance{% else %}Без технических знаний, без обучения{% endif %}</p>
           </div>
         </div>
         <div class="mission-item">
           <div class="mission-icon"><i class="bi bi-shield-check"></i></div>
           <div>
-            <strong>מאובטח</strong>
-            <p>הנתונים שלך נשארים שלך</p>
+            <strong>{% if current_lang == 'he' %}מאובטח{% elif current_lang == 'en' %}Secure{% else %}Безопасно{% endif %}</strong>
+            <p>{% if current_lang == 'he' %}הנתונים שלך נשארים שלך{% elif current_lang == 'en' %}Your data remains yours{% else %}Ваши данные остаются вашими{% endif %}</p>
           </div>
         </div>
       </div>

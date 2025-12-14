@@ -48,7 +48,7 @@
                     </div>
                   </div>
                   <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399;">
-                    {% if current_lang == 'he' %}עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
+                    {% if current_lang == 'he' %}עד +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
                   </span>
                 </div>
               </div>
@@ -65,7 +65,7 @@
                     </div>
                   </div>
                   <span class="badge" style="background: rgba(46,160,255,0.15); color: #34c3ff;">
-                    {% if current_lang == 'he' %}עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
+                    {% if current_lang == 'he' %}עד +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
                   </span>
                 </div>
               </div>
@@ -82,7 +82,7 @@
                     </div>
                   </div>
                   <span class="badge" style="background: rgba(251,191,36,0.15); color: #fbbf24;">
-                    {% if current_lang == 'he' %}עד +₪{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +${{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
+                    {% if current_lang == 'he' %}עד +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
                   </span>
                 </div>
               </div>
@@ -96,14 +96,14 @@
           <div class="col-6 col-md-4">
             <div class="text-center p-3" style="background: rgba(16,185,129,0.08); border-radius: 10px;">
               <div class="small text-muted">{% if current_lang == 'he' %}פוטנציאל מקסימלי{% elif current_lang == 'en' %}Maximum Potential{% else %}Максимальный потенциал{% endif %}</div>
-              <div style="font-size: 1.5rem; font-weight: bold; color: #34d399;">~${% if current_lang == 'he' %}₪{% endif %}{{ "{:,.0f}".format(_gain) }}</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #34d399;">~{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</div>
               <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}per month{% else %}в месяц{% endif %}</div>
             </div>
           </div>
           <div class="col-6 col-md-4">
             <div class="text-center p-3" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
               <div class="small text-muted">{% if current_lang == 'he' %}עלות השירות{% elif current_lang == 'en' %}Service Cost{% else %}Стоимость услуги{% endif %}</div>
-              <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">${% if current_lang == 'he' %}₪{% endif %}{{ "{:,.0f}".format(roi.service_cost or 149) }}</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">{{ currency_symbol }}{{ "{:,.0f}".format(roi.service_cost or 149) }}</div>
               <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}per month{% else %}в месяц{% endif %}</div>
             </div>
           </div>

@@ -32,6 +32,45 @@ PLAN_PRICES = {
     "pro": {"usd": 19}
 }
 
+# Список доступных валют
+AVAILABLE_CURRENCIES = {
+    "ILS": {"symbol": "₪", "name": "ILS", "code": "ILS", "display": "₪", "label_he": "שקל", "label_en": "Shekel", "label_ru": "Шекель"},
+    "USD": {"symbol": "$", "name": "USD", "code": "USD", "display": "$", "label_he": "דולר", "label_en": "Dollar", "label_ru": "Доллар"},
+    "EUR": {"symbol": "€", "name": "EUR", "code": "EUR", "display": "€", "label_he": "אירו", "label_en": "Euro", "label_ru": "Евро"},
+    "GBP": {"symbol": "£", "name": "GBP", "code": "GBP", "display": "£", "label_he": "פאונד", "label_en": "Pound", "label_ru": "Фунт"},
+    "RUB": {"symbol": "₽", "name": "RUB", "code": "RUB", "display": "₽", "label_he": "רובל", "label_en": "Ruble", "label_ru": "Рубль"},
+    "UAH": {"symbol": "₴", "name": "UAH", "code": "UAH", "display": "₴", "label_he": "גריבנה", "label_en": "Hryvnia", "label_ru": "Гривна"},
+    "KZT": {"symbol": "₸", "name": "KZT", "code": "KZT", "display": "₸", "label_he": "טנגה", "label_en": "Tenge", "label_ru": "Тенге"},
+    "KGS": {"symbol": "сом", "name": "KGS", "code": "KGS", "display": "сом", "label_he": "סום", "label_en": "Som", "label_ru": "Сом"},
+}
+
+def get_currency(lang: str = None) -> dict:
+    """
+    Возвращает информацию о валюте пользователя.
+    Сначала проверяет выбор пользователя в сессии, затем язык по умолчанию.
+    Returns: {"symbol": "₪", "name": "ILS", "code": "ILS"}
+    """
+    from flask import session
+    
+    # Проверяем выбор пользователя в сессии
+    user_currency = session.get("currency")
+    if user_currency and user_currency in AVAILABLE_CURRENCIES:
+        return AVAILABLE_CURRENCIES[user_currency]
+    
+    # Если язык не передан, получаем из сессии
+    if lang is None:
+        lang = get_language()
+    
+    # Валюты по умолчанию в зависимости от языка
+    default_currencies = {
+        "he": "ILS",  # Шекели для иврита
+        "ru": "RUB",  # Рубли для русского (можно изменить на другую валюту СНГ)
+        "en": "USD"   # Доллары для английского
+    }
+    
+    default_code = default_currencies.get(lang, "USD")
+    return AVAILABLE_CURRENCIES.get(default_code, AVAILABLE_CURRENCIES["USD"])
+
 def send_contact_email(name: str, email: str, message: str, subject: str = "general"):
     """שליחת הודעת צור קשר למייל"""
     
@@ -464,11 +503,11 @@ TRANSLATIONS = {
         # Chart axis labels
         "chart_axis_hour": "Hour",
         "chart_axis_day": "Day of Week",
-        "chart_axis_total": "Total (₪)",
+        "chart_axis_total": "Total ($)",
         "chart_axis_quantity": "Quantity",
-        "chart_axis_avg_ticket": "Average Ticket (₪)",
+        "chart_axis_avg_ticket": "Average Ticket ($)",
         "chart_axis_sales": "Sales",
-        "chart_axis_currency": "₪",
+        "chart_axis_currency": "$",
         
         # Summary labels
         "summary_total_sales": "Total Sales",
@@ -659,11 +698,11 @@ TRANSLATIONS = {
         # Chart axis labels
         "chart_axis_hour": "Час",
         "chart_axis_day": "День недели",
-        "chart_axis_total": "Всего (₪)",
+        "chart_axis_total": "Всего (₽)",
         "chart_axis_quantity": "Количество",
-        "chart_axis_avg_ticket": "Средний чек (₪)",
+        "chart_axis_avg_ticket": "Средний чек (₽)",
         "chart_axis_sales": "Продажи",
-        "chart_axis_currency": "₪",
+        "chart_axis_currency": "₽",
         
         # Summary labels
         "summary_total_sales": "Общие продажи",
@@ -798,9 +837,34 @@ def t(key, lang=None):
 @app.context_processor
 def inject_translations():
     """Добавляет функцию t() и текущий язык во все шаблоны"""
+    from flask import session
+    current_lang = get_language()
+    currency = get_currency(current_lang)
+    
+    # Подготовка списка валют для выбора
+    currencies_list = []
+    user_currency_code = session.get("currency")
+    current_currency_code = currency["code"]
+    
+    for code, info in AVAILABLE_CURRENCIES.items():
+        label_key = f"label_{current_lang}"
+        label = info.get(label_key, info["name"])
+        is_selected = (user_currency_code == code) if user_currency_code else (current_currency_code == code)
+        currencies_list.append({
+            "code": code,
+            "symbol": info["symbol"],
+            "name": info["name"],
+            "label": label,
+            "is_selected": is_selected
+        })
+    
     return {
         "t": t,
-        "current_lang": get_language(),
+        "current_lang": current_lang,
+        "currency": currency,
+        "currency_symbol": currency["symbol"],
+        "currency_display": currency["display"],
+        "available_currencies": currencies_list,
         "languages": {
             "he": "עברית",
             "en": "English", 
@@ -3067,6 +3131,25 @@ def set_language(lang):
     if lang in ["he", "en", "ru"]:
         session["language"] = lang
         session.permanent = True
+        
+        # Устанавливаем валюту по умолчанию для языка, если пользователь еще не выбрал
+        if "currency" not in session:
+            default_currencies = {"he": "ILS", "ru": "RUB", "en": "USD"}
+            session["currency"] = default_currencies.get(lang, "USD")
+        
+        return_url = request.args.get("return_url") or request.referrer or url_for("index")
+        return redirect(return_url)
+    return redirect(url_for("index"))
+
+@app.route("/set-currency/<currency_code>")
+def set_currency(currency_code):
+    """Установка валюты пользователем"""
+    from flask import session, redirect, url_for, request
+    if currency_code in AVAILABLE_CURRENCIES:
+        session["currency"] = currency_code
+        session.permanent = True
+    return_url = request.args.get("return_url") or request.referrer or url_for("index")
+    return redirect(return_url)
         session.modified = True
     # Редирект на предыдущую страницу или главную
     return redirect(request.referrer or url_for("index"))
@@ -3172,11 +3255,12 @@ def index():
             if current_lang == "he":
                 ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
                 ax.set_xlabel(rtl("שעה"))
-                ax.set_ylabel(rtl('סה"כ (₪)'))
+                ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
             elif current_lang == "en":
-                ax.set_title(f"Sales by Hour (₪) {hour_start}:00–{hour_end}:00")
+                currency_sym = get_currency("en")["symbol"]
+                ax.set_title(f"Sales by Hour ({currency_sym}) {hour_start}:00–{hour_end}:00")
                 ax.set_xlabel("Hour")
-                ax.set_ylabel("Total (₪)")
+                ax.set_ylabel(f"Total ({currency_sym})")
             else:  # ru
                 ax.set_title(f"Продажи по часам (₪) {hour_start}:00–{hour_end}:00")
                 ax.set_xlabel(t("chart_axis_hour"))
@@ -3244,13 +3328,15 @@ def index():
                 if current_lang == "he":
                     ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
                     ax.set_xlabel(rtl("יום בשבוע"))
-                    ax.set_ylabel(rtl('סה"כ (₪)'))
+                    ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
                 elif current_lang == "en":
-                    ax.set_title("Sales by Day of Week (₪)")
+                    currency_sym = get_currency("en")["symbol"]
+                    ax.set_title(f"Sales by Day of Week ({currency_sym})")
                     ax.set_xlabel("Day of Week")
-                    ax.set_ylabel("Total (₪)")
+                    ax.set_ylabel(f"Total ({currency_sym})")
                 else:  # ru
-                    ax.set_title(t("chart_sales_by_weekday") + " (₪)")
+                    currency_sym = get_currency("ru")["symbol"]
+                    ax.set_title(t("chart_sales_by_weekday") + f" ({currency_sym})")
                     ax.set_xlabel(t("chart_axis_day"))
                     ax.set_ylabel(t("chart_axis_total"))
                 ax.set_xticks(xpos)
@@ -3388,10 +3474,11 @@ def index():
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
                         ax.set_title(_rtl("Top 10 — הכנסות לפי מוצר"))
-                        ax.set_ylabel(_rtl('סה"כ (₪)'))
+                        ax.set_ylabel(_rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
                     elif current_lang == "en":
+                        currency_sym = get_currency("en")["symbol"]
                         ax.set_title("Top 10 — Revenue by Product")
-                        ax.set_ylabel("Total (₪)")
+                        ax.set_ylabel(f"Total ({currency_sym})")
                     else:  # ru
                         ax.set_title("Top 10 — " + t("chart_top_revenue"))
                         ax.set_ylabel(t("chart_axis_total"))
@@ -3502,11 +3589,12 @@ def index():
                     if current_lang == "he":
                         ax.set_title(rtl(f"ממוצע קנייה לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
                         ax.set_xlabel(rtl("שעה"))
-                        ax.set_ylabel(rtl("ממוצע צ'ק (₪)"))
+                        ax.set_ylabel(rtl(f"ממוצע צ'ק ({get_currency('he')['symbol']})"))
                     elif current_lang == "en":
-                        ax.set_title(f"Average Ticket by Hour (₪) {hour_start}:00–{hour_end}:00")
+                        currency_sym = get_currency("en")["symbol"]
+                        ax.set_title(f"Average Ticket by Hour ({currency_sym}) {hour_start}:00–{hour_end}:00")
                         ax.set_xlabel("Hour")
-                        ax.set_ylabel("Average Ticket (₪)")
+                        ax.set_ylabel(f"Average Ticket ({currency_sym})")
                     else:  # ru
                         ax.set_title(t("chart_avg_ticket") + f" (₪) {hour_start}:00–{hour_end}:00")
                         ax.set_xlabel(t("chart_axis_hour"))

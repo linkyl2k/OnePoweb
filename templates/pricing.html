@@ -95,7 +95,7 @@
           </div>
           <h3 class="pricing-name">BASIC</h3>
           <div class="pricing-price">
-            <span class="currency">$</span>
+            <span class="currency">{{ currency_symbol }}</span>
             <span class="amount">{{ prices.basic.usd }}</span>
             <span class="period">/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
           </div>
@@ -142,7 +142,7 @@
           </div>
           <h3 class="pricing-name">PRO</h3>
           <div class="pricing-price">
-            <span class="currency">$</span>
+            <span class="currency">{{ currency_symbol }}</span>
             <span class="amount">{{ prices.pro.usd }}</span>
             <span class="period">/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
           </div>

@@ -18,7 +18,7 @@
       <div class="card bg-primary text-white shadow h-100">
         <div class="card-body text-center">
           <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_total_sales') }}</h6>
-          <h2 class="card-title mb-0">₪{{ "{:,.0f}".format(total_sales) }}</h2>
+          <h2 class="card-title mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(total_sales) }}</h2>
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
       <div class="card bg-info text-white shadow h-100">
         <div class="card-body text-center">
           <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_avg_daily') }}</h6>
-          <h2 class="card-title mb-0">₪{{ "{:,.0f}".format(latest_summary.get('avg_daily', 0)) }}</h2>
+          <h2 class="card-title mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(latest_summary.get('avg_daily', 0)) }}</h2>
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@
         <div class="col-md-5">
           <div class="border rounded p-3 bg-light h-100">
             <h6 class="text-muted mb-2">{{ comparison.get('report1_name', ('תקופה קודמת' if current_lang == 'he' else 'Previous Period' if current_lang == 'en' else 'Предыдущий период')) }}</h6>
-            <p class="h3 mb-1 text-primary">₪{{ "{:,.0f}".format(comparison.period1.total) }}</p>
+            <p class="h3 mb-1 text-primary">{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period1.total) }}</p>
             <div class="d-flex gap-3 text-muted small">
               <span><i class="bi bi-calendar"></i> {{ comparison.period1.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
               <span><i class="bi bi-receipt"></i> {{ comparison.period1.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}transactions{% else %}транзакций{% endif %}</span>
@@ -84,7 +84,7 @@
         <div class="col-md-5">
           <div class="border rounded p-3 h-100" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
             <h6 class="text-dark mb-2" style="color: #2d5016 !important;">{{ comparison.get('report2_name', ('תקופה אחרונה' if current_lang == 'he' else 'Latest Period' if current_lang == 'en' else 'Последний период')) }}</h6>
-            <p class="h3 mb-1" style="color: #1b5e20 !important; font-weight: 700;">₪{{ "{:,.0f}".format(comparison.period2.total) }}</p>
+            <p class="h3 mb-1" style="color: #1b5e20 !important; font-weight: 700;">{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period2.total) }}</p>
             <div class="d-flex gap-3 small" style="color: #2d5016 !important;">
               <span><i class="bi bi-calendar"></i> {{ comparison.period2.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
               <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}transactions{% else %}транзакций{% endif %}</span>
@@ -172,8 +172,8 @@
                   —
                 {% endif %}
               </td>
-              <td><strong>₪{{ "{:,.0f}".format(summary.get('total_sales', 0)) }}</strong></td>
-              <td>₪{{ "{:,.0f}".format(summary.get('avg_daily', 0)) }}</td>
+              <td><strong>{{ currency_symbol }}{{ "{:,.0f}".format(summary.get('total_sales', 0)) }}</strong></td>
+              <td>{{ currency_symbol }}{{ "{:,.0f}".format(summary.get('avg_daily', 0)) }}</td>
               <td><small>{{ report.created_at[:10] if report.created_at else '—' }}</small></td>
               <td>
                 <form method="POST" action="{{ url_for('dashboard_delete_report', report_id=report.id) }}" 

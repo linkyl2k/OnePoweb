@@ -83,9 +83,9 @@
         <!-- תקופה נוכחית -->
         <div class="col-md-5">
           <div class="border rounded p-3 h-100" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
-            <h6 class="text-muted mb-2">{{ comparison.get('report2_name', ('תקופה אחרונה' if current_lang == 'he' else 'Latest Period' if current_lang == 'en' else 'Последний период')) }}</h6>
-            <p class="h3 mb-1 text-success">₪{{ "{:,.0f}".format(comparison.period2.total) }}</p>
-            <div class="d-flex gap-3 text-muted small">
+            <h6 class="text-dark mb-2" style="color: #2d5016 !important;">{{ comparison.get('report2_name', ('תקופה אחרונה' if current_lang == 'he' else 'Latest Period' if current_lang == 'en' else 'Последний период')) }}</h6>
+            <p class="h3 mb-1" style="color: #1b5e20 !important; font-weight: 700;">₪{{ "{:,.0f}".format(comparison.period2.total) }}</p>
+            <div class="d-flex gap-3 small" style="color: #2d5016 !important;">
               <span><i class="bi bi-calendar"></i> {{ comparison.period2.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
               <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}transactions{% else %}транзакций{% endif %}</span>
             </div>

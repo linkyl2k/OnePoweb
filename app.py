@@ -4943,12 +4943,31 @@ def activate_subscription(user_id, plan, discount_used):
         
         print(f"[Activate] User found: {u['email'] if 'email' in dict(u).keys() else 'N/A'}")
         
+        # Ensure all required columns exist
+        cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+        if "canceled_at" not in cols:
+            print(f"[Activate] Adding canceled_at column to users table")
+            try:
+                db.execute("ALTER TABLE users ADD COLUMN canceled_at TEXT NULL")
+                db.commit()
+                print(f"[Activate] canceled_at column added successfully")
+            except Exception as e:
+                print(f"[Activate] Warning: Could not add canceled_at column: {e}")
+        
         # Update user plan and reset referral discount (one-time use)
-        db.execute("""
-            UPDATE users 
-            SET plan=?, referral_discount=0, cancelled_at=NULL 
-            WHERE id=?
-        """, (plan, user_id))
+        if "canceled_at" in cols or "canceled_at" in {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}:
+            db.execute("""
+                UPDATE users 
+                SET plan=?, referral_discount=0, canceled_at=NULL 
+                WHERE id=?
+            """, (plan, user_id))
+        else:
+            # If column still doesn't exist, update without it
+            db.execute("""
+                UPDATE users 
+                SET plan=?, referral_discount=0
+                WHERE id=?
+            """, (plan, user_id))
         db.commit()
         print(f"[Activate] User plan updated to {plan}")
         

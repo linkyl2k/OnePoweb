@@ -89,44 +89,6 @@
         <i class="bi bi-lock me-1"></i>
         {% if current_lang == 'he' %}התשלום מאובטח ומוצפן באמצעות PayPal{% elif current_lang == 'en' %}Payment is secured and encrypted via PayPal{% else %}Оплата защищена и зашифрована через PayPal{% endif %}
       </p>
-      
-      {% if paypal_mode == 'sandbox' %}
-      <!-- Sandbox Testing Instructions -->
-      <div class="alert alert-info mt-3 mb-0" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
-        <div class="d-flex align-items-start">
-          <i class="bi bi-info-circle me-2" style="font-size: 1.1rem; color: #3b82f6; margin-top: 2px;"></i>
-          <div>
-            <strong style="color: #3b82f6;">
-              {% if current_lang == 'he' %}🧪 מצב בדיקה (Sandbox){% elif current_lang == 'en' %}🧪 Test Mode (Sandbox){% else %}🧪 Режим тестирования (Sandbox){% endif %}
-            </strong>
-            <p class="small mb-2 mt-1" style="color: var(--text);">
-              {% if current_lang == 'he' %}
-                <strong>לבדיקה ללא תשלום אמיתי:</strong><br>
-                • השתמש בחשבון PayPal Sandbox (צור ב-<a href="https://developer.paypal.com" target="_blank" style="color: #3b82f6;">developer.paypal.com</a>)<br>
-                • או השתמש בכרטיסי בדיקה:<br>
-                &nbsp;&nbsp;Visa: <code>4032 0312 3456 7890</code> (תאריך: כל עתיד, CVV: כל 3 ספרות)<br>
-                &nbsp;&nbsp;Mastercard: <code>5555 5555 5555 4444</code><br>
-                &nbsp;&nbsp;CVV: כל 3 ספרות, תאריך: כל עתיד
-              {% elif current_lang == 'en' %}
-                <strong>To test without real payment:</strong><br>
-                • Use a PayPal Sandbox account (create at <a href="https://developer.paypal.com" target="_blank" style="color: #3b82f6;">developer.paypal.com</a>)<br>
-                • Or use test cards:<br>
-                &nbsp;&nbsp;Visa: <code>4032 0312 3456 7890</code> (any future date, any 3-digit CVV)<br>
-                &nbsp;&nbsp;Mastercard: <code>5555 5555 5555 4444</code><br>
-                &nbsp;&nbsp;CVV: any 3 digits, Date: any future date
-              {% else %}
-                <strong>Для тестирования без реальной оплаты:</strong><br>
-                • Используйте аккаунт PayPal Sandbox (создайте на <a href="https://developer.paypal.com" target="_blank" style="color: #3b82f6;">developer.paypal.com</a>)<br>
-                • Или используйте тестовые карты:<br>
-                &nbsp;&nbsp;Visa: <code>4032 0312 3456 7890</code> (любая будущая дата, любой 3-значный CVV)<br>
-                &nbsp;&nbsp;Mastercard: <code>5555 5555 5555 4444</code><br>
-                &nbsp;&nbsp;CVV: любые 3 цифры, Дата: любая будущая дата
-              {% endif %}
-            </p>
-          </div>
-        </div>
-      </div>
-      {% endif %}
     </div>
   </div>
   {% else %}

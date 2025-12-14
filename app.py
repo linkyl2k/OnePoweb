@@ -26,11 +26,10 @@ PAYPAL_SECRET = os.getenv("PAYPAL_SECRET", "")
 PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")  # sandbox or live
 PAYPAL_API_URL = "https://api-m.sandbox.paypal.com" if PAYPAL_MODE == "sandbox" else "https://api-m.paypal.com"
 
-# Prices in USD (PayPal works better with USD)
-# מחירים מותאמים לעסקים קטנים בישראל
+# Prices in USD
 PLAN_PRICES = {
-    "basic": {"usd": 9, "ils": 39},
-    "pro": {"usd": 19, "ils": 69}
+    "basic": {"usd": 9},
+    "pro": {"usd": 19}
 }
 
 def send_contact_email(name: str, email: str, message: str, subject: str = "general"):
@@ -684,14 +683,14 @@ TRANSLATIONS = {
         "pricing_free": "Бесплатно",
         "pricing_free_desc": "Базовые графики без AI",
         "pricing_free_features": "Базовые графики",
-        "pricing_free_price": "₪0",
+        "pricing_free_price": "$0",
         "pricing_basic": "Basic",
         "pricing_basic_desc": "Графики без AI",
-        "pricing_basic_price": "₪39/месяц",
+        "pricing_basic_price": "$9/месяц",
         "pricing_basic_features": "Все графики, без AI",
         "pricing_pro": "Pro",
         "pricing_pro_desc": "Графики + AI-инсайты",
-        "pricing_pro_price": "₪69/месяц",
+        "pricing_pro_price": "$19/месяц",
         "pricing_pro_features": "Все графики + AI-рекомендации",
         "pricing_try_trial": "Попробуйте 7 дней бесплатно",
         "pricing_no_credit_card": "Без кредитной карты",
@@ -4689,7 +4688,6 @@ def subscribe():
         # Continue anyway - not critical
     
     # Calculate price with referral discount (50% off, one time)
-    base_price_ils = PLAN_PRICES[plan]["ils"]
     base_price_usd = PLAN_PRICES[plan]["usd"]
     
     # Check for referral discount (50% off next month)
@@ -4708,13 +4706,10 @@ def subscribe():
         # 50% discount on current plan
         discount_percent = min(referral_discount, 50)
         discount_usd = int(base_price_usd * discount_percent / 100)
-        discount_ils = int(base_price_ils * discount_percent / 100)
     else:
         discount_usd = 0
-        discount_ils = 0
     
     net_price_usd = base_price_usd - discount_usd
-    net_price_ils = base_price_ils - discount_ils
 
     # Ensure PayPal client ID is a string (not None)
     paypal_client_id = PAYPAL_CLIENT_ID or ""
@@ -4722,13 +4717,10 @@ def subscribe():
 
     return render_template("checkout.html",
         plan=plan,
-        base_price_ils=base_price_ils,
         base_price_usd=base_price_usd,
         referral_discount=referral_discount,
         discount_usd=discount_usd,
-        discount_ils=discount_ils,
         net_price_usd=net_price_usd,
-        net_price_ils=net_price_ils,
         paypal_client_id=paypal_client_id,
         paypal_mode=paypal_mode
     )
@@ -5016,10 +5008,10 @@ def subscribe_success():
     plan = request.args.get("plan", "basic")
     u = current_user()
     
-    base_price = PLAN_PRICES.get(plan, PLAN_PRICES["basic"])["ils"]
+    base_price = PLAN_PRICES.get(plan, PLAN_PRICES["basic"])["usd"]
     
     flash_t("msg_subscription_active", "success")
-    msg = f"נרשמת לחבילת {plan.upper()} במחיר ₪{base_price}/חודש"
+    msg = f"נרשמת לחבילת {plan.upper()} במחיר ${base_price}/חודש"
     
     return render_template("subscribe_thanks.html", name="תודה שהצטרפת!", message=msg)
 

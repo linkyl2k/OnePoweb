@@ -21,13 +21,13 @@
       
       <div class="d-flex justify-content-between mb-2">
         <span>{% if current_lang == 'he' %}חבילת {{ plan|upper }} (חודשי){% elif current_lang == 'en' %}{{ plan|upper }} Plan (Monthly){% else %}План {{ plan|upper }} (Месячный){% endif %}</span>
-        <span>₪{{ base_price_ils }} / ${{ base_price_usd }}</span>
+        <span>${{ base_price_usd }}</span>
       </div>
       
       {% if referral_discount > 0 %}
       <div class="d-flex justify-content-between mb-2" style="color: #34d399;">
         <span><i class="bi bi-gift me-1"></i> {% if current_lang == 'he' %}הנחת רפרל ({{ referral_discount }}%){% elif current_lang == 'en' %}Referral Discount ({{ referral_discount }}%){% else %}Реферальная скидка ({{ referral_discount }}%){% endif %}</span>
-        <span>-₪{{ discount_ils }} / -${{ discount_usd }}</span>
+        <span>-${{ discount_usd }}</span>
       </div>
       <div class="small text-muted mb-2">
         <i class="bi bi-info-circle me-1"></i> {% if current_lang == 'he' %}הנחה חד-פעמית מהזמנת חבר{% elif current_lang == 'en' %}One-time discount from friend's order{% else %}Одноразовая скидка от заказа друга{% endif %}
@@ -40,7 +40,6 @@
         <span>{% if current_lang == 'he' %}סה"כ לתשלום{% elif current_lang == 'en' %}Total to Pay{% else %}Итого к оплате{% endif %}</span>
         <span style="color: {% if plan == 'pro' %}#34d399{% else %}#34c3ff{% endif %};">
           ${{ net_price_usd }}
-          <span class="text-muted small">(≈₪{{ net_price_ils }})</span>
         </span>
       </div>
     </div>

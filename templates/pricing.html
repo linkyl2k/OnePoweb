@@ -95,11 +95,10 @@
           </div>
           <h3 class="pricing-name">BASIC</h3>
           <div class="pricing-price">
-            <span class="currency">₪</span>
-            <span class="amount">{{ prices.basic.ils }}</span>
+            <span class="currency">$</span>
+            <span class="amount">{{ prices.basic.usd }}</span>
             <span class="period">/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
           </div>
-          <p class="pricing-desc text-muted small">({% if current_lang == 'he' %}או{% elif current_lang == 'en' %}or{% else %}или{% endif %} ${{ prices.basic.usd }})</p>
         </div>
         <div class="pricing-features">
           <ul>
@@ -143,11 +142,10 @@
           </div>
           <h3 class="pricing-name">PRO</h3>
           <div class="pricing-price">
-            <span class="currency">₪</span>
-            <span class="amount">{{ prices.pro.ils }}</span>
+            <span class="currency">$</span>
+            <span class="amount">{{ prices.pro.usd }}</span>
             <span class="period">/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
           </div>
-          <p class="pricing-desc text-muted small">({% if current_lang == 'he' %}או{% elif current_lang == 'en' %}or{% else %}или{% endif %} ${{ prices.pro.usd }})</p>
         </div>
         <div class="pricing-features">
           <ul>

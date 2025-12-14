@@ -4716,6 +4716,10 @@ def subscribe():
     net_price_usd = base_price_usd - discount_usd
     net_price_ils = base_price_ils - discount_ils
 
+    # Ensure PayPal client ID is a string (not None)
+    paypal_client_id = PAYPAL_CLIENT_ID or ""
+    paypal_mode = PAYPAL_MODE or "sandbox"
+
     return render_template("checkout.html",
         plan=plan,
         base_price_ils=base_price_ils,
@@ -4725,8 +4729,8 @@ def subscribe():
         discount_ils=discount_ils,
         net_price_usd=net_price_usd,
         net_price_ils=net_price_ils,
-        paypal_client_id=PAYPAL_CLIENT_ID,
-        paypal_mode=PAYPAL_MODE
+        paypal_client_id=paypal_client_id,
+        paypal_mode=paypal_mode
     )
 
 
@@ -4810,7 +4814,7 @@ def paypal_create_order():
                 "order_id": order["id"],
                 "plan": plan,
                 "amount_usd": net_price_usd,
-                "credit_used": credit_usd * 4
+                "discount_used": discount_usd
             }
             return jsonify({"id": order["id"]})
         else:
@@ -4826,69 +4830,111 @@ def paypal_create_order():
 @login_required
 def paypal_capture_order():
     """Capture PayPal payment and activate subscription"""
-    data = request.get_json()
-    order_id = data.get("orderID")
-    
-    pending = session.get("pending_order", {})
-    if pending.get("order_id") != order_id:
-        return jsonify({"error": "Order mismatch"}), 400
-    
-    access_token = get_paypal_access_token()
-    if not access_token:
-        return jsonify({"error": "PayPal not configured"}), 500
-    
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
-    
-    response = requests.post(
-        f"{PAYPAL_API_URL}/v2/checkout/orders/{order_id}/capture",
-        headers=headers
-    )
-    
-    if response.status_code in [200, 201]:
-        capture_data = response.json()
-        if capture_data.get("status") == "COMPLETED":
-            u = current_user()
-            plan = pending.get("plan", "basic")
-            credit_used = pending.get("credit_used", 0)
+    try:
+        data = request.get_json() or {}
+        order_id = data.get("orderID")
+        
+        if not order_id:
+            return jsonify({"error": "Order ID missing"}), 400
+        
+        pending = session.get("pending_order", {})
+        if not pending or pending.get("order_id") != order_id:
+            return jsonify({"error": "Order mismatch or session expired"}), 400
+        
+        access_token = get_paypal_access_token()
+        if not access_token:
+            print("[PayPal] Failed to get access token for capture")
+            return jsonify({"error": "PayPal not configured"}), 500
+        
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        
+        response = requests.post(
+            f"{PAYPAL_API_URL}/v2/checkout/orders/{order_id}/capture",
+            headers=headers
+        )
+        
+        print(f"[PayPal] Capture response status: {response.status_code}")
+        print(f"[PayPal] Capture response body: {response.text[:500]}")
+        
+        if response.status_code in [200, 201]:
+            capture_data = response.json()
+            if capture_data.get("status") == "COMPLETED":
+                u = current_user()
+                if not u:
+                    return jsonify({"error": "User not found"}), 401
+                
+                plan = pending.get("plan", "basic")
+                discount_used = pending.get("discount_used", 0)
+                
+                # Clear pending order
+                session.pop("pending_order", None)
+                
+                # Activate subscription
+                return activate_subscription(u["id"], plan, discount_used)
+            else:
+                print(f"[PayPal] Payment not completed. Status: {capture_data.get('status')}")
+                return jsonify({"error": f"Payment status: {capture_data.get('status', 'unknown')}"}), 400
+        else:
+            print(f"[PayPal] Capture error: {response.text}")
+            return jsonify({"error": f"PayPal capture error: {response.status_code}"}), 500
             
-            # Clear pending order
-            session.pop("pending_order", None)
-            
-            # Activate subscription
-            return activate_subscription(u["id"], plan, credit_used)
-    
-    return jsonify({"error": "Payment not completed"}), 400
+    except Exception as e:
+        print(f"[PayPal] Capture exception: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 
 def activate_subscription(user_id, plan, discount_used):
     """Activate subscription after successful payment"""
-    db = get_db()
-    u = db.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
-    
-    # Update user plan and reset referral discount (one-time use)
-    db.execute("""
-        UPDATE users 
-        SET plan=?, referral_discount=0, cancelled_at=NULL 
-        WHERE id=?
-    """, (plan, user_id))
-    db.commit()
-    
-    # Grant referral bonus to referrer (one-time 50% discount on next month)
-    referrer_id = u["referred_by"]
-    already_granted = int(u["ref_bonus_granted"] or 0)
-    if referrer_id and not already_granted and int(referrer_id) != int(user_id):
+    try:
+        db = get_db()
+        u = db.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
+        
+        if not u:
+            return jsonify({"error": "User not found"}), 404
+        
+        # Update user plan and reset referral discount (one-time use)
+        db.execute("""
+            UPDATE users 
+            SET plan=?, referral_discount=0, cancelled_at=NULL 
+            WHERE id=?
+        """, (plan, user_id))
+        db.commit()
+        
+        # Grant referral bonus to referrer (one-time 50% discount on next month)
         try:
-            # Give referrer 50% discount on next payment (one time only)
-            db.execute("UPDATE users SET referral_discount=50 WHERE id=? AND (referral_discount IS NULL OR referral_discount=0)", (referrer_id,))
-            db.execute("UPDATE users SET ref_bonus_granted=1 WHERE id=?", (user_id,))
-            db.commit()
-        except Exception:
-            pass
-    
-    return jsonify({"success": True, "redirect": url_for("subscribe_success", plan=plan)})
+            # Safe access to referred_by and ref_bonus_granted
+            referrer_id = None
+            if hasattr(u, 'keys') and "referred_by" in u.keys():
+                referrer_id = u["referred_by"]
+            elif "referred_by" in dict(u).keys():
+                referrer_id = dict(u)["referred_by"]
+            
+            already_granted = 0
+            if hasattr(u, 'keys') and "ref_bonus_granted" in u.keys():
+                already_granted = int(u["ref_bonus_granted"] or 0)
+            elif "ref_bonus_granted" in dict(u).keys():
+                already_granted = int(dict(u)["ref_bonus_granted"] or 0)
+            
+            if referrer_id and not already_granted and int(referrer_id) != int(user_id):
+                # Give referrer 50% discount on next payment (one time only)
+                db.execute("UPDATE users SET referral_discount=50 WHERE id=? AND (referral_discount IS NULL OR referral_discount=0)", (referrer_id,))
+                db.execute("UPDATE users SET ref_bonus_granted=1 WHERE id=?", (user_id,))
+                db.commit()
+        except (KeyError, TypeError, AttributeError, ValueError) as e:
+            print(f"⚠️ Error granting referral bonus: {e}")
+            # Continue anyway - not critical
+        
+        return jsonify({"success": True, "redirect": url_for("subscribe_success", plan=plan)})
+    except Exception as e:
+        print(f"❌ Error activating subscription: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Failed to activate subscription: {str(e)}"}), 500
 
 
 @app.route("/subscribe/success")

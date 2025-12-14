@@ -176,21 +176,52 @@ paypal.Buttons({
       },
       body: JSON.stringify({ orderID: data.orderID })
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => Promise.reject(err));
+      }
+      return response.json();
+    })
     .then(result => {
       if (result.success && result.redirect) {
         window.location.href = result.redirect;
       } else {
-        alert('שגיאה בעיבוד התשלום: ' + (result.error || 'Unknown error'));
+        const errorMsg = result.error || 'Unknown error';
+        console.error('[PayPal] Capture error:', errorMsg);
+        const lang = "{{ current_lang }}";
+        const alertMsg = lang === 'he' 
+          ? 'שגיאה בעיבוד התשלום: ' + errorMsg
+          : lang === 'en'
+          ? 'Payment processing error: ' + errorMsg
+          : 'Ошибка обработки платежа: ' + errorMsg;
+        alert(alertMsg);
         document.getElementById('paypal-button-container').style.display = 'block';
         document.getElementById('payment-status').style.display = 'none';
       }
+    })
+    .catch(err => {
+      console.error('[PayPal] Capture fetch error:', err);
+      const lang = "{{ current_lang }}";
+      const alertMsg = lang === 'he'
+        ? 'שגיאה בעיבוד התשלום. נסה שוב או צור קשר.'
+        : lang === 'en'
+        ? 'Payment processing error. Try again or contact us.'
+        : 'Ошибка обработки платежа. Попробуйте снова или свяжитесь с нами.';
+      alert(alertMsg);
+      document.getElementById('paypal-button-container').style.display = 'block';
+      document.getElementById('payment-status').style.display = 'none';
     });
   },
   
   onError: function(err) {
     console.error('PayPal Error:', err);
-    alert('שגיאה בתשלום. נסה שוב או צור קשר.');
+    const lang = "{{ current_lang }}";
+    const alertMsg = lang === 'he'
+      ? 'שגיאה בתשלום. נסה שוב או צור קשר.'
+      : lang === 'en'
+      ? 'Payment error. Try again or contact us.'
+      : 'Ошибка платежа. Попробуйте снова или свяжитесь с нами.';
+    alert(alertMsg);
   },
   
   onCancel: function(data) {

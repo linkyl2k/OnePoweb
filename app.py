@@ -1958,9 +1958,9 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
         if lang == "he":
             parts.append(f"שעות ערב חלשות → יעד חדש: +{c['uplift_per_day']:,.0f} ₪ ליום × {int(c['days_in_month_factor']):d} ימים ≈ +{c['monthly_gain']:,.0f} ₪/חודש.")
         elif lang == "en":
-            parts.append(f"Weak evening hours → new target: +{c['uplift_per_day']:,.0f} ₪ per day × {int(c['days_in_month_factor']):d} days ≈ +{c['monthly_gain']:,.0f} ₪/month.")
+            parts.append(f"Weak evening hours → new target: +${c['uplift_per_day']:,.0f} per day × {int(c['days_in_month_factor']):d} days ≈ +${c['monthly_gain']:,.0f}/month.")
         else:  # ru
-            parts.append(f"Слабые вечерние часы → новая цель: +{c['uplift_per_day']:,.0f} ₪ в день × {int(c['days_in_month_factor']):d} дней ≈ +{c['monthly_gain']:,.0f} ₪/месяц.")
+            parts.append(f"Слабые вечерние часы → новая цель: +${c['uplift_per_day']:,.0f} в день × {int(c['days_in_month_factor']):d} дней ≈ +${c['monthly_gain']:,.0f}/месяц.")
     if "tail_products" in out["components"]:
         c = out["components"]["tail_products"]
         parts.append(
@@ -1976,15 +1976,15 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
         disclaimer = "⚠️ הערכה זו מבוססת על ניתוח הנתונים בלבד. התוצאות בפועל תלויות בפעולות שתנקטו."
     elif lang == "en":
         summary_text = (
-            f"Monthly improvement potential (if you act on insights): ~{total_gain:,.0f} ₪. "
-            f"Service cost: {params.service_cost:,.0f} ₪. "
+            f"Monthly improvement potential (if you act on insights): ~${total_gain:,.0f}. "
+            f"Service cost: ${params.service_cost:,.0f}. "
             f"Theoretical ROI: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ This estimate is based on data analysis only. Actual results depend on actions taken."
     else:  # ru
         summary_text = (
-            f"Потенциал улучшения в месяц (при условии действий на основе инсайтов): ~{total_gain:,.0f} ₪. "
-            f"Стоимость услуги: {params.service_cost:,.0f} ₪. "
+            f"Потенциал улучшения в месяц (при условии действий на основе инсайтов): ~${total_gain:,.0f}. "
+            f"Стоимость услуги: ${params.service_cost:,.0f}. "
             f"Теоретический ROI: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ Эта оценка основана только на анализе данных. Фактические результаты зависят от предпринятых действий."
@@ -4697,12 +4697,16 @@ def export_pdf():
         {"".join(
             [
               (
-                f"<div class='plot'>"
-                f"{('<h2>' + _esc(p.get('title','')) + '</h2>') if p.get('title') else ''}"
-                f"{('<img src=\"' + _img_base64(p.get('filename')) + '\" alt=\"plot\" style=\"max-width: 100%; height: auto; display: block;\"/>') if _img_base64(p.get('filename')) else ('<p style=\"color: red;\">Image not found: ' + _esc(p.get('filename', '')) + '</p>' if p.get('filename') else '')}"
-                f"{('<p>' + _esc(p.get('ai','')) + '</p>') if p.get('ai') else ''}"
-                f"</div>"
-              )
+                lambda p: (
+                    lambda img_src: (
+                        f"<div class='plot'>"
+                        f"{('<h2>' + _esc(p.get('title','')) + '</h2>') if p.get('title') else ''}"
+                        f"{('<img src=\"' + img_src + '\" alt=\"plot\" style=\"max-width: 100%; height: auto; display: block;\"/>') if img_src else ('<p style=\"color: red;\">Image not found: ' + _esc(p.get('filename', '')) + '</p>' if p.get('filename') else '')}"
+                        f"{('<p>' + _esc(p.get('ai','')) + '</p>') if p.get('ai') else ''}"
+                        f"</div>"
+                    )
+                )(_img_base64(p.get('filename', '')))
+              )(p)
               for p in (snap.get('plots') or [])
             ]
         )}
@@ -4719,13 +4723,19 @@ def export_pdf():
         print(f"📄 Creating PDF with weasyprint, {len(snap.get('plots', []))} plots")
         print(f"📄 PLOTS_DIR: {PLOTS_DIR}")
         
-        # Verify images exist
+        # Verify images exist and test base64 encoding
         for plot in snap.get('plots', []):
             filename = plot.get('filename', '')
             if filename:
                 img_path = os.path.join(PLOTS_DIR, filename)
                 exists = os.path.exists(img_path)
                 print(f"📄 Image: {filename} -> {img_path} exists={exists}")
+                if exists:
+                    # Test base64 encoding
+                    base64_result = _img_base64(filename)
+                    print(f"📄 Base64 for {filename}: {'OK' if base64_result else 'FAILED'} (length: {len(base64_result) if base64_result else 0})")
+                else:
+                    print(f"⚠️ Image file not found: {img_path}")
         
         # Create PDF from HTML
         # _img_url already returns absolute file:// URLs, so no base_url needed

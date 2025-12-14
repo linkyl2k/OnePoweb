@@ -89,6 +89,44 @@
         <i class="bi bi-lock me-1"></i>
         {% if current_lang == 'he' %}התשלום מאובטח ומוצפן באמצעות PayPal{% elif current_lang == 'en' %}Payment is secured and encrypted via PayPal{% else %}Оплата защищена и зашифрована через PayPal{% endif %}
       </p>
+      
+      {% if paypal_mode == 'sandbox' %}
+      <!-- Sandbox Testing Instructions -->
+      <div class="alert alert-info mt-3 mb-0" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
+        <div class="d-flex align-items-start">
+          <i class="bi bi-info-circle me-2" style="font-size: 1.1rem; color: #3b82f6; margin-top: 2px;"></i>
+          <div>
+            <strong style="color: #3b82f6;">
+              {% if current_lang == 'he' %}🧪 מצב בדיקה (Sandbox){% elif current_lang == 'en' %}🧪 Test Mode (Sandbox){% else %}🧪 Режим тестирования (Sandbox){% endif %}
+            </strong>
+            <p class="small mb-2 mt-1" style="color: var(--text);">
+              {% if current_lang == 'he' %}
+                <strong>לבדיקה ללא תשלום אמיתי:</strong><br>
+                • השתמש בחשבון PayPal Sandbox (צור ב-<a href="https://developer.paypal.com" target="_blank" style="color: #3b82f6;">developer.paypal.com</a>)<br>
+                • או השתמש בכרטיסי בדיקה:<br>
+                &nbsp;&nbsp;Visa: <code>4032 0312 3456 7890</code> (תאריך: כל עתיד, CVV: כל 3 ספרות)<br>
+                &nbsp;&nbsp;Mastercard: <code>5555 5555 5555 4444</code><br>
+                &nbsp;&nbsp;CVV: כל 3 ספרות, תאריך: כל עתיד
+              {% elif current_lang == 'en' %}
+                <strong>To test without real payment:</strong><br>
+                • Use a PayPal Sandbox account (create at <a href="https://developer.paypal.com" target="_blank" style="color: #3b82f6;">developer.paypal.com</a>)<br>
+                • Or use test cards:<br>
+                &nbsp;&nbsp;Visa: <code>4032 0312 3456 7890</code> (any future date, any 3-digit CVV)<br>
+                &nbsp;&nbsp;Mastercard: <code>5555 5555 5555 4444</code><br>
+                &nbsp;&nbsp;CVV: any 3 digits, Date: any future date
+              {% else %}
+                <strong>Для тестирования без реальной оплаты:</strong><br>
+                • Используйте аккаунт PayPal Sandbox (создайте на <a href="https://developer.paypal.com" target="_blank" style="color: #3b82f6;">developer.paypal.com</a>)<br>
+                • Или используйте тестовые карты:<br>
+                &nbsp;&nbsp;Visa: <code>4032 0312 3456 7890</code> (любая будущая дата, любой 3-значный CVV)<br>
+                &nbsp;&nbsp;Mastercard: <code>5555 5555 5555 4444</code><br>
+                &nbsp;&nbsp;CVV: любые 3 цифры, Дата: любая будущая дата
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
   {% else %}
@@ -177,23 +215,40 @@ paypal.Buttons({
       body: JSON.stringify({ orderID: data.orderID })
     })
     .then(response => {
+      console.log('[PayPal] Capture response status:', response.status);
+      console.log('[PayPal] Capture response ok:', response.ok);
       if (!response.ok) {
-        return response.json().then(err => Promise.reject(err));
+        return response.json().then(err => {
+          console.error('[PayPal] Capture error response:', err);
+          return Promise.reject(err);
+        }).catch(() => {
+          // If JSON parsing fails, return generic error
+          return Promise.reject({error: `HTTP ${response.status}: ${response.statusText}`});
+        });
       }
-      return response.json();
+      return response.json().catch(err => {
+        console.error('[PayPal] Failed to parse JSON:', err);
+        return Promise.reject({error: 'Invalid response from server'});
+      });
     })
     .then(result => {
+      console.log('[PayPal] Capture result:', result);
       if (result.success && result.redirect) {
+        console.log('[PayPal] Payment successful, redirecting to:', result.redirect);
         window.location.href = result.redirect;
       } else {
         const errorMsg = result.error || 'Unknown error';
         console.error('[PayPal] Capture error:', errorMsg);
+        console.error('[PayPal] Full result:', JSON.stringify(result, null, 2));
         const lang = "{{ current_lang }}";
-        const alertMsg = lang === 'he' 
-          ? 'שגיאה בעיבוד התשלום: ' + errorMsg
-          : lang === 'en'
-          ? 'Payment processing error: ' + errorMsg
-          : 'Ошибка обработки платежа: ' + errorMsg;
+        let alertMsg;
+        if (lang === 'he') {
+          alertMsg = 'שגיאה בעיבוד התשלום: ' + errorMsg + '\n\nאנא נסה שוב או צור קשר לתמיכה.';
+        } else if (lang === 'en') {
+          alertMsg = 'Payment processing error: ' + errorMsg + '\n\nPlease try again or contact support.';
+        } else {
+          alertMsg = 'Ошибка обработки платежа: ' + errorMsg + '\n\nПопробуйте снова или свяжитесь с поддержкой.';
+        }
         alert(alertMsg);
         document.getElementById('paypal-button-container').style.display = 'block';
         document.getElementById('payment-status').style.display = 'none';

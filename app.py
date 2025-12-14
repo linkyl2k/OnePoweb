@@ -4857,29 +4857,71 @@ def paypal_capture_order():
         )
         
         print(f"[PayPal] Capture response status: {response.status_code}")
-        print(f"[PayPal] Capture response body: {response.text[:500]}")
+        print(f"[PayPal] Capture response body: {response.text[:1000]}")
         
         if response.status_code in [200, 201]:
-            capture_data = response.json()
-            if capture_data.get("status") == "COMPLETED":
-                u = current_user()
-                if not u:
-                    return jsonify({"error": "User not found"}), 401
+            try:
+                capture_data = response.json()
+                print(f"[PayPal] Capture data keys: {list(capture_data.keys())}")
+                print(f"[PayPal] Capture data (first 1000 chars): {json.dumps(capture_data, indent=2)[:1000]}")
                 
-                plan = pending.get("plan", "basic")
-                discount_used = pending.get("discount_used", 0)
+                # Check for errors in response
+                if "error" in capture_data or "errors" in capture_data:
+                    error_info = capture_data.get("error") or capture_data.get("errors", [])
+                    error_msg = f"PayPal returned error: {json.dumps(error_info)}"
+                    print(f"[PayPal] ERROR: {error_msg}")
+                    return jsonify({"error": error_msg}), 400
                 
-                # Clear pending order
-                session.pop("pending_order", None)
+                # Check order status - PayPal can return status in different places
+                order_status = None
+                if "status" in capture_data:
+                    order_status = capture_data["status"]
+                elif "purchase_units" in capture_data and len(capture_data["purchase_units"]) > 0:
+                    payments = capture_data["purchase_units"][0].get("payments", {})
+                    captures = payments.get("captures", [])
+                    if captures and len(captures) > 0:
+                        order_status = captures[0].get("status")
+                        print(f"[PayPal] Found status in capture: {order_status}")
                 
-                # Activate subscription
-                return activate_subscription(u["id"], plan, discount_used)
-            else:
-                print(f"[PayPal] Payment not completed. Status: {capture_data.get('status')}")
-                return jsonify({"error": f"Payment status: {capture_data.get('status', 'unknown')}"}), 400
+                # Also check in payment status
+                if not order_status and "payment_status" in capture_data:
+                    order_status = capture_data["payment_status"]
+                
+                print(f"[PayPal] Detected order status: {order_status}")
+                
+                # Accept both COMPLETED and APPROVED statuses
+                if order_status in ["COMPLETED", "APPROVED"]:
+                    u = current_user()
+                    if not u:
+                        print("[PayPal] ERROR: User not found after payment")
+                        return jsonify({"error": "User not found"}), 401
+                    
+                    plan = pending.get("plan", "basic")
+                    discount_used = pending.get("discount_used", 0)
+                    
+                    print(f"[PayPal] Activating subscription for user {u['id']}, plan: {plan}")
+                    
+                    # Clear pending order
+                    session.pop("pending_order", None)
+                    
+                    # Activate subscription
+                    result = activate_subscription(u["id"], plan, discount_used)
+                    print(f"[PayPal] Subscription activation result: {result}")
+                    return result
+                else:
+                    error_msg = f"Payment status: {order_status or 'unknown'}"
+                    print(f"[PayPal] ERROR: {error_msg}")
+                    print(f"[PayPal] Full capture data: {json.dumps(capture_data, indent=2)}")
+                    return jsonify({"error": error_msg}), 400
+            except json.JSONDecodeError as e:
+                print(f"[PayPal] ERROR: Failed to parse JSON response: {e}")
+                print(f"[PayPal] Raw response: {response.text}")
+                return jsonify({"error": "Invalid response from PayPal"}), 500
         else:
-            print(f"[PayPal] Capture error: {response.text}")
-            return jsonify({"error": f"PayPal capture error: {response.status_code}"}), 500
+            error_text = response.text[:500]
+            print(f"[PayPal] ERROR: Capture failed with status {response.status_code}")
+            print(f"[PayPal] Error response: {error_text}")
+            return jsonify({"error": f"PayPal capture error: {response.status_code}. {error_text}"}), 500
             
     except Exception as e:
         print(f"[PayPal] Capture exception: {str(e)}")
@@ -4891,11 +4933,15 @@ def paypal_capture_order():
 def activate_subscription(user_id, plan, discount_used):
     """Activate subscription after successful payment"""
     try:
+        print(f"[Activate] Starting subscription activation for user {user_id}, plan: {plan}")
         db = get_db()
         u = db.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
         
         if not u:
+            print(f"[Activate] ERROR: User {user_id} not found in database")
             return jsonify({"error": "User not found"}), 404
+        
+        print(f"[Activate] User found: {u['email'] if 'email' in dict(u).keys() else 'N/A'}")
         
         # Update user plan and reset referral discount (one-time use)
         db.execute("""
@@ -4904,6 +4950,7 @@ def activate_subscription(user_id, plan, discount_used):
             WHERE id=?
         """, (plan, user_id))
         db.commit()
+        print(f"[Activate] User plan updated to {plan}")
         
         # Grant referral bonus to referrer (one-time 50% discount on next month)
         try:
@@ -4929,12 +4976,18 @@ def activate_subscription(user_id, plan, discount_used):
             print(f"⚠️ Error granting referral bonus: {e}")
             # Continue anyway - not critical
         
-        return jsonify({"success": True, "redirect": url_for("subscribe_success", plan=plan)})
+        success_url = url_for("subscribe_success", plan=plan)
+        print(f"[Activate] Success! Redirecting to: {success_url}")
+        result = jsonify({"success": True, "redirect": success_url})
+        print(f"[Activate] Returning result: {result.get_data(as_text=True)}")
+        return result
     except Exception as e:
         print(f"❌ Error activating subscription: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({"error": f"Failed to activate subscription: {str(e)}"}), 500
+        error_response = jsonify({"error": f"Failed to activate subscription: {str(e)}"})
+        print(f"[Activate] Returning error: {error_response.get_data(as_text=True)}")
+        return error_response, 500
 
 
 @app.route("/subscribe/success")

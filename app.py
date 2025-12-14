@@ -1848,17 +1848,19 @@ def ai_explain(title: str, brief: dict, lang: str = "he") -> str:
             )
         else:  # ru
             prompt = (
+                "ВАЖНО: Отвечай ТОЛЬКО на русском языке! Все твои ответы должны быть на русском языке.\n\n"
                 "Ты бизнес-консультант, специализирующийся на розничных магазинах и ресторанах в Израиле. "
                 "Твоя роль - помочь владельцу бизнеса понять данные и принимать умные решения.\n\n"
                 "Правила:\n"
-                f"• Пиши {lang_dict['example']}, как будто разговариваешь с владельцем магазина или кафе\n"
+                f"• ОБЯЗАТЕЛЬНО пиши {lang_dict['example']}, как будто разговариваешь с владельцем магазина или кафе\n"
                 f"• {lang_dict['focus']} — что самое важное нужно знать из этого графика?\n"
                 f"• {lang_dict['give']}, которую можно реализовать завтра утром (не теорию!)\n"
                 f"• Длина: {lang_dict['length']}\n"
                 f"• {lang_dict['dont']}, которые уже есть в графике — дай интерпретацию\n"
                 f"{specific_instructions}\n"
                 f"Название графика: {title}\n"
-                f"Данные: {payload}"
+                f"Данные: {payload}\n\n"
+                "ПОМНИ: Отвечай ТОЛЬКО на русском языке!"
             )
 
         # ---- נסיון A1: Chat Completions עם max_completion_tokens ----
@@ -3399,9 +3401,10 @@ def index():
                 ax.set_xlabel("Hour")
                 ax.set_ylabel(f"Total ({currency_sym})")
             else:  # ru
-                ax.set_title(f"Продажи по часам (₪) {hour_start}:00–{hour_end}:00")
+                currency_sym = get_currency(current_lang)["symbol"]
+                ax.set_title(f"Продажи по часам ({currency_sym}) {hour_start}:00–{hour_end}:00")
                 ax.set_xlabel(t("chart_axis_hour"))
-                ax.set_ylabel(t("chart_axis_total"))
+                ax.set_ylabel(t("chart_axis_total") + f" ({currency_sym})")
             ax.set_xticks(list(range(hour_start, hour_end + 1)))
             ax.set_xlim(hour_start - 0.5, hour_end + 0.5)
             fname = _save_fig(fig, "hourly.png")
@@ -3472,10 +3475,10 @@ def index():
                     ax.set_xlabel("Day of Week")
                     ax.set_ylabel(f"Total ({currency_sym})")
                 else:  # ru
-                    currency_sym = get_currency("ru")["symbol"]
+                    currency_sym = get_currency(current_lang)["symbol"]
                     ax.set_title(t("chart_sales_by_weekday") + f" ({currency_sym})")
                     ax.set_xlabel(t("chart_axis_day"))
-                    ax.set_ylabel(t("chart_axis_total"))
+                    ax.set_ylabel(t("chart_axis_total") + f" ({currency_sym})")
                 ax.set_xticks(xpos)
                 ax.set_xticklabels(names, rotation=0)
                 fname = _save_fig(fig, "by_weekday.png")
@@ -3669,9 +3672,11 @@ def index():
                     if current_lang == "he":
                         ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
                     elif current_lang == "en":
-                        ax.set_title("Payment Methods Breakdown (₪)")
+                        currency_sym = get_currency("en")["symbol"]
+                        ax.set_title(f"Payment Methods Breakdown ({currency_sym})")
                     else:  # ru
-                        ax.set_title(t("chart_payment_methods") + " (₪)")
+                        currency_sym = get_currency(current_lang)["symbol"]
+                        ax.set_title(t("chart_payment_methods") + f" ({currency_sym})")
 
                     fname = _save_fig(fig, "payments.png")
 
@@ -3733,9 +3738,10 @@ def index():
                         ax.set_xlabel("Hour")
                         ax.set_ylabel(f"Average Ticket ({currency_sym})")
                     else:  # ru
-                        ax.set_title(t("chart_avg_ticket") + f" (₪) {hour_start}:00–{hour_end}:00")
+                        currency_sym = get_currency(current_lang)["symbol"]
+                        ax.set_title(t("chart_avg_ticket") + f" ({currency_sym}) {hour_start}:00–{hour_end}:00")
                         ax.set_xlabel(t("chart_axis_hour"))
-                        ax.set_ylabel(t("chart_axis_avg_ticket"))
+                        ax.set_ylabel(t("chart_axis_avg_ticket") + f" ({currency_sym})")
                     ax.set_xticks(list(range(hour_start, hour_end + 1)))
                     
                     # הוספת ערכים על העמודות
@@ -4377,13 +4383,15 @@ def demo_analysis():
                 plt.xlabel("שעה")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
-                plt.title(f"Sales by Hour (₪) {hour_start}:00–{hour_end}:00")
+                currency_sym = get_currency("en")["symbol"]
+                plt.title(f"Sales by Hour ({currency_sym}) {hour_start}:00–{hour_end}:00")
                 plt.xlabel("Hour")
-                plt.ylabel("Total (₪)")
+                plt.ylabel(f"Total ({currency_sym})")
             else:  # ru
-                plt.title(t("chart_sales_by_hour") + f" (₪) {hour_start}:00–{hour_end}:00")
+                currency_sym = get_currency(current_lang)["symbol"]
+                plt.title(t("chart_sales_by_hour") + f" ({currency_sym}) {hour_start}:00–{hour_end}:00")
                 plt.xlabel(t("chart_axis_hour"))
-                plt.ylabel(t("chart_axis_total"))
+                plt.ylabel(t("chart_axis_total") + f" ({currency_sym})")
             fname = _save_fig(fig, "hourly.png")
 
             best_hour_row = hourly.loc[hourly[COL_SUM].idxmax()] if not hourly.empty else None

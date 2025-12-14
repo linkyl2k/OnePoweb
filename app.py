@@ -1772,12 +1772,14 @@ def ai_explain(title: str, brief: dict, lang: str = "he") -> str:
                 if "weak_day" in compact:
                     weak_day = compact.get("weak_day")
                     weak_sum = compact.get("weak_day_sum", 0)
+                    currency_info = get_currency(lang)
+                    currency_symbol = currency_info["symbol"]
                     if lang == "he":
-                        weak_info = f"\n• היום החלש ביותר: {weak_day} (₪{weak_sum:.0f}) - זה הזמן למשוך לקוחות חדשים!\n"
+                        weak_info = f"\n• היום החלש ביותר: {weak_day} ({currency_symbol}{weak_sum:.0f}) - זה הזמן למשוך לקוחות חדשים!\n"
                     elif lang == "en":
-                        weak_info = f"\n• Weakest day: {weak_day} (₪{weak_sum:.0f}) - this is the time to attract new customers!\n"
+                        weak_info = f"\n• Weakest day: {weak_day} ({currency_symbol}{weak_sum:.0f}) - this is the time to attract new customers!\n"
                     else:  # ru
-                        weak_info = f"\n• Самый слабый день: {weak_day} (₪{weak_sum:.0f}) - это время привлечь новых клиентов!\n"
+                        weak_info = f"\n• Самый слабый день: {weak_day} ({currency_symbol}{weak_sum:.0f}) - это время привлечь новых клиентов!\n"
                 elif "weak_hour" in compact:
                     weak_hour = compact.get("weak_hour")
                     if lang == "he":
@@ -2164,7 +2166,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             category = "📅 יום חלש"
             title = f"חזק את יום {day_name}"
             default_action = f"הפעל מבצע מיוחד ביום {day_name}"
-            impact = f"פוטנציאל: עד +₪{weak.get('monthly_gain', 0):,.0f}/חודש"
+            impact = f"פוטנציאל: עד +{currency_symbol}{weak.get('monthly_gain', 0):,.0f}/חודש"
             how_to = [
                 f"הפער מהימים הרגילים: ~{gap_pct}%",
                 "פרסם בסושיאל יום לפני",
@@ -2184,7 +2186,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             category = "📅 Weak Day"
             title = f"Strengthen {day_name} day"
             default_action = f"Launch special promotion on {day_name}"
-            impact = f"Potential: up to +₪{weak.get('monthly_gain', 0):,.0f}/month"
+            impact = f"Potential: up to +{currency_symbol}{weak.get('monthly_gain', 0):,.0f}/month"
             how_to = [
                 f"Gap from regular days: ~{gap_pct}%",
                 "Post on social media a day before",
@@ -2204,7 +2206,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             category = "📅 Слабый день"
             title = f"Усильте день {day_name}"
             default_action = f"Запустите специальную акцию в день {day_name}"
-            impact = f"Потенциал: до +₪{weak.get('monthly_gain', 0):,.0f}/месяц"
+            impact = f"Потенциал: до +{currency_symbol}{weak.get('monthly_gain', 0):,.0f}/месяц"
             how_to = [
                 f"Разрыв с обычными днями: ~{gap_pct}%",
                 "Опубликуйте в соцсетях за день до",
@@ -2233,7 +2235,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
                 "category": "🌙 שעות ערב" if lang == "he" else ("🌙 Evening Hours" if lang == "en" else "🌙 Вечерние часы"),
                 "title": "הגבר פעילות בערב (17:00-20:00)" if lang == "he" else ("Increase evening activity (17:00-20:00)" if lang == "en" else "Увеличьте активность вечером (17:00-20:00)"),
                 "action": "הפעל Happy Hour או מבצע ערב" if lang == "he" else ("Launch Happy Hour or evening promotion" if lang == "en" else "Запустите Happy Hour или вечернюю акцию"),
-                "impact": f"פוטנציאל: עד +₪{eve.get('monthly_gain', 0):,.0f}/חודש" if lang == "he" else (f"Potential: up to +₪{eve.get('monthly_gain', 0):,.0f}/month" if lang == "en" else f"Потенциал: до +₪{eve.get('monthly_gain', 0):,.0f}/месяц"),
+                "impact": f"פוטנציאל: עד +{currency_symbol}{eve.get('monthly_gain', 0):,.0f}/חודש" if lang == "he" else (f"Potential: up to +{currency_symbol}{eve.get('monthly_gain', 0):,.0f}/month" if lang == "en" else f"Потенциал: до +{currency_symbol}{eve.get('monthly_gain', 0):,.0f}/месяц"),
                 "how_to": [
                     "Happy Hour 17:00-19:00 - הנחה 20% על משקאות",
                     "מבצע 'After Work' לעובדי משרדים",
@@ -2259,7 +2261,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             category = "📦 מוצרים"
             title = "הגבר מכירות מוצרים חלשים"
             action = "צור חבילות או מבצעי קומבו"
-            impact = f"פוטנציאל: עד +₪{tail.get('monthly_gain', 0):,.0f}/חודש"
+            impact = f"פוטנציאל: עד +{currency_symbol}{tail.get('monthly_gain', 0):,.0f}/חודש"
             how_to = [
                 "צור קומבו: מוצר חזק + מוצר חלש",
                 "הצע כ'תוספת' במחיר מיוחד",
@@ -2270,7 +2272,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             category = "📦 Products"
             title = "Increase sales of weak products"
             action = "Create packages or combo deals"
-            impact = f"Potential: up to +₪{tail.get('monthly_gain', 0):,.0f}/month"
+            impact = f"Potential: up to +{currency_symbol}{tail.get('monthly_gain', 0):,.0f}/month"
             how_to = [
                 "Create combo: strong product + weak product",
                 "Offer as 'add-on' at special price",
@@ -2281,7 +2283,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             category = "📦 Продукты"
             title = "Увеличьте продажи слабых продуктов"
             action = "Создайте пакеты или комбо-предложения"
-            impact = f"Потенциал: до +₪{tail.get('monthly_gain', 0):,.0f}/месяц"
+            impact = f"Потенциал: до +{currency_symbol}{tail.get('monthly_gain', 0):,.0f}/месяц"
             how_to = [
                 "Создайте комбо: сильный продукт + слабый продукт",
                 "Предложите как 'дополнение' по специальной цене",
@@ -3829,12 +3831,14 @@ def index():
                     # Colorbar
                     cbar = plt.colorbar(im, ax=ax)
                     # Переводим подпись colorbar
+                    currency_info = get_currency(current_lang)
+                    currency_symbol = currency_info["symbol"]
                     if current_lang == "he":
-                        cbar.set_label(rtl('סה"כ מכירות (₪)'))
+                        cbar.set_label(rtl(f'סה"כ מכירות ({currency_symbol})'))
                     elif current_lang == "en":
-                        cbar.set_label("Total Sales (₪)")
+                        cbar.set_label(f"Total Sales ({currency_symbol})")
                     else:  # ru
-                        cbar.set_label(t("summary_total_sales") + " (₪)")
+                        cbar.set_label(t("summary_total_sales") + f" ({currency_symbol})")
                     
                     # הוספת ערכים בתאים
                     for i in range(len(heatmap_data.index)):
@@ -3992,30 +3996,34 @@ def index():
         
         # בניית הסיכום
         # Переводим текст сводки
+        # Get currency symbol for current language
+        currency_info = get_currency(current_lang)
+        currency_symbol = currency_info["symbol"]
+        
         if current_lang == "he":
             summary_lines = [
-                f"📊 סה\"כ מכירות: ₪{total_sum:,.0f}",
-                f"📅 ימים בדוח: {days} | ממוצע יומי: ₪{avg_day:,.0f}",
-                f"🧾 עסקאות: {transaction_count:,} | ממוצע לעסקה: ₪{avg_transaction:,.0f}",
+                f"📊 סה\"כ מכירות: {currency_symbol}{total_sum:,.0f}",
+                f"📅 ימים בדוח: {days} | ממוצע יומי: {currency_symbol}{avg_day:,.0f}",
+                f"🧾 עסקאות: {transaction_count:,} | ממוצע לעסקה: {currency_symbol}{avg_transaction:,.0f}",
             ]
             if best_day and worst_day and days > 1:
-                summary_lines.append(f"🏆 היום הכי טוב: ₪{best_day_sales:,.0f} | היום הכי חלש: ₪{worst_day_sales:,.0f}")
+                summary_lines.append(f"🏆 היום הכי טוב: {currency_symbol}{best_day_sales:,.0f} | היום הכי חלש: {currency_symbol}{worst_day_sales:,.0f}")
         elif current_lang == "en":
             summary_lines = [
-                f"📊 Total Sales: ₪{total_sum:,.0f}",
-                f"📅 Days in Report: {days} | Daily Average: ₪{avg_day:,.0f}",
-                f"🧾 Transactions: {transaction_count:,} | Average per Transaction: ₪{avg_transaction:,.0f}",
+                f"📊 Total Sales: {currency_symbol}{total_sum:,.0f}",
+                f"📅 Days in Report: {days} | Daily Average: {currency_symbol}{avg_day:,.0f}",
+                f"🧾 Transactions: {transaction_count:,} | Average per Transaction: {currency_symbol}{avg_transaction:,.0f}",
             ]
             if best_day and worst_day and days > 1:
-                summary_lines.append(f"🏆 Best Day: ₪{best_day_sales:,.0f} | Weakest Day: ₪{worst_day_sales:,.0f}")
+                summary_lines.append(f"🏆 Best Day: {currency_symbol}{best_day_sales:,.0f} | Weakest Day: {currency_symbol}{worst_day_sales:,.0f}")
         else:  # ru
             summary_lines = [
-                f"📊 {t('summary_total_sales')}: ₪{total_sum:,.0f}",
-                f"📅 {t('summary_days_in_report')}: {days} | {t('summary_daily_avg')}: ₪{avg_day:,.0f}",
-                f"🧾 {t('summary_transactions')}: {transaction_count:,} | {t('summary_avg_per_transaction')}: ₪{avg_transaction:,.0f}",
+                f"📊 {t('summary_total_sales')}: {currency_symbol}{total_sum:,.0f}",
+                f"📅 {t('summary_days_in_report')}: {days} | {t('summary_daily_avg')}: {currency_symbol}{avg_day:,.0f}",
+                f"🧾 {t('summary_transactions')}: {transaction_count:,} | {t('summary_avg_per_transaction')}: {currency_symbol}{avg_transaction:,.0f}",
             ]
             if best_day and worst_day and days > 1:
-                summary_lines.append(f"🏆 {t('summary_best_day')}: ₪{best_day_sales:,.0f} | {t('summary_weakest_day')}: ₪{worst_day_sales:,.0f}")
+                summary_lines.append(f"🏆 {t('summary_best_day')}: {currency_symbol}{best_day_sales:,.0f} | {t('summary_weakest_day')}: {currency_symbol}{worst_day_sales:,.0f}")
         
         summary_txt = "\n".join(summary_lines)
     except Exception as e:
@@ -4232,11 +4240,17 @@ def demo_analysis():
     total_sales = float(df[COL_SUM].sum()) if COL_SUM in df.columns else 0.0
     # Переводим текст сводки для демо
     if current_lang == "he":
-        summary_txt = f"📊 דוגמה לניתוח | סה\"כ מכירות: ₪{total_sales:,.0f} | {len(plots)} גרפים נוצרו"
+        currency_info = get_currency(current_lang)
+        currency_symbol = currency_info["symbol"]
+        summary_txt = f"📊 דוגמה לניתוח | סה\"כ מכירות: {currency_symbol}{total_sales:,.0f} | {len(plots)} גרפים נוצרו"
     elif current_lang == "en":
-        summary_txt = f"📊 Demo Analysis | Total Sales: ₪{total_sales:,.0f} | {len(plots)} graphs created"
+        currency_info = get_currency(current_lang)
+        currency_symbol = currency_info["symbol"]
+        summary_txt = f"📊 Demo Analysis | Total Sales: {currency_symbol}{total_sales:,.0f} | {len(plots)} graphs created"
     else:  # ru
-        summary_txt = f"📊 Демо-анализ | {t('summary_total_sales')}: ₪{total_sales:,.0f} | Создано {len(plots)} графиков"
+        currency_info = get_currency(current_lang)
+        currency_symbol = currency_info["symbol"]
+        summary_txt = f"📊 Демо-анализ | {t('summary_total_sales')}: {currency_symbol}{total_sales:,.0f} | Создано {len(plots)} графиков"
     
     # שמירה ב-LAST_EXPORT
     LAST_EXPORT["generated_at"] = datetime.now()

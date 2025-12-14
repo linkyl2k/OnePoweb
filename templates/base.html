@@ -135,22 +135,6 @@
               <li><a class="dropdown-item {% if current_lang == 'ru' %}active{% endif %}" href="{{ url_for('set_language', lang='ru') }}">Русский</a></li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="currencyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-currency-exchange me-1"></i>{{ currency_symbol }}
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="currencyDropdown">
-              {% for curr in available_currencies %}
-              <li>
-                <a class="dropdown-item {% if curr.is_selected %}active{% endif %}" href="{{ url_for('set_currency', currency_code=curr.code, return_url=request.url) }}">
-                  <span class="me-2">{{ curr.symbol }}</span>
-                  <span>{{ curr.label }} ({{ curr.code }})</span>
-                  {% if curr.is_selected %}<i class="bi bi-check float-end"></i>{% endif %}
-                </a>
-              </li>
-              {% endfor %}
-            </ul>
-          </li>
         </ul>
 
         <!-- חלק ימין -->

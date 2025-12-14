@@ -102,6 +102,25 @@
         </div>
       </div>
       
+      <!-- Currency Selection -->
+      <div class="currency-selector-section mb-4" style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-currency-exchange" style="font-size: 1.2rem; color: #06b6d4;"></i>
+            <span style="font-weight: 500; color: #e6e9ef;">{% if current_lang == 'he' %}בחר מטבע:{% elif current_lang == 'en' %}Select Currency:{% else %}Выберите валюту:{% endif %}</span>
+          </div>
+          <div class="currency-dropdown-wrapper">
+            <select class="form-select currency-select" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #e6e9ef; border-radius: 8px; padding: 0.5rem 1rem; min-width: 200px;" onchange="window.location.href='{{ url_for('set_currency', currency_code='') }}' + this.value + '?return_url={{ request.url }}'">
+              {% for curr in available_currencies %}
+              <option value="{{ curr.code }}" {% if curr.is_selected %}selected{% endif %}>
+                {{ curr.symbol }} {{ curr.label }} ({{ curr.code }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      
       <div class="graphs-grid">
         <!-- זמנים ומגמות -->
         <div class="graph-category">

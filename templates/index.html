@@ -103,7 +103,7 @@
       </div>
       
       <!-- Currency Selection -->
-      <div class="currency-selector-section mb-4" style="padding: 1.25rem; background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(59,130,246,0.12) 100%); border-radius: 14px; border: 2px solid rgba(6,182,212,0.3); box-shadow: 0 4px 20px rgba(6,182,212,0.1); overflow: visible; z-index: 10000; position: relative;">
+      <div class="currency-selector-section mb-4" style="padding: 1.25rem; background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(59,130,246,0.12) 100%); border-radius: 14px; border: 2px solid rgba(6,182,212,0.3); box-shadow: 0 4px 20px rgba(6,182,212,0.1); position: relative; z-index: 10000;">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-currency-exchange" style="font-size: 1.3rem; color: #06b6d4; filter: drop-shadow(0 0 8px rgba(6,182,212,0.5));"></i>
@@ -121,7 +121,7 @@
               </span>
               <i class="bi bi-chevron-down" style="transition: transform 0.3s;"></i>
             </div>
-            <div class="currency-dropdown-menu" id="currencyDropdown" style="position: fixed; margin-top: 0.5rem; background: linear-gradient(135deg, rgba(20,20,30,0.98) 0%, rgba(30,30,40,0.98) 100%); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); max-height: 400px; overflow-y: auto; z-index: 99999; display: none; opacity: 0; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease; min-width: 280px;">
+            <div class="currency-dropdown-menu" id="currencyDropdown" style="position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.5rem; background: linear-gradient(135deg, rgba(20,20,30,0.98) 0%, rgba(30,30,40,0.98) 100%); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); max-height: 400px; overflow-y: auto; z-index: 99999; display: none; opacity: 0; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease;">
               {% for curr in available_currencies %}
               <div class="currency-option {% if curr.is_selected %}selected{% endif %}" 
                    onclick="window.location.href='{{ url_for('set_currency', currency_code=curr.code, return_url=request.url) }}'"
@@ -160,12 +160,6 @@
               dropdown.classList.remove('show');
               if (chevron) chevron.style.transform = 'rotate(0deg)';
             } else {
-              // Calculate position relative to trigger
-              const rect = trigger.getBoundingClientRect();
-              dropdown.style.top = (rect.bottom + window.scrollY + 8) + 'px';
-              dropdown.style.left = rect.left + 'px';
-              dropdown.style.width = rect.width + 'px';
-              
               dropdown.classList.add('show');
               if (chevron) chevron.style.transform = 'rotate(180deg)';
             }
@@ -441,6 +435,8 @@
   border-radius: 20px;
   padding: 1.5rem;
   transition: all 0.3s ease;
+  overflow: visible;
+  position: relative;
 }
 
 .glass-card:hover {
@@ -787,7 +783,8 @@
 /* ===== Currency Selector ===== */
 .currency-selector-section {
   position: relative;
-  overflow: hidden;
+  overflow: visible !important;
+  z-index: 10000;
 }
 
 .currency-selector-section::before {

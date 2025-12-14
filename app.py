@@ -4403,6 +4403,26 @@ def export_pdf():
             abs_path = os.path.abspath(path).replace("\\", "/")
             return f"file:///{abs_path}"
         return ""
+    
+    def _img_base64(fname):
+        """Returns base64 encoded image for embedding in HTML"""
+        if not fname:
+            return ""
+        path = os.path.join(PLOTS_DIR, fname)
+        if os.path.exists(path):
+            try:
+                import base64
+                with open(path, 'rb') as img_file:
+                    img_data = img_file.read()
+                    img_base64 = base64.b64encode(img_data).decode('utf-8')
+                    # Detect image type from extension
+                    ext = os.path.splitext(fname)[1].lower()
+                    mime_type = 'image/png' if ext == '.png' else 'image/jpeg' if ext in ['.jpg', '.jpeg'] else 'image/png'
+                    return f"data:{mime_type};base64,{img_base64}"
+            except Exception as e:
+                print(f"⚠️ Error encoding image {fname}: {e}")
+                return _img_url(fname)  # Fallback to file:// URL
+        return ""
 
     def _font_face_block():
         fonts_dir = os.path.join(STATIC_DIR, "fonts")
@@ -4439,37 +4459,79 @@ def export_pdf():
     tail_gain    = float(c_tail.get("monthly_gain") or 0.0)
     has_roi      = bool(roi_text or roi_gain or roi_pct)
 
-    # בונה את שורות הטבלה כ־HTML פשוט (רק מה שקיים)
+    # Build table rows - translate based on current language
+    current_lang = session.get('lang', 'en')
     roi_rows = ""
     if weak_gain:
-        roi_rows += f"<tr><td>יום חלש ↗︎</td><td>העלאה לרמת ימים רגילים</td><td>₪{weak_gain:,.0f}</td></tr>"
+        if current_lang == 'he':
+            roi_rows += f"<tr><td>יום חלש ↗︎</td><td>העלאה לרמת ימים רגילים</td><td>₪{weak_gain:,.0f}</td></tr>"
+        elif current_lang == 'ru':
+            roi_rows += f"<tr><td>Слабый день ↗︎</td><td>Поднятие до уровня обычных дней</td><td>${weak_gain:,.0f}</td></tr>"
+        else:  # en
+            roi_rows += f"<tr><td>Weak Day ↗︎</td><td>Raise to regular days level</td><td>${weak_gain:,.0f}</td></tr>"
     if evening_gain:
-        roi_rows += f"<tr><td>שעות ערב ↗︎</td><td>{evening_note}</td><td>₪{evening_gain:,.0f}</td></tr>"
+        evening_note_esc = _esc(evening_note)
+        if current_lang == 'he':
+            roi_rows += f"<tr><td>שעות ערב ↗︎</td><td>{evening_note_esc}</td><td>₪{evening_gain:,.0f}</td></tr>"
+        elif current_lang == 'ru':
+            roi_rows += f"<tr><td>Вечерние часы ↗︎</td><td>{evening_note_esc}</td><td>${evening_gain:,.0f}</td></tr>"
+        else:  # en
+            roi_rows += f"<tr><td>Evening Hours ↗︎</td><td>{evening_note_esc}</td><td>${evening_gain:,.0f}</td></tr>"
     if tail_gain:
-        roi_rows += f"<tr><td>זנב מוצרים ↗︎</td><td>קידום תחתית סל המוצרים</td><td>₪{tail_gain:,.0f}</td></tr>"
+        if current_lang == 'he':
+            roi_rows += f"<tr><td>זנב מוצרים ↗︎</td><td>קידום תחתית סל המוצרים</td><td>₪{tail_gain:,.0f}</td></tr>"
+        elif current_lang == 'ru':
+            roi_rows += f"<tr><td>Хвост продуктов ↗︎</td><td>Продвижение нижней части корзины</td><td>${tail_gain:,.0f}</td></tr>"
+        else:  # en
+            roi_rows += f"<tr><td>Tail Products ↗︎</td><td>Promote bottom of product basket</td><td>${tail_gain:,.0f}</td></tr>"
 
+    # Table headers
+    if current_lang == 'he':
+        th1, th2, th3 = "רכיב", "פירוט", "תרומה חודשית"
+    elif current_lang == 'ru':
+        th1, th2, th3 = "Компонент", "Детали", "Месячный вклад"
+    else:  # en
+        th1, th2, th3 = "Component", "Details", "Monthly Contribution"
+    
     roi_table_html = (
         f"<div class='roi-table-wrap'>"
         f"<table class='roi-table'>"
-        f"<thead><tr><th>רכיב</th><th>פירוט</th><th>תרומה חודשית</th></tr></thead>"
+        f"<thead><tr><th>{th1}</th><th>{th2}</th><th>{th3}</th></tr></thead>"
         f"<tbody>{roi_rows}</tbody></table></div>"
     ) if roi_rows else ""
 
-    # כרטיס ROI לדף הראשון
+    # ROI card for first page - translate based on current language
+    current_lang = session.get('lang', 'en')
     roi_inline_html = ""
     if has_roi:
+        if current_lang == 'he':
+            roi_header = "הערכת ROI (חודשי)"
+            badge_label_monthly = "תוספת חודשית מוערכת"
+            badge_label_roi = "ROI משוער"
+            currency_symbol = "₪"
+        elif current_lang == 'ru':
+            roi_header = "Оценка ROI (месячная)"
+            badge_label_monthly = "Потенциальная месячная добавка"
+            badge_label_roi = "Теоретический ROI"
+            currency_symbol = "$"
+        else:  # en
+            roi_header = "ROI Estimation (Monthly)"
+            badge_label_monthly = "Estimated Monthly Addition"
+            badge_label_roi = "Estimated ROI"
+            currency_symbol = "$"
+        
         roi_inline_html = (
-            "<section class='roi-card' dir='rtl'>"
-            "<div class='roi-header'>הערכת ROI (חודשי)</div>"
+            f"<section class='roi-card' dir={'rtl' if current_lang == 'he' else 'ltr'}>"
+            f"<div class='roi-header'>{roi_header}</div>"
             + (f"<div class='roi-text'>{roi_text}</div>" if roi_text else "")
             + f"""
             <div class="roi-badges">
               <div class="badge badge-green">
-                <div class="badge-label">תוספת חודשית מוערכת</div>
-                <div class="badge-value">₪{roi_gain:,.0f}</div>
+                <div class="badge-label">{badge_label_monthly}</div>
+                <div class="badge-value">{currency_symbol}{roi_gain:,.0f}</div>
               </div>
               <div class="badge badge-blue">
-                <div class="badge-label">ROI משוער</div>
+                <div class="badge-label">{badge_label_roi}</div>
                 <div class="badge-value">{roi_pct:,.0f}%</div>
               </div>
             </div>
@@ -4479,12 +4541,31 @@ def export_pdf():
         )
 
     # ---------- 4) HTML מלא ----------
+    # Get current language for PDF
+    current_lang = session.get('lang', 'en')
+    
+    if current_lang == 'he':
+        pdf_title = "דו״ח ניתוח מכירות"
+        pdf_dir = "rtl"
+        pdf_lang = "he"
+        date_label = "תאריך הפקה:"
+    elif current_lang == 'ru':
+        pdf_title = "Отчет анализа продаж"
+        pdf_dir = "ltr"
+        pdf_lang = "ru"
+        date_label = "Дата создания:"
+    else:  # en
+        pdf_title = "Sales Analysis Report"
+        pdf_dir = "ltr"
+        pdf_lang = "en"
+        date_label = "Generated:"
+    
     html = textwrap.dedent(f"""
     <!doctype html>
-    <html lang="he" dir="rtl">
+    <html lang="{pdf_lang}" dir="{pdf_dir}">
     <head>
       <meta charset="utf-8">
-      <title>דו״ח ניתוח מכירות</title>
+      <title>{pdf_title}</title>
       <style>
         {_font_face_block()}
         @page {{
@@ -4492,8 +4573,8 @@ def export_pdf():
           margin: 16mm;
         }}
         html, body {{
-          direction: rtl;
-          text-align: right;
+          direction: {pdf_dir};
+          text-align: {'right' if pdf_dir == 'rtl' else 'left'};
           margin: 0; 
           padding: 0;
           background: #ffffff;
@@ -4505,34 +4586,34 @@ def export_pdf():
           margin: 0;
           padding: 0;
           box-sizing: border-box;
-          direction: rtl;
+          direction: {pdf_dir};
         }}
         h1 {{ 
           margin: 0 0 8mm 0; 
           font-size: 22pt; 
-          text-align: right;
-          direction: rtl;
+          text-align: {'right' if pdf_dir == 'rtl' else 'left'};
+          direction: {pdf_dir};
         }}
         h2 {{ 
           margin: 10mm 0 4mm 0; 
           font-size: 14pt; 
-          text-align: right;
-          direction: rtl;
+          text-align: {'right' if pdf_dir == 'rtl' else 'left'};
+          direction: {pdf_dir};
         }}
         p {{ 
           margin: 2mm 0; 
           font-size: 11pt; 
           line-height: 1.6; 
           white-space: pre-wrap; 
-          text-align: right;
-          direction: rtl;
+          text-align: {'right' if pdf_dir == 'rtl' else 'left'};
+          direction: {pdf_dir};
         }}
         .meta {{ 
           color:#555; 
           margin-top: -6mm; 
           margin-bottom: 6mm; 
-          text-align: right;
-          direction: rtl;
+          text-align: {'right' if pdf_dir == 'rtl' else 'left'};
+          direction: {pdf_dir};
         }}
         .plot {{ page-break-inside: avoid; margin: 8mm 0; }}
         .plot img {{ max-width: 100%; height: auto; display:block; margin: 3mm 0; }}
@@ -4546,8 +4627,8 @@ def export_pdf():
           padding: 10mm;
           margin: 8mm 0;
           box-shadow: 0 1mm 3mm rgba(0,0,0,0.07);
-          text-align: right;
-          direction: rtl;
+          text-align: {'right' if pdf_dir == 'rtl' else 'left'};
+          direction: {pdf_dir};
         }}
         .roi-header {{
           font-size: 16pt;
@@ -4587,8 +4668,8 @@ def export_pdf():
           width: 100%;
           border-collapse: collapse;
           font-size: 10pt;
-          direction: rtl;
-          text-align: right;
+          direction: {pdf_dir};
+          text-align: {'right' if pdf_dir == 'rtl' else 'left'};
         }}
         .roi-table th, .roi-table td {{
           border: 1px solid #ddd;
@@ -4602,8 +4683,8 @@ def export_pdf():
     </head>
     <body>
       <div class="page">
-        <h1>דו״ח ניתוח מכירות</h1>
-        {"<div class='meta'>תאריך הפקה: " + _esc(snap.get("generated_at","")) + "</div>" if snap.get("generated_at") else ""}
+        <h1>{pdf_title}</h1>
+        {"<div class='meta'>" + date_label + " " + _esc(snap.get("generated_at","")) + "</div>" if snap.get("generated_at") else ""}
 
         {"<p>" + _esc(snap.get("summary","")) + "</p>" if snap.get("summary") else ""}
 
@@ -4618,7 +4699,7 @@ def export_pdf():
               (
                 f"<div class='plot'>"
                 f"{('<h2>' + _esc(p.get('title','')) + '</h2>') if p.get('title') else ''}"
-                f"{('<img src=\"' + _img_url(p.get('filename')) + '\" alt=\"plot\"/>') if _img_url(p.get('filename')) else ''}"
+                f"{('<img src=\"' + _img_base64(p.get('filename')) + '\" alt=\"plot\" style=\"max-width: 100%; height: auto; display: block;\"/>') if _img_base64(p.get('filename')) else ('<p style=\"color: red;\">Image not found: ' + _esc(p.get('filename', '')) + '</p>' if p.get('filename') else '')}"
                 f"{('<p>' + _esc(p.get('ai','')) + '</p>') if p.get('ai') else ''}"
                 f"</div>"
               )

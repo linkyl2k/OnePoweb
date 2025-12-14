@@ -3148,11 +3148,9 @@ def set_currency(currency_code):
     if currency_code in AVAILABLE_CURRENCIES:
         session["currency"] = currency_code
         session.permanent = True
+        session.modified = True
     return_url = request.args.get("return_url") or request.referrer or url_for("index")
     return redirect(return_url)
-        session.modified = True
-    # Редирект на предыдущую страницу или главную
-    return redirect(request.referrer or url_for("index"))
 
 @app.route("/", methods=["GET", "POST"])
 def index():

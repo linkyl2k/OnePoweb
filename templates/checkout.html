@@ -115,8 +115,8 @@
 </div>
 
 {% if paypal_client_id and paypal_client_id != 'YOUR_PAYPAL_CLIENT_ID' %}
-<!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+<!-- PayPal SDK with Subscriptions support -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&vault=true&intent=subscription"></script>
 <script>
 const plan = "{{ plan }}";
 
@@ -129,9 +129,9 @@ paypal.Buttons({
     height: 45
   },
   
-  // Create order on server
-  createOrder: function(data, actions) {
-    console.log('[PayPal] Creating order for plan:', plan);
+  // Create subscription on server
+  createSubscription: function(data, actions) {
+    console.log('[PayPal] Creating subscription for plan:', plan);
     return fetch('/api/paypal/create-order', {
       method: 'POST',
       headers: {
@@ -154,7 +154,13 @@ paypal.Buttons({
         window.location.href = data.redirect;
         return null;
       }
-      console.log('[PayPal] Order created:', data.id);
+      // For subscriptions, redirect to approval URL
+      if (data.approval_url) {
+        console.log('[PayPal] Redirecting to approval URL:', data.approval_url);
+        window.location.href = data.approval_url;
+        return null;
+      }
+      console.log('[PayPal] Subscription created:', data.id);
       return data.id;
     })
     .catch(err => {
@@ -163,70 +169,13 @@ paypal.Buttons({
     });
   },
   
-  // Capture payment on server
+  // For subscriptions, PayPal redirects to approval_url
+  // After approval, user is redirected back to return_url
+  // onApprove is not called for subscriptions, so we don't need it
   onApprove: function(data, actions) {
-    document.getElementById('paypal-button-container').style.display = 'none';
-    document.getElementById('payment-status').style.display = 'block';
-    
-    return fetch('/api/paypal/capture-order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ orderID: data.orderID })
-    })
-    .then(response => {
-      console.log('[PayPal] Capture response status:', response.status);
-      console.log('[PayPal] Capture response ok:', response.ok);
-      if (!response.ok) {
-        return response.json().then(err => {
-          console.error('[PayPal] Capture error response:', err);
-          return Promise.reject(err);
-        }).catch(() => {
-          // If JSON parsing fails, return generic error
-          return Promise.reject({error: `HTTP ${response.status}: ${response.statusText}`});
-        });
-      }
-      return response.json().catch(err => {
-        console.error('[PayPal] Failed to parse JSON:', err);
-        return Promise.reject({error: 'Invalid response from server'});
-      });
-    })
-    .then(result => {
-      console.log('[PayPal] Capture result:', result);
-      if (result.success && result.redirect) {
-        console.log('[PayPal] Payment successful, redirecting to:', result.redirect);
-        window.location.href = result.redirect;
-      } else {
-        const errorMsg = result.error || 'Unknown error';
-        console.error('[PayPal] Capture error:', errorMsg);
-        console.error('[PayPal] Full result:', JSON.stringify(result, null, 2));
-        const lang = "{{ current_lang }}";
-        let alertMsg;
-        if (lang === 'he') {
-          alertMsg = 'שגיאה בעיבוד התשלום: ' + errorMsg + '\n\nאנא נסה שוב או צור קשר לתמיכה.';
-        } else if (lang === 'en') {
-          alertMsg = 'Payment processing error: ' + errorMsg + '\n\nPlease try again or contact support.';
-        } else {
-          alertMsg = 'Ошибка обработки платежа: ' + errorMsg + '\n\nПопробуйте снова или свяжитесь с поддержкой.';
-        }
-        alert(alertMsg);
-        document.getElementById('paypal-button-container').style.display = 'block';
-        document.getElementById('payment-status').style.display = 'none';
-      }
-    })
-    .catch(err => {
-      console.error('[PayPal] Capture fetch error:', err);
-      const lang = "{{ current_lang }}";
-      const alertMsg = lang === 'he'
-        ? 'שגיאה בעיבוד התשלום. נסה שוב או צור קשר.'
-        : lang === 'en'
-        ? 'Payment processing error. Try again or contact us.'
-        : 'Ошибка обработки платежа. Попробуйте снова или свяжитесь с нами.';
-      alert(alertMsg);
-      document.getElementById('paypal-button-container').style.display = 'block';
-      document.getElementById('payment-status').style.display = 'none';
-    });
+    // This won't be called for subscriptions (redirect flow)
+    // But we keep it for error handling
+    console.log('[PayPal] onApprove called (unexpected for subscriptions)');
   },
   
   onError: function(err) {

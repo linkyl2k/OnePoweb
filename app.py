@@ -1357,6 +1357,9 @@ def ensure_subscription_columns():
     # Username column
     if "username" not in cols:
         db.execute("ALTER TABLE users ADD COLUMN username TEXT NULL")
+    # PayPal subscription ID for recurring billing
+    if "paypal_subscription_id" not in cols:
+        db.execute("ALTER TABLE users ADD COLUMN paypal_subscription_id TEXT NULL")
 
     db.commit()
 
@@ -2941,29 +2944,79 @@ from datetime import datetime
 from flask import redirect, url_for, flash
 
 @app.post("/cancel-subscription")
+@login_required
 def cancel_subscription():
+    """Cancel subscription in PayPal and update database"""
     user = current_user()
     if not user:
-        # אם אין התחברות — שולחים להתחברות אם יש, אחרת לדף הבית
-        return redirect(url_for("login") if "login" in app.view_functions else url_for("index"))
-
-    now_iso = datetime.utcnow().isoformat(timespec="seconds")
-
+        flash_t("msg_login_required", "warning")
+        return redirect(url_for("login"))
+    
+    # Get PayPal subscription ID
     db = get_db()
-    db.execute("""
-        UPDATE users
-        SET plan = ?, subscription_status = ?, canceled_at = ?, active_until = ?
-        WHERE id = ?
-    """, ("free", "canceled", now_iso, now_iso, user["id"]))
+    cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+    paypal_subscription_id = None
+    
+    if "paypal_subscription_id" in cols:
+        try:
+            if hasattr(user, 'keys') and "paypal_subscription_id" in user.keys():
+                paypal_subscription_id = user["paypal_subscription_id"]
+            elif "paypal_subscription_id" in dict(user).keys():
+                paypal_subscription_id = dict(user)["paypal_subscription_id"]
+        except (KeyError, TypeError, AttributeError):
+            pass
+    
+    # Cancel subscription in PayPal if exists
+    if paypal_subscription_id:
+        access_token = get_paypal_access_token()
+        if access_token:
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json"
+            }
+            
+            # Cancel subscription in PayPal
+            cancel_data = {
+                "reason": "User requested cancellation"
+            }
+            
+            response = requests.post(
+                f"{PAYPAL_API_URL}/v1/billing/subscriptions/{paypal_subscription_id}/cancel",
+                headers=headers,
+                json=cancel_data
+            )
+            
+            if response.status_code in [200, 204]:
+                print(f"[PayPal] Subscription {paypal_subscription_id} cancelled successfully")
+            else:
+                print(f"[PayPal] Failed to cancel subscription: {response.text}")
+                # Continue anyway - update DB even if PayPal cancel fails
+    
+    # Update database
+    now_iso = datetime.utcnow().isoformat(timespec="seconds")
+    
+    if "canceled_at" in cols and "subscription_status" in cols:
+        db.execute("""
+            UPDATE users
+            SET plan = ?, subscription_status = ?, canceled_at = ?
+            WHERE id = ?
+        """, ("free", "canceled", now_iso, user["id"]))
+    elif "canceled_at" in cols:
+        db.execute("""
+            UPDATE users
+            SET plan = ?, canceled_at = ?
+            WHERE id = ?
+        """, ("free", now_iso, user["id"]))
+    else:
+        db.execute("""
+            UPDATE users
+            SET plan = ?
+            WHERE id = ?
+        """, ("free", user["id"]))
     db.commit()
-
-    # אם אין לך flash, לא חיוני
-    try:
-        flash("המנוי בוטל. עברתם למסלול חינמי.", "success")
-    except Exception:
-        pass
-
-    return redirect(url_for("index"))
+    
+    flash_t("msg_subscription_cancelled", "success")
+    return redirect(url_for("profile"))
 
 
 @app.route("/set-language/<lang>")
@@ -4668,6 +4721,189 @@ def get_paypal_access_token():
     return None
 
 
+def get_or_create_paypal_product():
+    """Создает или получает продукт в PayPal (выполнить один раз)"""
+    access_token = get_paypal_access_token()
+    if not access_token:
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Проверяем, есть ли уже продукт
+    response = requests.get(
+        f"{PAYPAL_API_URL}/v1/catalogs/products",
+        headers=headers,
+        params={"page_size": 10, "total_required": "yes"}
+    )
+    
+    if response.status_code == 200:
+        products = response.json().get("products", [])
+        for product in products:
+            if product.get("name") == "OnePoweb":
+                print(f"[PayPal] Found existing product: {product.get('id')}")
+                return product.get("id")
+    
+    # Создаем новый продукт
+    product_data = {
+        "name": "OnePoweb",
+        "description": "OnePoweb - Smart Sales Analysis for Businesses",
+        "type": "SERVICE",
+        "category": "SOFTWARE"
+    }
+    
+    response = requests.post(
+        f"{PAYPAL_API_URL}/v1/catalogs/products",
+        headers=headers,
+        json=product_data
+    )
+    
+    if response.status_code in [200, 201]:
+        product_id = response.json().get("id")
+        print(f"[PayPal] Created product: {product_id}")
+        return product_id
+    
+    print(f"[PayPal] Failed to create product: {response.text}")
+    return None
+
+
+def get_or_create_paypal_plan(plan_name, price_usd):
+    """
+    Создает или получает план подписки в PayPal.
+    Возвращает plan_id или None.
+    """
+    access_token = get_paypal_access_token()
+    if not access_token:
+        return None
+    
+    # Сначала получаем или создаем продукт
+    product_id = get_or_create_paypal_product()
+    if not product_id:
+        print("[PayPal] Failed to get/create product")
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+    
+    # Проверяем, есть ли уже план
+    plan_name_search = f"OnePoweb {plan_name.upper()}"
+    response = requests.get(
+        f"{PAYPAL_API_URL}/v1/billing/plans",
+        headers=headers,
+        params={"product_id": product_id, "page_size": 10}
+    )
+    
+    if response.status_code == 200:
+        plans = response.json().get("plans", [])
+        for plan in plans:
+            if plan.get("name") == plan_name_search and plan.get("status") == "ACTIVE":
+                plan_id = plan.get("id")
+                print(f"[PayPal] Found existing plan: {plan_id}")
+                return plan_id
+    
+    # Создаем новый план
+    plan_data = {
+        "product_id": product_id,
+        "name": plan_name_search,
+        "description": f"Monthly subscription for OnePoweb {plan_name.upper()} plan",
+        "status": "ACTIVE",
+        "billing_cycles": [{
+            "frequency": {
+                "interval_unit": "MONTH",
+                "interval_count": 1
+            },
+            "tenure_type": "REGULAR",
+            "sequence": 1,
+            "total_cycles": 0,  # 0 = бесконечно (автоматическое продление)
+            "pricing_scheme": {
+                "fixed_price": {
+                    "value": f"{price_usd:.2f}",
+                    "currency_code": "USD"
+                }
+            }
+        }],
+        "payment_preferences": {
+            "auto_bill_outstanding": True,
+            "setup_fee_failure_action": "CONTINUE",
+            "payment_failure_threshold": 3
+        }
+    }
+    
+    response = requests.post(
+        f"{PAYPAL_API_URL}/v1/billing/plans",
+        headers=headers,
+        json=plan_data
+    )
+    
+    if response.status_code in [200, 201]:
+        plan_id = response.json().get("id")
+        print(f"[PayPal] Created plan: {plan_id}")
+        return plan_id
+    else:
+        print(f"[PayPal] Failed to create plan: {response.text}")
+        return None
+
+
+def create_paypal_subscription_plan(plan_name, price_usd):
+    """
+    Создает план подписки в PayPal (выполнить один раз для каждого плана).
+    Возвращает plan_id или None.
+    """
+    access_token = get_paypal_access_token()
+    if not access_token:
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+    
+    plan_data = {
+        "product_id": f"PROD_{plan_name.upper()}",  # Нужно создать продукт сначала
+        "name": f"OnePoweb {plan_name.upper()} Plan",
+        "description": f"Monthly subscription for OnePoweb {plan_name.upper()} plan",
+        "status": "ACTIVE",
+        "billing_cycles": [{
+            "frequency": {
+                "interval_unit": "MONTH",
+                "interval_count": 1
+            },
+            "tenure_type": "REGULAR",
+            "sequence": 1,
+            "total_cycles": 0,  # 0 = бесконечно
+            "pricing_scheme": {
+                "fixed_price": {
+                    "value": f"{price_usd:.2f}",
+                    "currency_code": "USD"
+                }
+            }
+        }],
+        "payment_preferences": {
+            "auto_bill_outstanding": True,
+            "setup_fee_failure_action": "CONTINUE",
+            "payment_failure_threshold": 3
+        }
+    }
+    
+    response = requests.post(
+        f"{PAYPAL_API_URL}/v1/billing/plans",
+        headers=headers,
+        json=plan_data
+    )
+    
+    if response.status_code in [200, 201]:
+        return response.json().get("id")
+    else:
+        print(f"[PayPal] Failed to create plan: {response.text}")
+        return None
+
+
 @app.route("/subscribe")
 @login_required
 def subscribe():
@@ -4776,39 +5012,87 @@ def paypal_create_order():
             "Content-Type": "application/json"
         }
         
-        # Format price with 2 decimal places (PayPal requirement)
-        order_data = {
-            "intent": "CAPTURE",
-            "purchase_units": [{
-                "amount": {
-                    "currency_code": "USD",
-                    "value": f"{net_price_usd:.2f}"
+        # Create subscription using PayPal Subscriptions API
+        # First, get or create the subscription plan
+        plan_id = get_or_create_paypal_plan(plan, base_price_usd)
+        if not plan_id:
+            print("[PayPal] Failed to get/create subscription plan")
+            return jsonify({"error": "Failed to create subscription plan"}), 500
+        
+        # Calculate start time (immediate payment)
+        from datetime import datetime, timedelta
+        start_time = datetime.utcnow() + timedelta(minutes=1)  # Start in 1 minute
+        start_time_str = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        
+        # Get user info
+        user_first_name = u.get("first_name") or "User"
+        user_last_name = u.get("last_name") or ""
+        user_email = u.get("email") or ""
+        
+            subscription_data = {
+            "plan_id": plan_id,
+            "start_time": start_time_str,
+            "subscriber": {
+                "name": {
+                    "given_name": user_first_name,
+                    "surname": user_last_name
                 },
-                "description": f"OnePoweb {plan.upper()} Plan"
-            }]
+                "email_address": user_email
+            },
+            "application_context": {
+                "brand_name": "OnePoweb",
+                "locale": "en-US",
+                "shipping_preference": "NO_SHIPPING",
+                "user_action": "SUBSCRIBE_NOW",
+                "payment_method": {
+                    "payer_selected": "PAYPAL",
+                    "payee_preferred": "IMMEDIATE_PAYMENT_REQUIRED"
+                },
+                "return_url": url_for("paypal_subscription_return", _external=True),
+                "cancel_url": url_for("subscribe", plan=plan, _external=True)
+            },
+            "custom_id": str(u["id"])
         }
         
-        print(f"[PayPal] Creating order: {order_data}")
+        # If discount, we need to apply it (for subscriptions, PayPal handles discounts differently)
+        # For now, creating subscription with full price, discount will be handled via referral system
+        
+        print(f"[PayPal] Creating subscription: {subscription_data}")
         
         response = requests.post(
-            f"{PAYPAL_API_URL}/v2/checkout/orders",
+            f"{PAYPAL_API_URL}/v1/billing/subscriptions",
             headers=headers,
-            json=order_data
+            json=subscription_data
         )
         
         print(f"[PayPal] Response status: {response.status_code}")
-        print(f"[PayPal] Response body: {response.text[:500]}")
+        print(f"[PayPal] Response body: {response.text[:1000]}")
         
         if response.status_code in [200, 201]:
-            order = response.json()
-            # Store order info in session for verification
-            session["pending_order"] = {
-                "order_id": order["id"],
+            subscription = response.json()
+            subscription_id = subscription.get("id")
+            approval_url = None
+            
+            # Get approval link from response
+            for link in subscription.get("links", []):
+                if link.get("rel") == "approve":
+                    approval_url = link.get("href")
+                    break
+            
+            if not approval_url:
+                print(f"[PayPal] No approval URL in subscription response: {subscription}")
+                return jsonify({"error": "Failed to get approval URL"}), 500
+            
+            # Store subscription info in session for verification
+            session["pending_subscription"] = {
+                "subscription_id": subscription_id,
                 "plan": plan,
                 "amount_usd": net_price_usd,
                 "discount_used": discount_usd
             }
-            return jsonify({"id": order["id"]})
+            
+            # Return approval URL for redirect
+            return jsonify({"id": subscription_id, "approval_url": approval_url})
         else:
             print(f"[PayPal] Error: {response.text}")
             return jsonify({"error": f"PayPal error: {response.status_code}"}), 500
@@ -4821,105 +5105,113 @@ def paypal_create_order():
 @app.route("/api/paypal/capture-order", methods=["POST"])
 @login_required
 def paypal_capture_order():
-    """Capture PayPal payment and activate subscription"""
+    """Handle subscription approval (deprecated - now using return_url)"""
+    # This endpoint is kept for backward compatibility
+    # Subscriptions are now handled via return_url callback
+    return jsonify({"error": "Use return URL instead"}), 400
+
+
+@app.route("/api/paypal/subscription-return")
+@login_required
+def paypal_subscription_return():
+    """Handle return from PayPal after subscription approval"""
     try:
-        data = request.get_json() or {}
-        order_id = data.get("orderID")
+        # PayPal adds subscription_id and token to return URL
+        subscription_id = request.args.get("subscription_id")
+        token = request.args.get("token")
         
-        if not order_id:
-            return jsonify({"error": "Order ID missing"}), 400
+        u = current_user()
+        if not u:
+            flash_t("msg_login_required", "warning")
+            return redirect(url_for("login"))
         
-        pending = session.get("pending_order", {})
-        if not pending or pending.get("order_id") != order_id:
-            return jsonify({"error": "Order mismatch or session expired"}), 400
+        if not subscription_id:
+            # Try to get from session
+            pending = session.get("pending_subscription", {})
+            subscription_id = pending.get("subscription_id")
         
+        if not subscription_id:
+            flash("Subscription ID missing", "error")
+            return redirect(url_for("subscribe", plan="basic"))
+        
+        # Verify subscription in PayPal
         access_token = get_paypal_access_token()
         if not access_token:
-            print("[PayPal] Failed to get access token for capture")
-            return jsonify({"error": "PayPal not configured"}), 500
+            flash("PayPal not configured", "error")
+            return redirect(url_for("subscribe", plan="basic"))
         
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
         
-        response = requests.post(
-            f"{PAYPAL_API_URL}/v2/checkout/orders/{order_id}/capture",
+        response = requests.get(
+            f"{PAYPAL_API_URL}/v1/billing/subscriptions/{subscription_id}",
             headers=headers
         )
         
-        print(f"[PayPal] Capture response status: {response.status_code}")
-        print(f"[PayPal] Capture response body: {response.text[:1000]}")
+        if response.status_code != 200:
+            print(f"[PayPal] Failed to get subscription: {response.text}")
+            flash("Failed to verify subscription", "error")
+            return redirect(url_for("subscribe", plan="basic"))
         
-        if response.status_code in [200, 201]:
-            try:
-                capture_data = response.json()
-                print(f"[PayPal] Capture data keys: {list(capture_data.keys())}")
-                print(f"[PayPal] Capture data (first 1000 chars): {json.dumps(capture_data, indent=2)[:1000]}")
-                
-                # Check for errors in response
-                if "error" in capture_data or "errors" in capture_data:
-                    error_info = capture_data.get("error") or capture_data.get("errors", [])
-                    error_msg = f"PayPal returned error: {json.dumps(error_info)}"
-                    print(f"[PayPal] ERROR: {error_msg}")
-                    return jsonify({"error": error_msg}), 400
-                
-                # Check order status - PayPal can return status in different places
-                order_status = None
-                if "status" in capture_data:
-                    order_status = capture_data["status"]
-                elif "purchase_units" in capture_data and len(capture_data["purchase_units"]) > 0:
-                    payments = capture_data["purchase_units"][0].get("payments", {})
-                    captures = payments.get("captures", [])
-                    if captures and len(captures) > 0:
-                        order_status = captures[0].get("status")
-                        print(f"[PayPal] Found status in capture: {order_status}")
-                
-                # Also check in payment status
-                if not order_status and "payment_status" in capture_data:
-                    order_status = capture_data["payment_status"]
-                
-                print(f"[PayPal] Detected order status: {order_status}")
-                
-                # Accept both COMPLETED and APPROVED statuses
-                if order_status in ["COMPLETED", "APPROVED"]:
-                    u = current_user()
-                    if not u:
-                        print("[PayPal] ERROR: User not found after payment")
-                        return jsonify({"error": "User not found"}), 401
-                    
-                    plan = pending.get("plan", "basic")
-                    discount_used = pending.get("discount_used", 0)
-                    
-                    print(f"[PayPal] Activating subscription for user {u['id']}, plan: {plan}")
-                    
-                    # Clear pending order
-                    session.pop("pending_order", None)
-                    
-                    # Activate subscription
-                    result = activate_subscription(u["id"], plan, discount_used)
-                    print(f"[PayPal] Subscription activation result: {result}")
-                    return result
-                else:
-                    error_msg = f"Payment status: {order_status or 'unknown'}"
-                    print(f"[PayPal] ERROR: {error_msg}")
-                    print(f"[PayPal] Full capture data: {json.dumps(capture_data, indent=2)}")
-                    return jsonify({"error": error_msg}), 400
-            except json.JSONDecodeError as e:
-                print(f"[PayPal] ERROR: Failed to parse JSON response: {e}")
-                print(f"[PayPal] Raw response: {response.text}")
-                return jsonify({"error": "Invalid response from PayPal"}), 500
+        subscription_data = response.json()
+        subscription_status = subscription_data.get("status")
+        
+        print(f"[PayPal] Subscription status: {subscription_status}")
+        print(f"[PayPal] Full subscription data: {json.dumps(subscription_data, indent=2)[:500]}")
+        
+        # Check if subscription is active or approved
+        if subscription_status in ["ACTIVE", "APPROVAL_PENDING", "APPROVED"]:
+            # Get plan from subscription plan_id
+            plan_id_paypal = subscription_data.get("plan_id", "")
+            plan = "basic" if "BASIC" in plan_id_paypal.upper() else "pro" if "PRO" in plan_id_paypal.upper() else "basic"
+            
+            # Get discount from session if available
+            pending = session.get("pending_subscription", {})
+            discount_used = pending.get("discount_used", 0)
+            
+            # Activate subscription in our database
+            db = get_db()
+            cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+            
+            if "paypal_subscription_id" in cols and "canceled_at" in cols:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, paypal_subscription_id=?, canceled_at=NULL, referral_discount=0
+                    WHERE id=?
+                """, (plan, subscription_id, u["id"]))
+            elif "paypal_subscription_id" in cols:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, paypal_subscription_id=?, referral_discount=0
+                    WHERE id=?
+                """, (plan, subscription_id, u["id"]))
+            else:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, canceled_at=NULL, referral_discount=0
+                    WHERE id=?
+                """, (plan, u["id"]))
+            db.commit()
+            
+            # Clear pending subscription from session
+            session.pop("pending_subscription", None)
+            
+            print(f"[PayPal] Subscription activated for user {u['id']}, plan: {plan}, subscription_id: {subscription_id}")
+            
+            flash_t("msg_subscription_active", "success")
+            return redirect(url_for("subscribe_success", plan=plan))
         else:
-            error_text = response.text[:500]
-            print(f"[PayPal] ERROR: Capture failed with status {response.status_code}")
-            print(f"[PayPal] Error response: {error_text}")
-            return jsonify({"error": f"PayPal capture error: {response.status_code}. {error_text}"}), 500
+            flash(f"Subscription status: {subscription_status}. Please contact support.", "warning")
+            return redirect(url_for("subscribe", plan="basic"))
             
     except Exception as e:
-        print(f"[PayPal] Capture exception: {str(e)}")
+        print(f"[PayPal] Subscription return error: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        flash("Error processing subscription", "error")
+        return redirect(url_for("subscribe", plan="basic"))
 
 
 def activate_subscription(user_id, plan, discount_used):
@@ -4947,19 +5239,39 @@ def activate_subscription(user_id, plan, discount_used):
                 print(f"[Activate] Warning: Could not add canceled_at column: {e}")
         
         # Update user plan and reset referral discount (one-time use)
-        if "canceled_at" in cols or "canceled_at" in {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}:
-            db.execute("""
-                UPDATE users 
-                SET plan=?, referral_discount=0, canceled_at=NULL 
-                WHERE id=?
-            """, (plan, user_id))
+        # Also store PayPal subscription_id if provided
+        cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+        subscription_id_param = None
+        if isinstance(discount_used, dict) and "subscription_id" in discount_used:
+            subscription_id_param = discount_used["subscription_id"]
+            discount_used = discount_used.get("discount", 0)
+        
+        if "canceled_at" in cols:
+            if "paypal_subscription_id" in cols and subscription_id_param:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, referral_discount=0, canceled_at=NULL, paypal_subscription_id=?
+                    WHERE id=?
+                """, (plan, subscription_id_param, user_id))
+            else:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, referral_discount=0, canceled_at=NULL 
+                    WHERE id=?
+                """, (plan, user_id))
         else:
-            # If column still doesn't exist, update without it
-            db.execute("""
-                UPDATE users 
-                SET plan=?, referral_discount=0
-                WHERE id=?
-            """, (plan, user_id))
+            if "paypal_subscription_id" in cols and subscription_id_param:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, referral_discount=0, paypal_subscription_id=?
+                    WHERE id=?
+                """, (plan, subscription_id_param, user_id))
+            else:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, referral_discount=0
+                    WHERE id=?
+                """, (plan, user_id))
         db.commit()
         print(f"[Activate] User plan updated to {plan}")
         
@@ -4999,6 +5311,146 @@ def activate_subscription(user_id, plan, discount_used):
         error_response = jsonify({"error": f"Failed to activate subscription: {str(e)}"})
         print(f"[Activate] Returning error: {error_response.get_data(as_text=True)}")
         return error_response, 500
+
+
+@app.route("/api/paypal/webhook", methods=["GET", "POST"])
+def paypal_webhook():
+    """
+    Webhook для обработки событий подписки PayPal:
+    - BILLING.SUBSCRIPTION.CREATED - подписка создана
+    - BILLING.SUBSCRIPTION.ACTIVATED - подписка активирована
+    - BILLING.SUBSCRIPTION.CANCELLED - подписка отменена
+    - PAYMENT.SALE.COMPLETED - платеж выполнен (автоматическое продление)
+    
+    GET запрос используется PayPal для проверки доступности webhook URL
+    """
+    # Handle GET request (PayPal verification)
+    if request.method == "GET":
+        return jsonify({
+            "status": "ok",
+            "message": "PayPal webhook endpoint is active",
+            "endpoint": "/api/paypal/webhook"
+        }), 200
+    
+    # Handle POST request (actual webhook events)
+    try:
+        data = request.get_json()
+        event_type = data.get("event_type")
+        resource = data.get("resource", {})
+        
+        print(f"[PayPal Webhook] Received event: {event_type}")
+        print(f"[PayPal Webhook] Resource: {json.dumps(resource, indent=2)[:500]}")
+        
+        subscription_id = resource.get("id") or resource.get("billing_agreement_id")
+        
+        if not subscription_id:
+            print("[PayPal Webhook] No subscription ID in resource")
+            return jsonify({"status": "ignored"}), 200
+        
+        db = get_db()
+        
+        # Find user by subscription_id
+        user = db.execute(
+            "SELECT * FROM users WHERE paypal_subscription_id = ?",
+            (subscription_id,)
+        ).fetchone()
+        
+        if not user:
+            print(f"[PayPal Webhook] User not found for subscription {subscription_id}")
+            return jsonify({"status": "user_not_found"}), 200
+        
+        if event_type == "BILLING.SUBSCRIPTION.ACTIVATED":
+            # Подписка активирована
+            plan_id = resource.get("plan_id", "")
+            plan = "basic" if "BASIC" in plan_id.upper() else "pro" if "PRO" in plan_id.upper() else "basic"
+            
+            cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+            if "canceled_at" in cols:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?, canceled_at=NULL
+                    WHERE id=?
+                """, (plan, user["id"]))
+            else:
+                db.execute("""
+                    UPDATE users 
+                    SET plan=?
+                    WHERE id=?
+                """, (plan, user["id"]))
+            db.commit()
+            
+            print(f"[PayPal Webhook] Subscription activated for user {user['id']}, plan: {plan}")
+            
+        elif event_type == "BILLING.SUBSCRIPTION.CANCELLED":
+            # Подписка отменена
+            now_iso = datetime.utcnow().isoformat(timespec="seconds")
+            cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+            if "canceled_at" in cols:
+                db.execute("""
+                    UPDATE users 
+                    SET plan='free', canceled_at=?
+                    WHERE id=?
+                """, (now_iso, user["id"]))
+            else:
+                db.execute("""
+                    UPDATE users 
+                    SET plan='free'
+                    WHERE id=?
+                """, (user["id"],))
+            db.commit()
+            
+            print(f"[PayPal Webhook] Subscription cancelled for user {user['id']}")
+            
+        elif event_type == "PAYMENT.SALE.COMPLETED":
+            # Автоматическое продление - платеж выполнен
+            # Подписка остается активной, ничего не нужно делать
+            print(f"[PayPal Webhook] Payment completed for subscription {subscription_id}, user {user['id']}")
+            
+        elif event_type == "BILLING.SUBSCRIPTION.SUSPENDED":
+            # Подписка приостановлена (например, из-за неудачного платежа)
+            # Можно оставить план активным или перевести на free
+            print(f"[PayPal Webhook] Subscription suspended for user {user['id']}")
+            # Оставляем план активным, но можно добавить логику для уведомления пользователя
+            
+        elif event_type == "BILLING.SUBSCRIPTION.EXPIRED":
+            # Подписка истекла
+            now_iso = datetime.utcnow().isoformat(timespec="seconds")
+            cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+            if "canceled_at" in cols:
+                db.execute("""
+                    UPDATE users 
+                    SET plan='free', canceled_at=?
+                    WHERE id=?
+                """, (now_iso, user["id"]))
+            else:
+                db.execute("""
+                    UPDATE users 
+                    SET plan='free'
+                    WHERE id=?
+                """, (user["id"],))
+            db.commit()
+            print(f"[PayPal Webhook] Subscription expired for user {user['id']}")
+            
+        elif event_type == "PAYMENT.SALE.DENIED":
+            # Платеж отклонен - подписка может быть приостановлена
+            print(f"[PayPal Webhook] Payment denied for subscription {subscription_id}, user {user['id']}")
+            # PayPal автоматически приостановит подписку, можно уведомить пользователя
+            
+        elif event_type == "BILLING.SUBSCRIPTION.CREATED":
+            # Подписка создана (для логирования)
+            print(f"[PayPal Webhook] Subscription created: {subscription_id}, user {user['id']}")
+            
+        else:
+            # Логируем неизвестные события для отладки
+            print(f"[PayPal Webhook] Unhandled event type: {event_type}")
+            
+        return jsonify({"status": "processed"}), 200
+        
+    except Exception as e:
+        print(f"[PayPal Webhook] Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/subscribe/success")

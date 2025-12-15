@@ -1097,17 +1097,17 @@ def reset_password(token):
             flash("הסיסמאות אינן תואמות.", "warning")
         else:
             # בדיקת תקינות סיסמה
-            current_lang = session.get('lang', 'en')
+            current_lang = get_language()
             is_valid, error_msg = validate_password(p1, current_lang)
             if not is_valid:
                 flash(error_msg, "warning")
-        else:
-            pw_hash = generate_password_hash(p1)
-            db.execute("UPDATE users SET password_hash=? WHERE id=?", (pw_hash, row["user_id"]))
-            db.execute("UPDATE password_resets SET used=1 WHERE id=?", (row["id"],))
-            db.commit()
-            flash("הסיסמה עודכנה! אפשר להתחבר.", "success")
-            return redirect(url_for("login"))
+            else:
+                pw_hash = generate_password_hash(p1)
+                db.execute("UPDATE users SET password_hash=? WHERE id=?", (pw_hash, row["user_id"]))
+                db.execute("UPDATE password_resets SET used=1 WHERE id=?", (row["id"],))
+                db.commit()
+                flash("הסיסמה עודכנה! אפשר להתחבר.", "success")
+                return redirect(url_for("login"))
 
     return render_template("reset.html", title="איפוס סיסמה", token=token)
 

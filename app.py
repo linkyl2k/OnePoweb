@@ -4008,38 +4008,63 @@ def index():
             best_day = worst_day = None
             best_day_sales = worst_day_sales = 0
         
-        # בניית הסיכום
-        # Переводим текст сводки
-        # Get currency symbol for current language
-        currency_info = get_currency(current_lang)
-        currency_symbol = currency_info["symbol"]
-        
-        if current_lang == "he":
-            summary_lines = [
-                f"📊 סה\"כ מכירות: {currency_symbol}{total_sum:,.0f}",
-                f"📅 ימים בדוח: {days} | ממוצע יומי: {currency_symbol}{avg_day:,.0f}",
-                f"🧾 עסקאות: {transaction_count:,} | ממוצע לעסקה: {currency_symbol}{avg_transaction:,.0f}",
+        # --- Строим сводку сразу на трёх языках, чтобы при смене языка
+        #     текст автоматически подстраивался без повторного анализа ---
+        summary_map = {}
+
+        # Иврит
+        try:
+            he_currency = get_currency("he")
+            he_symbol = he_currency["symbol"]
+            he_lines = [
+                f"📊 סה\"כ מכירות: {he_symbol}{total_sum:,.0f}",
+                f"📅 ימים בדוח: {days} | ממוצע יומי: {he_symbol}{avg_day:,.0f}",
+                f"🧾 עסקאות: {transaction_count:,} | ממוצע לעסקה: {he_symbol}{avg_transaction:,.0f}",
             ]
             if best_day and worst_day and days > 1:
-                summary_lines.append(f"🏆 היום הכי טוב: {currency_symbol}{best_day_sales:,.0f} | היום הכי חלש: {currency_symbol}{worst_day_sales:,.0f}")
-        elif current_lang == "en":
-            summary_lines = [
-                f"📊 Total Sales: {currency_symbol}{total_sum:,.0f}",
-                f"📅 Days in Report: {days} | Daily Average: {currency_symbol}{avg_day:,.0f}",
-                f"🧾 Transactions: {transaction_count:,} | Average per Transaction: {currency_symbol}{avg_transaction:,.0f}",
+                he_lines.append(
+                    f"🏆 היום הכי טוב: {he_symbol}{best_day_sales:,.0f} | היום הכי חלש: {he_symbol}{worst_day_sales:,.0f}"
+                )
+            summary_map["he"] = "\n".join(he_lines)
+        except Exception as e_he:
+            print(f"Summary HE error: {e_he}")
+
+        # Английский
+        try:
+            en_currency = get_currency("en")
+            en_symbol = en_currency["symbol"]
+            en_lines = [
+                f"📊 Total Sales: {en_symbol}{total_sum:,.0f}",
+                f"📅 Days in Report: {days} | Daily Average: {en_symbol}{avg_day:,.0f}",
+                f"🧾 Transactions: {transaction_count:,} | Average per Transaction: {en_symbol}{avg_transaction:,.0f}",
             ]
             if best_day and worst_day and days > 1:
-                summary_lines.append(f"🏆 Best Day: {currency_symbol}{best_day_sales:,.0f} | Weakest Day: {currency_symbol}{worst_day_sales:,.0f}")
-        else:  # ru
-            summary_lines = [
-                f"📊 {t('summary_total_sales')}: {currency_symbol}{total_sum:,.0f}",
-                f"📅 {t('summary_days_in_report')}: {days} | {t('summary_daily_avg')}: {currency_symbol}{avg_day:,.0f}",
-                f"🧾 {t('summary_transactions')}: {transaction_count:,} | {t('summary_avg_per_transaction')}: {currency_symbol}{avg_transaction:,.0f}",
+                en_lines.append(
+                    f"🏆 Best Day: {en_symbol}{best_day_sales:,.0f} | Weakest Day: {en_symbol}{worst_day_sales:,.0f}"
+                )
+            summary_map["en"] = "\n".join(en_lines)
+        except Exception as e_en:
+            print(f"Summary EN error: {e_en}")
+
+        # Русский
+        try:
+            ru_currency = get_currency("ru")
+            ru_symbol = ru_currency["symbol"]
+            ru_lines = [
+                f"📊 {t('summary_total_sales', 'ru')}: {ru_symbol}{total_sum:,.0f}",
+                f"📅 {t('summary_days_in_report', 'ru')}: {days} | {t('summary_daily_avg', 'ru')}: {ru_symbol}{avg_day:,.0f}",
+                f"🧾 {t('summary_transactions', 'ru')}: {transaction_count:,} | {t('summary_avg_per_transaction', 'ru')}: {ru_symbol}{avg_transaction:,.0f}",
             ]
             if best_day and worst_day and days > 1:
-                summary_lines.append(f"🏆 {t('summary_best_day')}: {currency_symbol}{best_day_sales:,.0f} | {t('summary_weakest_day')}: {currency_symbol}{worst_day_sales:,.0f}")
-        
-        summary_txt = "\n".join(summary_lines)
+                ru_lines.append(
+                    f"🏆 {t('summary_best_day', 'ru')}: {ru_symbol}{best_day_sales:,.0f} | {t('summary_weakest_day', 'ru')}: {ru_symbol}{worst_day_sales:,.0f}"
+                )
+            summary_map["ru"] = "\n".join(ru_lines)
+        except Exception as e_ru:
+            print(f"Summary RU error: {e_ru}")
+
+        # Выбираем текст для текущего языка (fallback на иврит)
+        summary_txt = summary_map.get(current_lang) or summary_map.get("he") or ""
     except Exception as e:
         print(f"Summary error: {e}")
         summary_txt = ""
@@ -4111,7 +4136,8 @@ def index():
             }
             for p in plots
         ],
-        "summary": summary_txt[:1000] if summary_txt else "",  # מוגבל ל-1000 תווים
+        # summary может быть как строкой, так и dict c языками; сохраняем как есть
+        "summary": summary_txt if summary_txt else "",
         "summary_ai": summary_ai_txt[:400] if summary_ai_txt else "",  # מוגבל ל-400 תווים
         "roi": roi_data,
         "action_items": action_items,
@@ -4500,16 +4526,16 @@ def demo_analysis():
                 qty = df.groupby(COL_ITEM)[COL_QTY].sum().sort_values(ascending=False).head(10).reset_index()
                 fig = plt.figure(figsize=(9,4))
                 plt.bar(qty[COL_ITEM], qty[COL_QTY])
-            # Переводим заголовки и подписи осей
-            if current_lang == "he":
-                plt.title("Top 10 — כמות לפי מוצר")
-                plt.ylabel("כמות")
-            elif current_lang == "en":
-                plt.title("Top 10 — Quantity by Product")
-                plt.ylabel("Quantity")
-            else:  # ru
-                plt.title("Top 10 — " + t("chart_top_quantity"))
-                plt.ylabel(t("chart_axis_quantity"))
+                # Переводим заголовки и подписи осей
+                if current_lang == "he":
+                    plt.title("Top 10 — כמות לפי מוצר")
+                    plt.ylabel("כמות")
+                elif current_lang == "en":
+                    plt.title("Top 10 — Quantity by Product")
+                    plt.ylabel("Quantity")
+                else:  # ru
+                    plt.title("Top 10 — " + t("chart_top_quantity"))
+                    plt.ylabel(t("chart_axis_quantity"))
                 plt.xticks(rotation=40, ha="right")
                 fname1 = _save_fig(fig, "top_qty.png")
                 brief1 = {
@@ -4634,9 +4660,18 @@ def export_pdf():
                 generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
             except:
                 generated_at_str = ""
+        current_lang = get_language()
+        raw_summary = session_data.get("summary", "")
+
+        # summary может быть dict с языками или строкой
+        if isinstance(raw_summary, dict):
+            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+        else:
+            summary_for_lang = raw_summary
+
         snap = {
             "generated_at": generated_at_str,
-            "summary": session_data.get("summary", ""),
+            "summary": summary_for_lang,
             "summary_ai": session_data.get("summary_ai", ""),
             "roi": session_data.get("roi", {}),
             "plots": session_data.get("plots", []),
@@ -4644,10 +4679,17 @@ def export_pdf():
         print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
     else:
         # Fallback на LAST_EXPORT
+    current_lang = get_language()
+    raw_summary = LAST_EXPORT.get("summary", "")
+    if isinstance(raw_summary, dict):
+        summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+    else:
+        summary_for_lang = raw_summary
+
     snap = {
         "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
                          if LAST_EXPORT.get("generated_at") else ""),
-        "summary": LAST_EXPORT.get("summary", ""),
+        "summary": summary_for_lang,
         "summary_ai": LAST_EXPORT.get("summary_ai", ""),
         "roi": LAST_EXPORT.get("roi", {}),
         "plots": LAST_EXPORT.get("plots", []),
@@ -6408,15 +6450,21 @@ def result():
     roi = {}
     action_items = []
     
+    current_lang = get_language()
+    
     # Сначала пробуем LAST_EXPORT (глобальная переменная - работает мгновенно)
     plots_from_export = LAST_EXPORT.get("plots", [])
     
     if plots_from_export and len(plots_from_export) > 0:
         # Данные есть в LAST_EXPORT - используем их (самый быстрый способ)
         plots = plots_from_export
-    summary = LAST_EXPORT.get("summary", "")
-    summary_ai = LAST_EXPORT.get("summary_ai", "")
-    roi = LAST_EXPORT.get("roi", {})
+        raw_summary = LAST_EXPORT.get("summary", "")
+        if isinstance(raw_summary, dict):
+            summary = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+        else:
+            summary = raw_summary
+        summary_ai = LAST_EXPORT.get("summary_ai", "")
+        roi = LAST_EXPORT.get("roi", {})
         action_items = LAST_EXPORT.get("action_items", [])
         print(f"📄 Loaded from LAST_EXPORT: {len(plots)} plots")
     else:
@@ -6428,7 +6476,11 @@ def result():
             plots_from_session = session_data.get("plots", [])
             if plots_from_session and len(plots_from_session) > 0:
                 plots = plots_from_session
-                summary = session_data.get("summary", "")
+                raw_summary = session_data.get("summary", "")
+                if isinstance(raw_summary, dict):
+                    summary = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+                else:
+                    summary = raw_summary
                 summary_ai = session_data.get("summary_ai", "")
                 roi = session_data.get("roi", {})
                 action_items = session_data.get("action_items", [])

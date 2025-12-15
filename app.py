@@ -3400,8 +3400,8 @@ def index():
             ax.bar(hourly[HOUR_COL], hourly[COL_SUM], align="center")
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
-            ax.set_xlabel(rtl("שעה"))
+                ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
+                ax.set_xlabel(rtl("שעה"))
                 ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
             elif current_lang == "en":
                 currency_sym = get_currency("en")["symbol"]

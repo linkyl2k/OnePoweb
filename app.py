@@ -5059,6 +5059,7 @@ def export_pdf():
                 f"<div class='plot'>"
                 f"{('<h2>' + _esc(p.get('title','')) + '</h2>') if p.get('title') else ''}"
                         f"{('<img src=\"' + img_src + '\" alt=\"plot\" style=\"max-width: 100%; height: auto; display: block;\"/>') if img_src else ('<p style=\"color: red;\">Image not found: ' + _esc(p.get('filename', '')) + '</p>' if p.get('filename') else '')}"
+                f"{('<p>' + _esc(p.get('ai','')) + '</p>') if p.get('ai') else ''}"
                 f"</div>"
               )
                 )(_img_base64(p.get('filename', '')))

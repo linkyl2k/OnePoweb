@@ -6274,10 +6274,10 @@ def signup():
         return render_template("signup.html")
     
     # POST - הרשמה
-        email = (request.form.get("email") or "").strip().lower()
+    email = (request.form.get("email") or "").strip().lower()
     username = (request.form.get("username") or "").strip().lower()
-        password = request.form.get("password") or ""
-        agree_terms = request.form.get("agree_terms")  # נקבל מהצ’קבוקס
+    password = request.form.get("password") or ""
+    agree_terms = request.form.get("agree_terms")  # נקבל מהצ’קבוקס
 
     first_name = (request.form.get("first_name") or "").strip()
     last_name = (request.form.get("last_name") or "").strip()
@@ -6301,9 +6301,9 @@ def signup():
         flash("שם משתמש זה כבר תפוס", "danger")
         return render_template("signup.html", **form_data)
 
-        # אם לא סומן – נחזיר הודעת שגיאה
-        if not agree_terms:
-            flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
+    # אם לא סומן – נחזיר הודעת שגיאה
+    if not agree_terms:
+        flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
         return render_template("signup.html", **form_data)
 
     # בדיקת התאמת סיסמאות

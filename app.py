@@ -5394,7 +5394,7 @@ def subscribe():
         return redirect(url_for("login"))
     
     try:
-    ensure_user_ref_code(u["id"])
+        ensure_user_ref_code(u["id"])
     except Exception as e:
         print(f"⚠️ Error ensuring ref_code: {e}")
         # Continue anyway - not critical

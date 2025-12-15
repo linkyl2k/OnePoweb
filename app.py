@@ -2119,10 +2119,11 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
             f"קידום ‘זנב מוצרים’ (≈{int(params.tail_share_cutoff*100)}% מההכנסות) ב+{int(params.tail_boost_ratio*100)}% → +{c['monthly_gain']:,.0f} ₪/חודש."
         )
 
+    # Текстовый итог ROI по языкам
     if lang == "he":
-    summary_text = (
+        summary_text = (
             f"פוטנציאל שיפור חודשי (בתנאי שפועלים על התובנות): ~{total_gain:,.0f} ₪. "
-        f"עלות השירות: {params.service_cost:,.0f} ₪. "
+            f"עלות השירות: {params.service_cost:,.0f} ₪. "
             f"ROI תיאורטי: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ הערכה זו מבוססת על ניתוח הנתונים בלבד. התוצאות בפועל תלויות בפעולות שתנקטו."
@@ -2131,7 +2132,7 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
             f"Monthly improvement potential (if you act on insights): ~${total_gain:,.0f}. "
             f"Service cost: ${params.service_cost:,.0f}. "
             f"Theoretical ROI: {out['roi_percent']:,.0f}%."
-    )
+        )
         disclaimer = "⚠️ This estimate is based on data analysis only. Actual results depend on actions taken."
     else:  # ru
         summary_text = (
@@ -2140,6 +2141,7 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
             f"Теоретический ROI: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ Эта оценка основана только на анализе данных. Фактические результаты зависят от предпринятых действий."
+
     out["text"] = " • ".join(parts + [summary_text, disclaimer])
     return out
 

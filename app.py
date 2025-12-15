@@ -5756,19 +5756,22 @@ def activate_subscription(user_id, plan, discount_used):
             # Safe access to referred_by and ref_bonus_granted
             referrer_id = None
             if hasattr(u, 'keys') and "referred_by" in u.keys():
-    referrer_id = u["referred_by"]
+                referrer_id = u["referred_by"]
             elif "referred_by" in dict(u).keys():
                 referrer_id = dict(u)["referred_by"]
             
             already_granted = 0
             if hasattr(u, 'keys') and "ref_bonus_granted" in u.keys():
-    already_granted = int(u["ref_bonus_granted"] or 0)
+                already_granted = int(u["ref_bonus_granted"] or 0)
             elif "ref_bonus_granted" in dict(u).keys():
                 already_granted = int(dict(u)["ref_bonus_granted"] or 0)
             
             if referrer_id and not already_granted and int(referrer_id) != int(user_id):
                 # Give referrer 50% discount on next payment (one time only)
-                db.execute("UPDATE users SET referral_discount=50 WHERE id=? AND (referral_discount IS NULL OR referral_discount=0)", (referrer_id,))
+                db.execute(
+                    "UPDATE users SET referral_discount=50 WHERE id=? AND (referral_discount IS NULL OR referral_discount=0)",
+                    (referrer_id,),
+                )
                 db.execute("UPDATE users SET ref_bonus_granted=1 WHERE id=?", (user_id,))
                 db.commit()
         except (KeyError, TypeError, AttributeError, ValueError) as e:

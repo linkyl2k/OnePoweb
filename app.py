@@ -6446,14 +6446,20 @@ def resend_verification():
 
 @app.route("/roi")
 def roi_page():
-    snap = session.get("export_payload") or {}
-    roi = snap.get("roi") or {}
+    # Используем те же данные, что и для result/pdf:
+    # сначала LAST_EXPORT, потом session["last_export"]
+    roi = LAST_EXPORT.get("roi") or {}
+    if not roi:
+        snap = session.get("last_export") or {}
+        roi = snap.get("roi") or {}
     # הצלה: אם אין ROI בכלל – הודעה מסודרת
-    has_any = bool(roi) and any([
-        bool(roi.get("text")), 
-        float(roi.get("monthly_gain") or 0) != 0.0, 
-        float(roi.get("roi_percent") or 0) != 0.0
-    ])
+    has_any = bool(roi) and any(
+        [
+            bool(roi.get("text")),
+            float(roi.get("monthly_gain") or 0) != 0.0,
+            float(roi.get("roi_percent") or 0) != 0.0,
+        ]
+    )
     return render_template(
         "roi.html",
         roi=roi,

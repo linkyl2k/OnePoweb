@@ -3830,9 +3830,9 @@ def index():
                     
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                    ax.set_title(rtl("מפת חום: מכירות לפי שעה ויום"))
-                    ax.set_xlabel(rtl("שעה"))
-                    ax.set_ylabel(rtl("יום בשבוע"))
+                        ax.set_title(rtl("מפת חום: מכירות לפי שעה ויום"))
+                        ax.set_xlabel(rtl("שעה"))
+                        ax.set_ylabel(rtl("יום בשבוע"))
                     elif current_lang == "en":
                         ax.set_title("Heat Map: Sales by Hour and Day")
                         ax.set_xlabel("Hour")
@@ -4387,7 +4387,7 @@ def demo_analysis():
             plt.bar(hourly["שעה עגולה"], hourly[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            plt.title(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00")
+                plt.title(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00")
                 plt.xlabel("שעה")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
@@ -4428,7 +4428,7 @@ def demo_analysis():
             plt.bar(by_wd["יום בשבוע"], by_wd[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            plt.title("מכירות לפי יום בשבוע (₪)")
+                plt.title("מכירות לפי יום בשבוע (₪)")
                 plt.xlabel("יום")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
@@ -4500,16 +4500,16 @@ def demo_analysis():
                 qty = df.groupby(COL_ITEM)[COL_QTY].sum().sort_values(ascending=False).head(10).reset_index()
                 fig = plt.figure(figsize=(9,4))
                 plt.bar(qty[COL_ITEM], qty[COL_QTY])
-                # Переводим заголовки и подписи осей
-                if current_lang == "he":
+            # Переводим заголовки и подписи осей
+            if current_lang == "he":
                 plt.title("Top 10 — כמות לפי מוצר")
-                    plt.ylabel("כמות")
-                elif current_lang == "en":
-                    plt.title("Top 10 — Quantity by Product")
-                    plt.ylabel("Quantity")
-                else:  # ru
-                    plt.title("Top 10 — " + t("chart_top_quantity"))
-                    plt.ylabel(t("chart_axis_quantity"))
+                plt.ylabel("כמות")
+            elif current_lang == "en":
+                plt.title("Top 10 — Quantity by Product")
+                plt.ylabel("Quantity")
+            else:  # ru
+                plt.title("Top 10 — " + t("chart_top_quantity"))
+                plt.ylabel(t("chart_axis_quantity"))
                 plt.xticks(rotation=40, ha="right")
                 fname1 = _save_fig(fig, "top_qty.png")
                 brief1 = {
@@ -4529,7 +4529,7 @@ def demo_analysis():
             plt.bar(revenue[COL_ITEM], revenue[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            plt.title("Top 10 — הכנסות לפי מוצר")
+                plt.title("Top 10 — הכנסות לפי מוצר")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
                 plt.title("Top 10 — Revenue by Product")

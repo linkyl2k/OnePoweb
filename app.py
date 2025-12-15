@@ -4679,21 +4679,21 @@ def export_pdf():
         print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
     else:
         # Fallback на LAST_EXPORT
-    current_lang = get_language()
-    raw_summary = LAST_EXPORT.get("summary", "")
-    if isinstance(raw_summary, dict):
-        summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
-    else:
-        summary_for_lang = raw_summary
+        current_lang = get_language()
+        raw_summary = LAST_EXPORT.get("summary", "")
+        if isinstance(raw_summary, dict):
+            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+        else:
+            summary_for_lang = raw_summary
 
-    snap = {
-        "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
-                         if LAST_EXPORT.get("generated_at") else ""),
-        "summary": summary_for_lang,
-        "summary_ai": LAST_EXPORT.get("summary_ai", ""),
-        "roi": LAST_EXPORT.get("roi", {}),
-        "plots": LAST_EXPORT.get("plots", []),
-    }
+        snap = {
+            "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
+                             if LAST_EXPORT.get("generated_at") else ""),
+            "summary": summary_for_lang,
+            "summary_ai": LAST_EXPORT.get("summary_ai", ""),
+            "roi": LAST_EXPORT.get("roi", {}),
+            "plots": LAST_EXPORT.get("plots", []),
+        }
         print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
     
     print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}")

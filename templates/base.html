@@ -27,6 +27,11 @@
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 
   <!-- Favicon / App Icons -->
+  <!-- Classic favicon.ico for browsers / Google -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+
+  <!-- High‑res PNG icon (tabs, PWA, etc.) -->
   <link rel="icon" type="image/png" sizes="48x48" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
   <meta name="color-scheme" content="light dark">

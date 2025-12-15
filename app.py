@@ -914,7 +914,7 @@ if IS_PRODUCTION:
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 else:
     DATA_DIR = BASE_DIR
-DB_PATH = os.path.join(BASE_DIR, "app.db")
+    DB_PATH = os.path.join(BASE_DIR, "app.db")
     UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 
 def get_db():

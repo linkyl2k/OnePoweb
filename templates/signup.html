@@ -16,7 +16,7 @@
             <p class="text-muted small mb-0">{% if current_lang == 'he' %}הצטרף ל-OnePoweb בחינם{% elif current_lang == 'en' %}Join OnePoweb for free{% else %}Присоединяйтесь к OnePoweb бесплатно{% endif %}</p>
           </div>
 
-          <form method="POST" class="vstack gap-3" novalidate>
+        <form method="POST" class="vstack gap-3" novalidate>
             
             <!-- Name Row -->
             <div class="row g-3">
@@ -31,27 +31,27 @@
             </div>
             
             <!-- Email -->
-            <div>
+          <div>
               <label class="form-label">{{ t('signup_email') }}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                 <input name="email" type="email" class="form-control" value="{{ email or '' }}" required placeholder="your@email.com">
               </div>
               <div class="form-text small">{% if current_lang == 'he' %}נשלח אליך קישור לאימות{% elif current_lang == 'en' %}Verification link will be sent{% else %}Будет отправлена ссылка для подтверждения{% endif %}</div>
-            </div>
+          </div>
             
             <!-- Username -->
-            <div>
+          <div>
               <label class="form-label">{{ t('signup_username') }}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-at"></i></span>
                 <input name="username" type="text" class="form-control" value="{{ username or '' }}" placeholder="myusername" pattern="^[A-Za-z0-9]{4,20}$" minlength="4" maxlength="20" required>
               </div>
               <div class="form-text small">{% if current_lang == 'he' %}4-20 תווים: אותיות אנגליות וספרות בלבד{% elif current_lang == 'en' %}4-20 characters: English letters and digits only{% else %}4-20 символов: только английские буквы и цифры{% endif %}</div>
-            </div>
+          </div>
             
             <!-- Password -->
-            <div>
+          <div>
               <label class="form-label">{{ t('signup_password') }}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
@@ -67,21 +67,21 @@
                   <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_digit') }}</span>
                 </div>
               </div>
-            </div>
+          </div>
             
             <!-- Confirm Password -->
-            <div>
+          <div>
               <label class="form-label">{{ t('signup_confirm') }}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                 <input name="confirm_password" type="password" class="form-control" id="confirm_password" minlength="8" maxlength="32" required placeholder="{{ t('signup_confirm') }}">
-              </div>
+          </div>
               <div id="password-match" class="small mt-1" style="display: none;"></div>
-            </div>
+          </div>
             
             <!-- Terms Checkbox -->
             <div class="form-check mt-2">
-              <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
+            <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
               <label class="form-check-label small" for="agree_terms">
                 {% if current_lang == 'he' %}
                 אני מאשר/ת את <a href="{{ url_for('terms') }}" target="_blank">תנאי השימוש</a> ו<a href="{{ url_for('privacy') }}" target="_blank">מדיניות הפרטיות</a>
@@ -90,15 +90,15 @@
                 {% else %}
                 Я согласен с <a href="{{ url_for('terms') }}" target="_blank">Условиями использования</a> и <a href="{{ url_for('privacy') }}" target="_blank">Политикой конфиденциальности</a>
                 {% endif %}
-              </label>
-            </div>
+            </label>
+          </div>
             
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary w-100 py-2 mt-2" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); border: none; border-radius: 12px; font-weight: 600;">
               <i class="bi bi-person-check me-2"></i>{{ t('signup_button') }}
             </button>
-          </form>
-          
+        </form>
+
           <!-- Divider -->
           <div class="text-center my-4" style="position: relative;">
             <hr style="border-color: var(--border);">
@@ -126,7 +126,7 @@
           </div>
           <div class="small text-muted">
             <i class="bi bi-check-circle text-success me-1"></i>{{ t('benefits_cancel') }}
-          </div>
+      </div>
         </div>
       </div>
       

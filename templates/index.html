@@ -267,7 +267,7 @@
         <div class="hour-range-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
           <i class="bi bi-clock" style="font-size: 1.3rem; color: #06b6d4; filter: drop-shadow(0 0 8px rgba(6,182,212,0.5));"></i>
           <div class="hour-range-label" style="font-size: 0.95rem; color: #e6e9ef; font-weight: 600;">{% if current_lang == 'he' %}טווח שעות לגרף "לפי שעה"{% elif current_lang == 'en' %}Hour range for "Sales by Hour" graph{% else %}Диапазон часов для графика "Продажи по часам"{% endif %}</div>
-        </div>
+          </div>
         <div class="hour-range-inputs" style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
           <div class="hour-input-wrapper" style="flex: 1; min-width: 200px;">
             <label style="display: block; font-size: 0.85rem; color: #8b93a7; margin-bottom: 0.5rem; font-weight: 500;">{% if current_lang == 'he' %}התחלה{% elif current_lang == 'en' %}Start Hour{% else %}Начало{% endif %}</label>
@@ -279,9 +279,9 @@
               <button type="button" class="hour-btn hour-btn-plus" data-hour="start" data-action="increase" style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15)); border: 2px solid rgba(6,182,212,0.4); border-radius: 10px; color: #06b6d4; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0;" onmouseover="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.3), rgba(59,130,246,0.25))'; this.style.borderColor='rgba(6,182,212,0.6)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.15))'; this.style.borderColor='rgba(6,182,212,0.4)'; this.style.transform='scale(1)';">
                 <i class="bi bi-plus-lg"></i>
               </button>
-            </div>
-            <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem; text-align: center;">0-23</div>
           </div>
+            <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem; text-align: center;">0-23</div>
+        </div>
           <div class="hour-separator" style="display: flex; align-items: center; font-size: 1.5rem; color: #06b6d4; font-weight: bold; margin-top: 1.8rem;">→</div>
           <div class="hour-input-wrapper" style="flex: 1; min-width: 200px;">
             <label style="display: block; font-size: 0.85rem; color: #8b93a7; margin-bottom: 0.5rem; font-weight: 500;">{% if current_lang == 'he' %}סיום{% elif current_lang == 'en' %}End Hour{% else %}Конец{% endif %}</label>

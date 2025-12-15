@@ -20,7 +20,7 @@
         הנתונים מציגים <u>פוטנציאל תיאורטי</u> על בסיס ניתוח הדוח. התוצאות בפועל תלויות בפעולות שתנקטו ובתנאי השוק. אנחנו מספקים תובנות — ההצלחה תלויה ביישום שלכם.
       {% elif current_lang == 'en' %}
         The data shows <u>theoretical potential</u> based on report analysis. Actual results depend on actions taken and market conditions. We provide insights — success depends on your implementation.
-      {% else %}
+  {% else %}
         Данные показывают <u>теоретический потенциал</u> на основе анализа отчета. Фактические результаты зависят от предпринятых действий и рыночных условий. Мы предоставляем инсайты — успех зависит от вашей реализации.
       {% endif %}
     </div>
@@ -37,8 +37,8 @@
 
         {% if roi.components %}
           <div class="mb-4">
-            {% if roi.components.weak_day %}
-              {% set c = roi.components.weak_day %}
+              {% if roi.components.weak_day %}
+                {% set c = roi.components.weak_day %}
               <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
@@ -52,10 +52,10 @@
                   </span>
                 </div>
               </div>
-            {% endif %}
+              {% endif %}
             
-            {% if roi.components.evening_hours %}
-              {% set c = roi.components.evening_hours %}
+              {% if roi.components.evening_hours %}
+                {% set c = roi.components.evening_hours %}
               <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
@@ -69,10 +69,10 @@
                   </span>
                 </div>
               </div>
-            {% endif %}
+              {% endif %}
             
-            {% if roi.components.tail_products %}
-              {% set c = roi.components.tail_products %}
+              {% if roi.components.tail_products %}
+                {% set c = roi.components.tail_products %}
               <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
@@ -85,8 +85,8 @@
                     {% if current_lang == 'he' %}עד +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
                   </span>
                 </div>
-              </div>
-            {% endif %}
+          </div>
+        {% endif %}
           </div>
         {% endif %}
 

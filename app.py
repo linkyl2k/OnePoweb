@@ -914,7 +914,7 @@ if IS_PRODUCTION:
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 else:
     DATA_DIR = BASE_DIR
-    DB_PATH = os.path.join(BASE_DIR, "app.db")
+DB_PATH = os.path.join(BASE_DIR, "app.db")
     UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 
 def get_db():
@@ -1101,13 +1101,13 @@ def reset_password(token):
             is_valid, error_msg = validate_password(p1, current_lang)
             if not is_valid:
                 flash(error_msg, "warning")
-            else:
-                pw_hash = generate_password_hash(p1)
-                db.execute("UPDATE users SET password_hash=? WHERE id=?", (pw_hash, row["user_id"]))
-                db.execute("UPDATE password_resets SET used=1 WHERE id=?", (row["id"],))
-                db.commit()
-                flash("הסיסמה עודכנה! אפשר להתחבר.", "success")
-                return redirect(url_for("login"))
+        else:
+            pw_hash = generate_password_hash(p1)
+            db.execute("UPDATE users SET password_hash=? WHERE id=?", (pw_hash, row["user_id"]))
+            db.execute("UPDATE password_resets SET used=1 WHERE id=?", (row["id"],))
+            db.commit()
+            flash("הסיסמה עודכנה! אפשר להתחבר.", "success")
+            return redirect(url_for("login"))
 
     return render_template("reset.html", title="איפוס סיסמה", token=token)
 
@@ -1817,8 +1817,9 @@ def ai_explain(title: str, brief: dict, lang: str = "he") -> str:
                     "• Пример: '[Слабый день/час] - самый слабый. Рассмотрите запуск специальной акции в [слабый день/час], чтобы привлечь новых клиентов, которые не приходят в [сильные дни/часы]'\n"
                 )
         
-        # Создаем промпт на нужном языке
+        # Создаем промпט + system‑сообщение на нужном языке
         if lang == "he":
+            system_msg = "ענה תמיד אך ורק בעברית. אל תשתמש בשום שפה אחרת."
             prompt = (
                 "אתה יועץ עסקי מומחה לחנויות קמעונאיות ומסעדות בישראל. "
                 "תפקידך לעזור לבעל העסק להבין את הנתונים ולקבל החלטות חכמות.\n\n"
@@ -1833,6 +1834,7 @@ def ai_explain(title: str, brief: dict, lang: str = "he") -> str:
                 f"נתונים: {payload}"
             )
         elif lang == "en":
+            system_msg = "Always respond strictly in English."
             prompt = (
                 "You are a business consultant specializing in retail stores and restaurants in Israel. "
                 "Your role is to help the business owner understand the data and make smart decisions.\n\n"
@@ -1847,28 +1849,32 @@ def ai_explain(title: str, brief: dict, lang: str = "he") -> str:
                 f"Data: {payload}"
             )
         else:  # ru
+            system_msg = "Отвечай строго на русском языке. Не используй другие языки."
             prompt = (
-                "ВАЖНО: Отвечай ТОЛЬКО на русском языке! Все твои ответы должны быть на русском языке.\n\n"
                 "Ты бизнес-консультант, специализирующийся на розничных магазинах и ресторанах в Израиле. "
                 "Твоя роль - помочь владельцу бизнеса понять данные и принимать умные решения.\n\n"
                 "Правила:\n"
-                f"• ОБЯЗАТЕЛЬНО пиши {lang_dict['example']}, как будто разговариваешь с владельцем магазина или кафе\n"
+                f"• Пиши {lang_dict['example']}, как будто разговариваешь с владельцем магазина или кафе\n"
                 f"• {lang_dict['focus']} — что самое важное нужно знать из этого графика?\n"
                 f"• {lang_dict['give']}, которую можно реализовать завтра утром (не теорию!)\n"
                 f"• Длина: {lang_dict['length']}\n"
                 f"• {lang_dict['dont']}, которые уже есть в графике — дай интерпретацию\n"
                 f"{specific_instructions}\n"
                 f"Название графика: {title}\n"
-                f"Данные: {payload}\n\n"
-                "ПОМНИ: Отвечай ТОЛЬКО на русском языке!"
+                f"Данные: {payload}"
             )
+
+        messages = [
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": prompt},
+        ]
 
         # ---- נסיון A1: Chat Completions עם max_completion_tokens ----
         try:
             print(f"📤 Chat.Completions call → {OPENAI_MODEL} | {title} | A1")
             r = _openai_client.chat.completions.create(
                 model=OPENAI_MODEL,
-                messages=[{"role": "user", "content": prompt}],
+                messages=messages,
                 max_tokens=180
             )
             txt = (r.choices[0].message.content or "").strip()
@@ -1882,7 +1888,7 @@ def ai_explain(title: str, brief: dict, lang: str = "he") -> str:
             print(f"📤 Chat.Completions call → {OPENAI_MODEL} | {title} | A2")
             r = _openai_client.chat.completions.create(
                 model=OPENAI_MODEL,
-                messages=[{"role": "user", "content": prompt}]
+                messages=messages
             )
             txt = (r.choices[0].message.content or "").strip()
             if txt:
@@ -2114,9 +2120,9 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
         )
 
     if lang == "he":
-        summary_text = (
+    summary_text = (
             f"פוטנציאל שיפור חודשי (בתנאי שפועלים על התובנות): ~{total_gain:,.0f} ₪. "
-            f"עלות השירות: {params.service_cost:,.0f} ₪. "
+        f"עלות השירות: {params.service_cost:,.0f} ₪. "
             f"ROI תיאורטי: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ הערכה זו מבוססת על ניתוח הנתונים בלבד. התוצאות בפועל תלויות בפעולות שתנקטו."
@@ -2125,7 +2131,7 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
             f"Monthly improvement potential (if you act on insights): ~${total_gain:,.0f}. "
             f"Service cost: ${params.service_cost:,.0f}. "
             f"Theoretical ROI: {out['roi_percent']:,.0f}%."
-        )
+    )
         disclaimer = "⚠️ This estimate is based on data analysis only. Actual results depend on actions taken."
     else:  # ru
         summary_text = (
@@ -3219,12 +3225,12 @@ def cancel_subscription():
     
     # Update database
     now_iso = datetime.utcnow().isoformat(timespec="seconds")
-    
+
     if "canceled_at" in cols and "subscription_status" in cols:
-        db.execute("""
-            UPDATE users
+    db.execute("""
+        UPDATE users
             SET plan = ?, subscription_status = ?, canceled_at = ?
-            WHERE id = ?
+        WHERE id = ?
         """, ("free", "canceled", now_iso, user["id"]))
     elif "canceled_at" in cols:
         db.execute("""
@@ -3239,7 +3245,7 @@ def cancel_subscription():
             WHERE id = ?
         """, ("free", user["id"]))
     db.commit()
-    
+
     flash_t("msg_subscription_cancelled", "success")
     return redirect(url_for("profile"))
 
@@ -3392,8 +3398,8 @@ def index():
             ax.bar(hourly[HOUR_COL], hourly[COL_SUM], align="center")
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-                ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
-                ax.set_xlabel(rtl("שעה"))
+            ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
+            ax.set_xlabel(rtl("שעה"))
                 ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
             elif current_lang == "en":
                 currency_sym = get_currency("en")["symbol"]
@@ -3466,8 +3472,8 @@ def index():
                 ax.bar(xpos, values)
                 # Переводим заголовки и подписи осей
                 if current_lang == "he":
-                    ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
-                    ax.set_xlabel(rtl("יום בשבוע"))
+                ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
+                ax.set_xlabel(rtl("יום בשבוע"))
                     ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
                 elif current_lang == "en":
                     currency_sym = get_currency("en")["symbol"]
@@ -3514,15 +3520,15 @@ def index():
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
             # Переводим заголовок
             if current_lang == "he":
-                plt.title(rtl("מכירות יומיות"))
+            plt.title(rtl("מכירות יומיות"))
             elif current_lang == "en":
                 plt.title("Daily Sales")
             else:  # ru
                 plt.title(t("chart_daily_sales"))
             # Переводим подписи осей
             if current_lang == "he":
-                plt.xlabel(rtl("תאריך"))
-                plt.ylabel(rtl("סה\"כ (₪)"))
+            plt.xlabel(rtl("תאריך"))
+            plt.ylabel(rtl("סה\"כ (₪)"))
             elif current_lang == "en":
                 plt.xlabel("Date")
                 plt.ylabel("Total (₪)")
@@ -3571,8 +3577,8 @@ def index():
                         ax.bar(xpos, qty[COL_QTY])
                         # Переводим заголовки и подписи осей
                         if current_lang == "he":
-                            ax.set_title(_rtl("Top 10 — כמות לפי מוצר"))
-                            ax.set_ylabel(_rtl("כמות"))
+                        ax.set_title(_rtl("Top 10 — כמות לפי מוצר"))
+                        ax.set_ylabel(_rtl("כמות"))
                         elif current_lang == "en":
                             ax.set_title("Top 10 — Quantity by Product")
                             ax.set_ylabel("Quantity")
@@ -3613,7 +3619,7 @@ def index():
                     ax.bar(xpos_r, revenue[COL_SUM])
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                        ax.set_title(_rtl("Top 10 — הכנסות לפי מוצר"))
+                    ax.set_title(_rtl("Top 10 — הכנסות לפי מוצר"))
                         ax.set_ylabel(_rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
                     elif current_lang == "en":
                         currency_sym = get_currency("en")["symbol"]
@@ -3670,7 +3676,7 @@ def index():
                     ax.pie(values, labels=labels, autopct="%1.0f%%", startangle=90)
                     # Переводим заголовок
                     if current_lang == "he":
-                        ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
+                    ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
                     elif current_lang == "en":
                         currency_sym = get_currency("en")["symbol"]
                         ax.set_title(f"Payment Methods Breakdown ({currency_sym})")
@@ -3729,8 +3735,8 @@ def index():
                     bars = ax.bar(hourly_stats[HOUR_COL], hourly_stats['avg_ticket'], color='#2ecc71')
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                        ax.set_title(rtl(f"ממוצע קנייה לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
-                        ax.set_xlabel(rtl("שעה"))
+                    ax.set_title(rtl(f"ממוצע קנייה לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
+                    ax.set_xlabel(rtl("שעה"))
                         ax.set_ylabel(rtl(f"ממוצע צ'ק ({get_currency('he')['symbol']})"))
                     elif current_lang == "en":
                         currency_sym = get_currency("en")["symbol"]
@@ -3822,9 +3828,9 @@ def index():
                     
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                        ax.set_title(rtl("מפת חום: מכירות לפי שעה ויום"))
-                        ax.set_xlabel(rtl("שעה"))
-                        ax.set_ylabel(rtl("יום בשבוע"))
+                    ax.set_title(rtl("מפת חום: מכירות לפי שעה ויום"))
+                    ax.set_xlabel(rtl("שעה"))
+                    ax.set_ylabel(rtl("יום בשבוע"))
                     elif current_lang == "en":
                         ax.set_title("Heat Map: Sales by Hour and Day")
                         ax.set_xlabel("Hour")
@@ -3906,7 +3912,7 @@ def index():
                     
                     # Переводим метки
                     if current_lang == "he":
-                        labels = [rtl('ימי חול'), rtl('סופ"ש (שישי-שבת)')]
+                    labels = [rtl('ימי חול'), rtl('סופ"ש (שישי-שבת)')]
                     elif current_lang == "en":
                         labels = ["Weekdays", "Weekend (Fri-Sat)"]
                     else:  # ru
@@ -3919,8 +3925,8 @@ def index():
                     ax1.bar(labels, [weekday_total, weekend_total], color=colors)
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                        ax1.set_title(rtl('סה"כ מכירות'))
-                        ax1.set_ylabel(rtl('₪'))
+                    ax1.set_title(rtl('סה"כ מכירות'))
+                    ax1.set_ylabel(rtl('₪'))
                         ax2.set_title(rtl('ממוצע עסקה'))
                         ax2.set_ylabel(rtl('₪'))
                     elif current_lang == "en":
@@ -4109,7 +4115,7 @@ def index():
         "action_items": action_items,
         "saved_report_id": saved_report_id
     }
-    
+
     # שמירה ב-LAST_EXPORT (גלובלי - למקרה של single worker)
     LAST_EXPORT["generated_at"] = _dt.now()
     LAST_EXPORT["plots"] = plots
@@ -4267,7 +4273,7 @@ def demo_analysis():
     LAST_EXPORT["action_items"] = action_items
     
     print(f"✅ Demo: נוצרו {len(plots)} גרפים")
-    
+
     return redirect(url_for("result"))
 
 
@@ -4285,7 +4291,7 @@ def demo_analysis():
             plt.bar(daily["תאריך"].astype(str), daily["סכום (₪)"])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-                plt.title("מכירות יומיות (₪)")
+            plt.title("מכירות יומיות (₪)")
                 plt.xlabel("תאריך")
                 plt.ylabel("סה\"כ (₪)")
             elif current_lang == "en":
@@ -4311,7 +4317,7 @@ def demo_analysis():
                 plt.bar(qty["מוצר"], qty["כמות"])
                 # Переводим заголовки и подписи осей
                 if current_lang == "he":
-                    plt.title("Top 10 — כמות לפי מוצר")
+                plt.title("Top 10 — כמות לפי מוצר")
                     plt.ylabel("כמות")
                 elif current_lang == "en":
                     plt.title("Top 10 — Quantity by Product")
@@ -4327,7 +4333,7 @@ def demo_analysis():
             plt.bar(revenue["מוצר"], revenue["סכום (₪)"])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-                plt.title("Top 10 — הכנסות לפי מוצר")
+            plt.title("Top 10 — הכנסות לפי מוצר")
                 plt.ylabel("סה\"כ (₪)")
             elif current_lang == "en":
                 plt.title("Top 10 — Revenue by Product")
@@ -4350,7 +4356,7 @@ def demo_analysis():
                 plt.pie(pay["סכום (₪)"], labels=pay["אמצעי תשלום"], autopct="%1.0f%%", startangle=90)
                 # Переводим заголовок
                 if current_lang == "he":
-                    plt.title("פילוח אמצעי תשלום (₪)")
+                plt.title("פילוח אמצעי תשלום (₪)")
                 elif current_lang == "en":
                     plt.title("Payment Methods Breakdown (₪)")
                 else:  # ru
@@ -4379,7 +4385,7 @@ def demo_analysis():
             plt.bar(hourly["שעה עגולה"], hourly[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-                plt.title(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00")
+            plt.title(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00")
                 plt.xlabel("שעה")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
@@ -4420,7 +4426,7 @@ def demo_analysis():
             plt.bar(by_wd["יום בשבוע"], by_wd[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-                plt.title("מכירות לפי יום בשבוע (₪)")
+            plt.title("מכירות לפי יום בשבוע (₪)")
                 plt.xlabel("יום")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
@@ -4457,7 +4463,7 @@ def demo_analysis():
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-                plt.title("מכירות יומיות (₪)")
+            plt.title("מכירות יומיות (₪)")
                 plt.xlabel("תאריך")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
@@ -4494,7 +4500,7 @@ def demo_analysis():
                 plt.bar(qty[COL_ITEM], qty[COL_QTY])
                 # Переводим заголовки и подписи осей
                 if current_lang == "he":
-                    plt.title("Top 10 — כמות לפי מוצר")
+                plt.title("Top 10 — כמות לפי מוצר")
                     plt.ylabel("כמות")
                 elif current_lang == "en":
                     plt.title("Top 10 — Quantity by Product")
@@ -4521,7 +4527,7 @@ def demo_analysis():
             plt.bar(revenue[COL_ITEM], revenue[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-                plt.title("Top 10 — הכנסות לפי מוצר")
+            plt.title("Top 10 — הכנסות לפי מוצר")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":
                 plt.title("Top 10 — Revenue by Product")
@@ -4557,7 +4563,7 @@ def demo_analysis():
             plt.pie(pay[COL_SUM], labels=pay[COL_PAY], autopct="%1.0f%%", startangle=90)
             # Переводим заголовок
             if current_lang == "he":
-                plt.title("פילוח אמצעי תשלום (₪)")
+            plt.title("פילוח אמצעי תשלום (₪)")
             elif current_lang == "en":
                 plt.title("Payment Methods Breakdown (₪)")
             else:  # ru
@@ -4636,14 +4642,14 @@ def export_pdf():
         print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
     else:
         # Fallback на LAST_EXPORT
-        snap = {
-            "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
-                             if LAST_EXPORT.get("generated_at") else ""),
-            "summary": LAST_EXPORT.get("summary", ""),
-            "summary_ai": LAST_EXPORT.get("summary_ai", ""),
-            "roi": LAST_EXPORT.get("roi", {}),
-            "plots": LAST_EXPORT.get("plots", []),
-        }
+    snap = {
+        "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
+                         if LAST_EXPORT.get("generated_at") else ""),
+        "summary": LAST_EXPORT.get("summary", ""),
+        "summary_ai": LAST_EXPORT.get("summary_ai", ""),
+        "roi": LAST_EXPORT.get("roi", {}),
+        "plots": LAST_EXPORT.get("plots", []),
+    }
         print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
     
     print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}")
@@ -4789,7 +4795,7 @@ def export_pdf():
         th1, th2, th3 = "Компонент", "Детали", "Месячный вклад"
     else:  # en
         th1, th2, th3 = "Component", "Details", "Monthly Contribution"
-    
+
     roi_table_html = (
         f"<div class='roi-table-wrap'>"
         f"<table class='roi-table'>"
@@ -4997,12 +5003,12 @@ def export_pdf():
               (
                 lambda p: (
                     lambda img_src: (
-                        f"<div class='plot'>"
-                        f"{('<h2>' + _esc(p.get('title','')) + '</h2>') if p.get('title') else ''}"
+                f"<div class='plot'>"
+                f"{('<h2>' + _esc(p.get('title','')) + '</h2>') if p.get('title') else ''}"
                         f"{('<img src=\"' + img_src + '\" alt=\"plot\" style=\"max-width: 100%; height: auto; display: block;\"/>') if img_src else ('<p style=\"color: red;\">Image not found: ' + _esc(p.get('filename', '')) + '</p>' if p.get('filename') else '')}"
-                        f"{('<p>' + _esc(p.get('ai','')) + '</p>') if p.get('ai') else ''}"
-                        f"</div>"
-                    )
+                f"{('<p>' + _esc(p.get('ai','')) + '</p>') if p.get('ai') else ''}"
+                f"</div>"
+              )
                 )(_img_base64(p.get('filename', '')))
               )(p)
               for p in (snap.get('plots') or [])
@@ -5344,7 +5350,7 @@ def subscribe():
         return redirect(url_for("login"))
     
     try:
-        ensure_user_ref_code(u["id"])
+    ensure_user_ref_code(u["id"])
     except Exception as e:
         print(f"⚠️ Error ensuring ref_code: {e}")
         # Continue anyway - not critical
@@ -5619,8 +5625,8 @@ def paypal_subscription_return():
                     SET plan=?, canceled_at=NULL, referral_discount=0
                     WHERE id=?
                 """, (plan, u["id"]))
-            db.commit()
-            
+    db.commit()
+
             # Clear pending subscription from session
             session.pop("pending_subscription", None)
             
@@ -5706,13 +5712,13 @@ def activate_subscription(user_id, plan, discount_used):
             # Safe access to referred_by and ref_bonus_granted
             referrer_id = None
             if hasattr(u, 'keys') and "referred_by" in u.keys():
-                referrer_id = u["referred_by"]
+    referrer_id = u["referred_by"]
             elif "referred_by" in dict(u).keys():
                 referrer_id = dict(u)["referred_by"]
             
             already_granted = 0
             if hasattr(u, 'keys') and "ref_bonus_granted" in u.keys():
-                already_granted = int(u["ref_bonus_granted"] or 0)
+    already_granted = int(u["ref_bonus_granted"] or 0)
             elif "ref_bonus_granted" in dict(u).keys():
                 already_granted = int(dict(u)["ref_bonus_granted"] or 0)
             
@@ -6221,10 +6227,10 @@ def signup():
         return render_template("signup.html")
     
     # POST - הרשמה
-    email = (request.form.get("email") or "").strip().lower()
+        email = (request.form.get("email") or "").strip().lower()
     username = (request.form.get("username") or "").strip().lower()
-    password = request.form.get("password") or ""
-    agree_terms = request.form.get("agree_terms")  # נקבל מהצ’קבוקס
+        password = request.form.get("password") or ""
+        agree_terms = request.form.get("agree_terms")  # נקבל מהצ’קבוקס
 
     first_name = (request.form.get("first_name") or "").strip()
     last_name = (request.form.get("last_name") or "").strip()
@@ -6247,10 +6253,10 @@ def signup():
     if existing:
         flash("שם משתמש זה כבר תפוס", "danger")
         return render_template("signup.html", **form_data)
-    
-    # אם לא סומן – נחזיר הודעת שגיאה
-    if not agree_terms:
-        flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
+
+        # אם לא סומן – נחזיר הודעת שגיאה
+        if not agree_terms:
+            flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
         return render_template("signup.html", **form_data)
 
     # בדיקת התאמת סיסמאות
@@ -6267,7 +6273,7 @@ def signup():
 
     # יצירת טוקן אימות
     verification_token = generate_verification_token()
-    
+
     db = get_db()
     try:
         db.execute(
@@ -6284,10 +6290,10 @@ def signup():
 
     # קבלת המשתמש החדש (בלי כניסה אוטומטית - צריך לאמת מייל)
     user = db.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
-    
+
     # דואגים שלמשתמש החדש יהיה ref_code
     ensure_user_ref_code(user["id"])
-    
+
     # טיפול בהפניה: אם היה ref בסשן, נקשר את המשתמש למפנה
     ref_code = session.pop("pending_ref", None)
     if ref_code:
@@ -6297,7 +6303,7 @@ def signup():
             db.execute("UPDATE users SET referred_by=? WHERE id=?", (referrer["id"], user["id"]))
             db.execute("UPDATE users SET referred_count=COALESCE(referred_count,0)+1 WHERE id=?", (referrer["id"],))
             db.commit()
-    
+
     # שליחת מייל אימות
     send_verification_email(email, verification_token)
     
@@ -6406,9 +6412,9 @@ def result():
     if plots_from_export and len(plots_from_export) > 0:
         # Данные есть в LAST_EXPORT - используем их (самый быстрый способ)
         plots = plots_from_export
-        summary = LAST_EXPORT.get("summary", "")
-        summary_ai = LAST_EXPORT.get("summary_ai", "")
-        roi = LAST_EXPORT.get("roi", {})
+    summary = LAST_EXPORT.get("summary", "")
+    summary_ai = LAST_EXPORT.get("summary_ai", "")
+    roi = LAST_EXPORT.get("roi", {})
         action_items = LAST_EXPORT.get("action_items", [])
         print(f"📄 Loaded from LAST_EXPORT: {len(plots)} plots")
     else:

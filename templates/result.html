@@ -35,13 +35,13 @@
           <div class="d-flex align-items-center gap-3 mb-4">
             <div style="width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); display: flex; align-items: center; justify-content: center;">
               <i class="bi bi-clipboard-data" style="font-size: 1.4rem; color: #fff;"></i>
-            </div>
+      </div>
             <div>
               <h4 class="mb-0" style="color: var(--text);">{{ t('results_summary') }}</h4>
               <p class="mb-0 text-muted small">{{ t('results_summary_desc') }}</p>
             </div>
           </div>
-          
+
           <!-- Main Summary -->
           <div style="color: #e6e9ef; font-size: 1.1rem; line-height: 1.9; white-space: pre-wrap;">{{ summary }}</div>
           
@@ -208,37 +208,37 @@
 
     {# ==== Charts - BASIC and PRO only ==== #}
     {% if user_plan in ['basic', 'pro'] %}
-      <div class="vstack gap-4">
-        {% for p in plots %}
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <div class="d-flex align-items-center justify-content-between mb-2">
-                <h5 class="mb-0">{{ p.title }}</h5>
-                <a class="btn btn-sm btn-outline-secondary"
-                   data-download="{{ url_for('static', filename='plots/' ~ p.filename) }}"
-                   data-filename="{{ p.filename }}">
+    <div class="vstack gap-4">
+      {% for p in plots %}
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="mb-0">{{ p.title }}</h5>
+              <a class="btn btn-sm btn-outline-secondary"
+                 data-download="{{ url_for('static', filename='plots/' ~ p.filename) }}"
+                 data-filename="{{ p.filename }}">
                   {{ t('results_download_image') }}
-                </a>
-              </div>
+              </a>
+            </div>
 
-              <img class="img-fluid rounded border"
-                   src="{{ url_for('static', filename='plots/' ~ p.filename) }}"
-                   alt="{{ p.title }}">
+            <img class="img-fluid rounded border"
+                 src="{{ url_for('static', filename='plots/' ~ p.filename) }}"
+                 alt="{{ p.title }}">
 
-              {% if p.note %}
-                <div class="small text-muted mt-2">{{ p.note }}</div>
-              {% endif %}
+            {% if p.note %}
+              <div class="small text-muted mt-2">{{ p.note }}</div>
+            {% endif %}
 
               {# AI analysis on charts - PRO only #}
               {% if p.ai and user_plan == 'pro' %}
-                <div class="alert alert-secondary mt-3 mb-0" dir="rtl" style="white-space:pre-wrap">
-                  {{ p.ai }}
-                </div>
-              {% endif %}
-            </div>
+              <div class="alert alert-secondary mt-3 mb-0" dir="rtl" style="white-space:pre-wrap">
+                {{ p.ai }}
+              </div>
+            {% endif %}
           </div>
-        {% endfor %}
-      </div>
+        </div>
+      {% endfor %}
+    </div>
     {% endif %}
 
   {% endif %}

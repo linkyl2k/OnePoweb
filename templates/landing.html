@@ -36,7 +36,7 @@
           {% else %}
             Загрузите отчёт с кассы (CSV/Excel) и мгновенно получите умные графики, практичные рекомендации ИИ и профессиональный PDF‑отчёт.
           {% endif %}
-        </p>
+      </p>
         
         <div class="hero-features mb-4">
           <div class="hero-feature">
@@ -68,9 +68,9 @@
             <i class="bi bi-play-circle me-2"></i>
             {% if current_lang == 'he' %}צפה בדוגמה{% elif current_lang == 'en' %}See a live demo{% else %}Посмотреть демо{% endif %}
           </a>
-        </div>
+      </div>
 
-        {% if session.uid %}
+      {% if session.uid %}
           <div class="hero-note mt-3">
             <i class="bi bi-person-check me-1"></i>
             {% if current_lang == 'he' %}
@@ -88,11 +88,11 @@
               7 ימי ניסיון PRO חינם · <a href="{{ url_for('signup') }}">הרשמה בחינם</a>
             {% elif current_lang == 'en' %}
               7‑day PRO trial for free · <a href="{{ url_for('signup') }}">Sign up free</a>
-            {% else %}
+      {% else %}
               7 дней PRO бесплатно · <a href="{{ url_for('signup') }}">бесплатная регистрация</a>
             {% endif %}
           </div>
-        {% endif %}
+      {% endif %}
       </div>
 
       <div class="col-12 col-lg-6">

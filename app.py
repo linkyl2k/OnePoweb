@@ -3229,10 +3229,10 @@ def cancel_subscription():
     now_iso = datetime.utcnow().isoformat(timespec="seconds")
 
     if "canceled_at" in cols and "subscription_status" in cols:
-    db.execute("""
-        UPDATE users
+        db.execute("""
+            UPDATE users
             SET plan = ?, subscription_status = ?, canceled_at = ?
-        WHERE id = ?
+            WHERE id = ?
         """, ("free", "canceled", now_iso, user["id"]))
     elif "canceled_at" in cols:
         db.execute("""

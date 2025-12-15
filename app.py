@@ -5669,7 +5669,7 @@ def paypal_subscription_return():
                     SET plan=?, canceled_at=NULL, referral_discount=0
                     WHERE id=?
                 """, (plan, u["id"]))
-    db.commit()
+            db.commit()
 
             # Clear pending subscription from session
             session.pop("pending_subscription", None)

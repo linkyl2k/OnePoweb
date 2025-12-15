@@ -92,6 +92,45 @@
       color: #ef4444;
       animation: pulse-urgent 1s ease-in-out infinite;
     }
+    /* Mobile navbar tweaks */
+    @media (max-width: 767.98px) {
+      .navbar {
+        padding-top: 0.35rem;
+        padding-bottom: 0.35rem;
+      }
+      .navbar-brand {
+        font-size: 1.05rem;
+      }
+      .navbar .plan-nav-badge,
+      .navbar .trial-countdown {
+        font-size: 0.6rem;
+      }
+      .navbar-nav .nav-link {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+      }
+      /* Make collapsed menu full‑width and stacked */
+      #nav {
+        margin-top: 0.5rem;
+      }
+      #nav .navbar-nav.me-auto,
+      #nav .navbar-nav.ms-auto {
+        align-items: flex-start;
+      }
+      #nav .navbar-nav.me-auto .nav-item,
+      #nav .navbar-nav.ms-auto .nav-item {
+        width: 100%;
+      }
+      #nav .navbar-nav.ms-auto {
+        margin-top: 0.5rem;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding-top: 0.5rem;
+      }
+      /* Right side buttons in two rows on mobile */
+      #nav .navbar-nav.ms-auto.align-items-center {
+        align-items: flex-start !important;
+      }
+    }
   </style>
 </head>
 
@@ -111,7 +150,7 @@
         <i class="bi bi-graph-up-arrow"></i>
         OnePoweb
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div id="nav" class="collapse navbar-collapse">

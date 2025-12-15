@@ -4358,7 +4358,7 @@ def demo_analysis():
                 plt.pie(pay["סכום (₪)"], labels=pay["אמצעי תשלום"], autopct="%1.0f%%", startangle=90)
                 # Переводим заголовок
                 if current_lang == "he":
-                plt.title("פילוח אמצעי תשלום (₪)")
+                    plt.title("פילוח אמצעי תשלום (₪)")
                 elif current_lang == "en":
                     plt.title("Payment Methods Breakdown (₪)")
                 else:  # ru

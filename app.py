@@ -2416,6 +2416,7 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
 # ====== שמירת מצב אחרון לייצוא PDF (MVP) ======
 LAST_EXPORT = {
     "generated_at": None,    # datetime
+    "lang": "he",            # язык, на котором был выполнен анализ
     "plots": [],             # [{filename,title,note,ai}]
     "summary": ""            # טקסט קצר
 }
@@ -4127,6 +4128,7 @@ def index():
     # שומרים הכל ב-LAST_EXPORT (גלובלי) וגם ב-session (למקרה של multi-worker)
     export_data = {
         "generated_at": _dt.now().isoformat(),
+        "lang": current_lang,
         "plots": [
             {
                 "filename": p.get("filename", ""),
@@ -4146,6 +4148,7 @@ def index():
 
     # שמירה ב-LAST_EXPORT (גלובלי - למקרה של single worker)
     LAST_EXPORT["generated_at"] = _dt.now()
+    LAST_EXPORT["lang"] = current_lang
     LAST_EXPORT["plots"] = plots
     LAST_EXPORT["summary"] = summary_txt
     LAST_EXPORT["summary_ai"] = summary_ai_txt
@@ -4294,6 +4297,7 @@ def demo_analysis():
     
     # שמירה ב-LAST_EXPORT
     LAST_EXPORT["generated_at"] = datetime.now()
+    LAST_EXPORT["lang"] = current_lang
     LAST_EXPORT["plots"] = plots
     LAST_EXPORT["summary"] = summary_txt
     LAST_EXPORT["summary_ai"] = "זהו ניתוח לדוגמה. העלה דוח משלך לקבלת תובנות מותאמות!"
@@ -4671,6 +4675,7 @@ def export_pdf():
 
         snap = {
             "generated_at": generated_at_str,
+            "lang": session_data.get("lang") or get_language(),
             "summary": summary_for_lang,
             "summary_ai": session_data.get("summary_ai", ""),
             "roi": session_data.get("roi", {}),
@@ -4689,6 +4694,7 @@ def export_pdf():
         snap = {
             "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
                              if LAST_EXPORT.get("generated_at") else ""),
+            "lang": LAST_EXPORT.get("lang") or get_language(),
             "summary": summary_for_lang,
             "summary_ai": LAST_EXPORT.get("summary_ai", ""),
             "roi": LAST_EXPORT.get("roi", {}),
@@ -4696,7 +4702,10 @@ def export_pdf():
         }
         print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
     
-    print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}")
+    print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}, lang={snap.get('lang')}")
+
+    # Язык PDF берём из snapshot (язык анализа), а не из текущей сессии
+    pdf_lang_code = snap.get("lang") or get_language()
 
     # ---------- 2) עזרים ----------
     def _esc(s: str) -> str:
@@ -4805,7 +4814,7 @@ def export_pdf():
     has_roi      = bool(roi_text or roi_gain or roi_pct)
 
     # Build table rows - translate based on current language
-    current_lang = get_language()
+    current_lang = pdf_lang_code
     currency_info = get_currency(current_lang)
     currency_symbol = currency_info["symbol"]
     roi_rows = ""
@@ -4848,7 +4857,7 @@ def export_pdf():
     ) if roi_rows else ""
 
     # ROI card for first page - translate based on current language
-    current_lang = get_language()
+    current_lang = pdf_lang_code
     currency_info = get_currency(current_lang)
     currency_symbol = currency_info["symbol"]
     roi_inline_html = ""
@@ -4887,8 +4896,8 @@ def export_pdf():
         )
 
     # ---------- 4) HTML מלא ----------
-    # Get current language for PDF
-    current_lang = get_language()
+    # Use snapshot language for PDF
+    current_lang = pdf_lang_code
     currency_info = get_currency(current_lang)
     currency_symbol = currency_info["symbol"]
     

@@ -11,7 +11,7 @@
   <!-- OpenGraph -->
   <meta property="og:title" content="OnePoweb – ניתוח קופה חכם">
   <meta property="og:description" content="העלה דוח קופה, קבל גרפים ודו״ח PDF מסודר. בקרוב – הסברי AI לעסק שלך.">
-  <meta property="og:image" content="{{ url_for('static', filename='img/logo.png', _external=True) }}">
+  <meta property="og:image" content="{{ url_for('static', filename='img/onepoweb_icon_only_48.png', _external=True) }}">
   <meta property="og:url" content="{{ request.url }}">
   <meta property="og:type" content="website">
 
@@ -25,7 +25,10 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <!-- Style -->
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-  <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+
+  <!-- Favicon / App Icons -->
+  <link rel="icon" type="image/png" sizes="48x48" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
   <meta name="color-scheme" content="light dark">
   
   <style>

@@ -4465,7 +4465,7 @@ def demo_analysis():
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            plt.title("מכירות יומיות (₪)")
+                plt.title("מכירות יומיות (₪)")
                 plt.xlabel("תאריך")
                 plt.ylabel('סה"כ (₪)')
             elif current_lang == "en":

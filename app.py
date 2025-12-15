@@ -3260,6 +3260,18 @@ def set_language(lang):
     if lang in ["he", "en", "ru"]:
         session["language"] = lang
         session.permanent = True
+        session.modified = True
+        
+        # При смене языка очищаем последний экспорт,
+        # чтобы не было сводок/AI на старом языке
+        global LAST_EXPORT
+        LAST_EXPORT = {
+            "generated_at": None,
+            "lang": lang,
+            "plots": [],
+            "summary": "",
+        }
+        session["last_export"] = {}
         
         # Устанавливаем валюту по умолчанию для языка, если пользователь еще не выбрал
         if "currency" not in session:

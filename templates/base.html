@@ -191,7 +191,8 @@
             {% set effective = get_effective_plan(u) if u else 'free' %}
             
             {# Plan Badge with Dropdown #}
-            <li class="nav-item dropdown me-2">
+            <!-- Desktop: full plan dropdown -->
+            <li class="nav-item dropdown me-2 d-none d-lg-block">
               <a class="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 {% if effective == 'pro' or is_trial_active(u) %}
                   <span class="plan-nav-badge pro">
@@ -252,7 +253,21 @@
                   </a>
                 </li>
               </ul>
-          </li>
+            </li>
+
+            <!-- Mobile: compact plan label -->
+            <li class="nav-item d-block d-lg-none mb-1">
+              <span class="nav-link px-0" style="font-size: 0.8rem; opacity: 0.85;">
+                {% if effective == 'pro' or is_trial_active(u) %}
+                  <span class="badge bg-success me-1">PRO</span>
+                {% elif effective == 'basic' %}
+                  <span class="badge bg-primary me-1">BASIC</span>
+                {% else %}
+                  <span class="badge bg-secondary me-1">FREE</span>
+                {% endif %}
+                {{ t('nav_dashboard') }}
+              </span>
+            </li>
 
             <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">📊 {{ t('nav_dashboard') }}</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">{{ t('nav_profile') }}</a></li>

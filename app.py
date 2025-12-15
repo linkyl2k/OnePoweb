@@ -3474,8 +3474,8 @@ def index():
                 ax.bar(xpos, values)
                 # Переводим заголовки и подписи осей
                 if current_lang == "he":
-                ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
-                ax.set_xlabel(rtl("יום בשבוע"))
+                    ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
+                    ax.set_xlabel(rtl("יום בשבוע"))
                     ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
                 elif current_lang == "en":
                     currency_sym = get_currency("en")["symbol"]
@@ -3522,15 +3522,15 @@ def index():
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
             # Переводим заголовок
             if current_lang == "he":
-            plt.title(rtl("מכירות יומיות"))
+                plt.title(rtl("מכירות יומיות"))
             elif current_lang == "en":
                 plt.title("Daily Sales")
             else:  # ru
                 plt.title(t("chart_daily_sales"))
             # Переводим подписи осей
             if current_lang == "he":
-            plt.xlabel(rtl("תאריך"))
-            plt.ylabel(rtl("סה\"כ (₪)"))
+                plt.xlabel(rtl("תאריך"))
+                plt.ylabel(rtl("סה\"כ (₪)"))
             elif current_lang == "en":
                 plt.xlabel("Date")
                 plt.ylabel("Total (₪)")
@@ -3579,8 +3579,8 @@ def index():
                         ax.bar(xpos, qty[COL_QTY])
                         # Переводим заголовки и подписи осей
                         if current_lang == "he":
-                        ax.set_title(_rtl("Top 10 — כמות לפי מוצר"))
-                        ax.set_ylabel(_rtl("כמות"))
+                            ax.set_title(_rtl("Top 10 — כמות לפי מוצר"))
+                            ax.set_ylabel(_rtl("כמות"))
                         elif current_lang == "en":
                             ax.set_title("Top 10 — Quantity by Product")
                             ax.set_ylabel("Quantity")
@@ -3621,7 +3621,7 @@ def index():
                     ax.bar(xpos_r, revenue[COL_SUM])
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                    ax.set_title(_rtl("Top 10 — הכנסות לפי מוצר"))
+                        ax.set_title(_rtl("Top 10 — הכנסות לפי מוצר"))
                         ax.set_ylabel(_rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
                     elif current_lang == "en":
                         currency_sym = get_currency("en")["symbol"]
@@ -3678,7 +3678,7 @@ def index():
                     ax.pie(values, labels=labels, autopct="%1.0f%%", startangle=90)
                     # Переводим заголовок
                     if current_lang == "he":
-                    ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
+                        ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
                     elif current_lang == "en":
                         currency_sym = get_currency("en")["symbol"]
                         ax.set_title(f"Payment Methods Breakdown ({currency_sym})")
@@ -3737,8 +3737,8 @@ def index():
                     bars = ax.bar(hourly_stats[HOUR_COL], hourly_stats['avg_ticket'], color='#2ecc71')
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                    ax.set_title(rtl(f"ממוצע קנייה לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
-                    ax.set_xlabel(rtl("שעה"))
+                        ax.set_title(rtl(f"ממוצע קנייה לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
+                        ax.set_xlabel(rtl("שעה"))
                         ax.set_ylabel(rtl(f"ממוצע צ'ק ({get_currency('he')['symbol']})"))
                     elif current_lang == "en":
                         currency_sym = get_currency("en")["symbol"]
@@ -3914,7 +3914,7 @@ def index():
                     
                     # Переводим метки
                     if current_lang == "he":
-                    labels = [rtl('ימי חול'), rtl('סופ"ש (שישי-שבת)')]
+                        labels = [rtl('ימי חול'), rtl('סופ"ש (שישי-שבת)')]
                     elif current_lang == "en":
                         labels = ["Weekdays", "Weekend (Fri-Sat)"]
                     else:  # ru
@@ -3927,8 +3927,8 @@ def index():
                     ax1.bar(labels, [weekday_total, weekend_total], color=colors)
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
-                    ax1.set_title(rtl('סה"כ מכירות'))
-                    ax1.set_ylabel(rtl('₪'))
+                        ax1.set_title(rtl('סה"כ מכירות'))
+                        ax1.set_ylabel(rtl('₪'))
                         ax2.set_title(rtl('ממוצע עסקה'))
                         ax2.set_ylabel(rtl('₪'))
                     elif current_lang == "en":
@@ -4293,7 +4293,7 @@ def demo_analysis():
             plt.bar(daily["תאריך"].astype(str), daily["סכום (₪)"])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            plt.title("מכירות יומיות (₪)")
+                plt.title("מכירות יומיות (₪)")
                 plt.xlabel("תאריך")
                 plt.ylabel("סה\"כ (₪)")
             elif current_lang == "en":
@@ -4319,7 +4319,7 @@ def demo_analysis():
                 plt.bar(qty["מוצר"], qty["כמות"])
                 # Переводим заголовки и подписи осей
                 if current_lang == "he":
-                plt.title("Top 10 — כמות לפי מוצר")
+                    plt.title("Top 10 — כמות לפי מוצר")
                     plt.ylabel("כמות")
                 elif current_lang == "en":
                     plt.title("Top 10 — Quantity by Product")
@@ -4335,7 +4335,7 @@ def demo_analysis():
             plt.bar(revenue["מוצר"], revenue["סכום (₪)"])
             # Переводим заголовки и подписи осей
             if current_lang == "he":
-            plt.title("Top 10 — הכנסות לפי מוצר")
+                plt.title("Top 10 — הכנסות לפי מוצר")
                 plt.ylabel("סה\"כ (₪)")
             elif current_lang == "en":
                 plt.title("Top 10 — Revenue by Product")
@@ -4565,7 +4565,7 @@ def demo_analysis():
             plt.pie(pay[COL_SUM], labels=pay[COL_PAY], autopct="%1.0f%%", startangle=90)
             # Переводим заголовок
             if current_lang == "he":
-            plt.title("פילוח אמצעי תשלום (₪)")
+                plt.title("פילוח אמצעי תשלום (₪)")
             elif current_lang == "en":
                 plt.title("Payment Methods Breakdown (₪)")
             else:  # ru

@@ -131,6 +131,52 @@
         align-items: flex-start !important;
       }
     }
+    
+    /* iPhone / small phones - extra strict rules */
+    @media (max-width: 480px) {
+      .navbar {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+      }
+      .navbar-brand {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 60%;
+      }
+      .navbar-toggler {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.9rem;
+      }
+      /* Force all nav items to be block-level */
+      #nav .navbar-nav {
+        width: 100%;
+        margin: 0;
+      }
+      #nav .navbar-nav .nav-item {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #nav .navbar-nav .nav-link {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+        white-space: normal;
+        word-wrap: break-word;
+      }
+      /* Hide language dropdown text on very small screens, show only icon */
+      #nav .navbar-nav .dropdown-toggle::after {
+        margin-left: 0.25rem;
+      }
+      /* Ensure no horizontal overflow */
+      .navbar .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+    }
   </style>
 </head>
 

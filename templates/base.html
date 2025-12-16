@@ -264,14 +264,14 @@
             {% endif %}
               </a>
               <ul class="dropdown-menu dropdown-menu-end plan-dropdown">
-                <li class="dropdown-header">בחר תוכנית</li>
+                <li class="dropdown-header">{% if current_lang == 'he' %}בחר תוכנית{% elif current_lang == 'en' %}Choose a plan{% else %}Выберите план{% endif %}</li>
                 <li>
                   <a class="dropdown-item plan-option {% if effective == 'free' and not is_trial_active(u) %}current{% endif %}" href="{{ url_for('profile') }}">
                     <div class="plan-option-header">
                       <span class="plan-name">FREE</span>
-                      <span class="plan-price">חינם</span>
+                      <span class="plan-price">{% if current_lang == 'he' %}חינם{% elif current_lang == 'en' %}Free{% else %}Бесплатно{% endif %}</span>
                     </div>
-                    <small class="text-muted">גרפים בסיסיים</small>
+                    <small class="text-muted">{% if current_lang == 'he' %}גרפים בסיסיים{% elif current_lang == 'en' %}Basic graphs{% else %}Базовые графики{% endif %}</small>
                     {% if effective == 'free' and not is_trial_active(u) %}<i class="bi bi-check-circle-fill current-mark"></i>{% endif %}
                   </a>
                 </li>
@@ -281,7 +281,7 @@
                       <span class="plan-name basic-text">BASIC</span>
                       <span class="plan-price">$9/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
                     </div>
-                    <small class="text-muted">+ השוואת תקופות</small>
+                    <small class="text-muted">{% if current_lang == 'he' %}+ השוואת תקופות{% elif current_lang == 'en' %}+ Period comparison{% else %}+ Сравнение периодов{% endif %}</small>
                     {% if effective == 'basic' %}<i class="bi bi-check-circle-fill current-mark"></i>{% endif %}
                   </a>
                 </li>
@@ -291,14 +291,14 @@
                       <span class="plan-name pro-text">PRO</span>
                       <span class="plan-price">$19/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
                     </div>
-                    <small class="text-muted">+ AI + PDF + הכל</small>
+                    <small class="text-muted">{% if current_lang == 'he' %}+ AI + PDF + הכל{% elif current_lang == 'en' %}+ AI + PDF + Everything{% else %}+ AI + PDF + Всё{% endif %}</small>
                     {% if effective == 'pro' %}<i class="bi bi-check-circle-fill current-mark"></i>{% endif %}
                   </a>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                   <a class="dropdown-item" href="{{ url_for('profile') }}">
-                    <i class="bi bi-gear me-2"></i>ניהול מנוי
+                    <i class="bi bi-gear me-2"></i>{% if current_lang == 'he' %}ניהול מנוי{% elif current_lang == 'en' %}Subscription management{% else %}Управление подпиской{% endif %}
                   </a>
                 </li>
               </ul>

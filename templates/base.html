@@ -92,7 +92,7 @@
       color: #ef4444;
       animation: pulse-urgent 1s ease-in-out infinite;
     }
-    /* Mobile navbar tweaks */
+    /* Mobile navbar tweaks - force vertical column layout like iPad */
     @media (max-width: 767.98px) {
       .navbar {
         padding-top: 0.35rem;
@@ -105,30 +105,50 @@
       .navbar .trial-countdown {
         font-size: 0.6rem;
       }
-      .navbar-nav .nav-link {
-        padding-top: 0.4rem;
-        padding-bottom: 0.4rem;
-      }
-      /* Make collapsed menu full‑width and stacked */
+      /* Force ALL nav items to be vertical column - no horizontal layout */
       #nav {
         margin-top: 0.5rem;
       }
+      #nav .navbar-nav {
+        flex-direction: column !important;
+        width: 100% !important;
+        margin: 0 !important;
+      }
       #nav .navbar-nav.me-auto,
       #nav .navbar-nav.ms-auto {
-        align-items: flex-start;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
       }
-      #nav .navbar-nav.me-auto .nav-item,
-      #nav .navbar-nav.ms-auto .nav-item {
-        width: 100%;
+      #nav .navbar-nav .nav-item {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
       }
+      #nav .navbar-nav .nav-link {
+        display: block !important;
+        width: 100% !important;
+        padding: 0.5rem 0.75rem !important;
+        text-align: left !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+      }
+      #nav .navbar-nav .nav-link:last-child {
+        border-bottom: none !important;
+      }
+      /* Separate left and right sections */
       #nav .navbar-nav.ms-auto {
-        margin-top: 0.5rem;
-        border-top: 1px solid rgba(0,0,0,0.05);
-        padding-top: 0.5rem;
+        margin-top: 0.5rem !important;
+        border-top: 1px solid rgba(0,0,0,0.1) !important;
+        padding-top: 0.5rem !important;
       }
-      /* Right side buttons in two rows on mobile */
-      #nav .navbar-nav.ms-auto.align-items-center {
-        align-items: flex-start !important;
+      /* Buttons should also be full width */
+      #nav .navbar-nav .btn {
+        width: 100% !important;
+        margin: 0.25rem 0 !important;
+        text-align: center !important;
       }
     }
     
@@ -149,32 +169,15 @@
         padding: 0.2rem 0.4rem;
         font-size: 0.9rem;
       }
-      /* Force all nav items to be block-level */
-      #nav .navbar-nav {
-        width: 100%;
-        margin: 0;
-      }
-      #nav .navbar-nav .nav-item {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #nav .navbar-nav .nav-link {
-        display: block;
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        text-align: left;
-        white-space: normal;
-        word-wrap: break-word;
-      }
-      /* Hide language dropdown text on very small screens, show only icon */
-      #nav .navbar-nav .dropdown-toggle::after {
-        margin-left: 0.25rem;
-      }
       /* Ensure no horizontal overflow */
       .navbar .container {
         padding-left: 0.75rem;
         padding-right: 0.75rem;
+      }
+      /* Smaller padding on very small screens */
+      #nav .navbar-nav .nav-link {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.9rem;
       }
     }
   </style>

@@ -5328,7 +5328,7 @@ def export_pdf():
                     ("Консервативный (60%)" if current_lang == 'ru' else "Conservative (60%)")
                   ) + """</div>
                   <div style="font-size: 1.1em; font-weight: bold; color: #ef4444;">""" + f"{currency_symbol}{roi_gain_cons:,.0f}" + """</div>
-                  <div style="font-size: 0.7em; color: #f87171;">ROI: """ + f"{roi_pct_cons:,.0f}%" + """</div>
+                  <div style="font-size: 0.7em; color: #f87171;">ROI: $20</div>
                 </div>
                 <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(16,185,129,0.1); border-radius: 6px; border: 1px solid rgba(16,185,129,0.3);">
                   <div style="font-size: 0.75em; color: #10b981;">""" + (
@@ -5336,7 +5336,7 @@ def export_pdf():
                     ("Базовый (100%)" if current_lang == 'ru' else "Base (100%)")
                   ) + """</div>
                   <div style="font-size: 1.1em; font-weight: bold; color: #34d399;">""" + f"{currency_symbol}{roi_gain:,.0f}" + """</div>
-                  <div style="font-size: 0.7em; color: #10b981;">ROI: """ + f"{roi_pct:,.0f}%" + """</div>
+                  <div style="font-size: 0.7em; color: #10b981;">ROI: $20</div>
                 </div>
                 <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(34,197,94,0.1); border-radius: 6px; border: 1px solid rgba(34,197,94,0.3);">
                   <div style="font-size: 0.75em; color: #16a34a;">""" + (
@@ -5344,7 +5344,7 @@ def export_pdf():
                     ("Оптимистичный (140%)" if current_lang == 'ru' else "Optimistic (140%)")
                   ) + """</div>
                   <div style="font-size: 1.1em; font-weight: bold; color: #22c55e;">""" + f"{currency_symbol}{roi_gain_opt:,.0f}" + """</div>
-                  <div style="font-size: 0.7em; color: #16a34a;">ROI: """ + f"{roi_pct_opt:,.0f}%" + """</div>
+                  <div style="font-size: 0.7em; color: #16a34a;">ROI: $20</div>
                 </div>
               </div>
             </div>

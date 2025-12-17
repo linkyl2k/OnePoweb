@@ -187,12 +187,18 @@
               <div class="p-2" style="background: rgba(16,185,129,0.08); border-radius: 10px;">
                 <div class="small text-muted">{{ t('results_roi_monthly') }}</div>
                 <div style="font-size: 1.25rem; font-weight: bold; color: #34d399;">~{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</div>
+                <button class="btn btn-sm mt-2" style="background: rgba(16,185,129,0.15); color: #10b981; border: none; border-radius: 6px; font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#monthlyTipsModal">
+                  <i class="bi bi-lightbulb me-1"></i>{% if current_lang == 'he' %}איך להשיג{% elif current_lang == 'en' %}How to achieve{% else %}Как достичь{% endif %}
+                </button>
               </div>
             </div>
             <div class="col-6 col-md-4">
               <div class="p-2" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
                 <div class="small text-muted">{{ t('results_roi_theoretical') }}</div>
                 <div style="font-size: 1.25rem; font-weight: bold; color: #34c3ff;">{{ "{:,.0f}".format(_roi) }}%</div>
+                <button class="btn btn-sm mt-2" style="background: rgba(46,160,255,0.15); color: #2ea0ff; border: none; border-radius: 6px; font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#roiTipsModal">
+                  <i class="bi bi-graph-up me-1"></i>{% if current_lang == 'he' %}איך לשפר{% elif current_lang == 'en' %}How to improve{% else %}Как улучшить{% endif %}
+                </button>
               </div>
             </div>
             <div class="col-12 col-md-4">
@@ -243,4 +249,105 @@
 
   {% endif %}
 </div>
+
+{# ==== Модальные окна с советами ==== #}
+{% if user_plan in ['basic', 'pro'] and roi and (roi.text or roi.monthly_gain or roi.roi_percent) %}
+  {% set _gain = roi.monthly_gain or 0 %}
+  {% set _roi  = roi.roi_percent or 0 %}
+
+  {# Модальное окно: Как улучшить ROI #}
+  <div class="modal fade" id="roiTipsModal" tabindex="-1" aria-labelledby="roiTipsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content" style="background: #1a1a2e; border: 1px solid rgba(46,160,255,0.3);">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(46,160,255,0.2);">
+          <h5 class="modal-title" id="roiTipsModalLabel" style="color: #34c3ff;">
+            <i class="bi bi-graph-up me-2"></i>
+            {% if current_lang == 'he' %}איך לשפר את ה-ROI שלך{% elif current_lang == 'en' %}How to Improve Your ROI{% else %}Как улучшить ROI{% endif %}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="color: #e6e9ef;">
+          {% if current_lang == 'he' %}
+            <p class="mb-3">כדי להשיג ROI של <strong>{{ "{:,.0f}".format(_roi) }}%</strong>, התמקד בפעולות הבאות:</p>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>חיזוק ימים חלשים:</strong> הפעל מבצעים מיוחדים בימים עם מכירות נמוכות כדי למשוך יותר לקוחות.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>שיפור שעות ערב:</strong> קידום פעילות בשעות 17:00-20:00 יכול להגדיל את ההכנסות החודשיות.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>קידום מוצרים בתחתית:</strong> הצע חבילות או הנחות על מוצרים שפחות נמכרים כדי להגדיל את המכירות שלהם.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>ניתוח מגמות:</strong> השתמש בגרפים כדי לזהות דפוסים ולנצל אותם.</li>
+            </ul>
+          {% elif current_lang == 'en' %}
+            <p class="mb-3">To achieve an ROI of <strong>{{ "{:,.0f}".format(_roi) }}%</strong>, focus on the following actions:</p>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Strengthen weak days:</strong> Run special promotions on days with low sales to attract more customers.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Improve evening hours:</strong> Promoting activity during 17:00-20:00 can increase monthly revenue.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Promote bottom products:</strong> Offer packages or discounts on less popular products to increase their sales.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Analyze trends:</strong> Use charts to identify patterns and leverage them.</li>
+            </ul>
+          {% else %}
+            <p class="mb-3">Чтобы достичь ROI <strong>{{ "{:,.0f}".format(_roi) }}%</strong>, сосредоточьтесь на следующих действиях:</p>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Усиление слабых дней:</strong> Проводите специальные акции в дни с низкими продажами, чтобы привлечь больше клиентов.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Улучшение вечерних часов:</strong> Продвижение активности в 17:00-20:00 может увеличить месячную выручку.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Продвижение товаров-аутсайдеров:</strong> Предлагайте пакеты или скидки на менее популярные товары, чтобы увеличить их продажи.</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: #34c3ff;"></i><strong>Анализ трендов:</strong> Используйте графики для выявления закономерностей и их использования.</li>
+            </ul>
+          {% endif %}
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid rgba(46,160,255,0.2);">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            {% if current_lang == 'he' %}סגור{% elif current_lang == 'en' %}Close{% else %}Закрыть{% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Модальное окно: Как достичь месячного потенциала #}
+  <div class="modal fade" id="monthlyTipsModal" tabindex="-1" aria-labelledby="monthlyTipsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content" style="background: #1a1a2e; border: 1px solid rgba(16,185,129,0.3);">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(16,185,129,0.2);">
+          <h5 class="modal-title" id="monthlyTipsModalLabel" style="color: #34d399;">
+            <i class="bi bi-lightbulb me-2"></i>
+            {% if current_lang == 'he' %}איך להשיג פוטנציאל חודשי{% elif current_lang == 'en' %}How to Achieve Monthly Potential{% else %}Как достичь месячного потенциала{% endif %}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="color: #e6e9ef;">
+          {% if current_lang == 'he' %}
+            <p class="mb-3">כדי להשיג תוספת חודשית של <strong>{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</strong>, בצע את הפעולות הבאות:</p>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-calendar-check me-2" style="color: #34d399;"></i><strong>זהה ימים חלשים:</strong> בדוק את הגרף "מכירות לפי יום בשבוע" וזהה את היום עם המכירות הנמוכות ביותר. הפעל מבצע מיוחד ביום הזה.</li>
+              <li class="mb-2"><i class="bi bi-clock me-2" style="color: #34d399;"></i><strong>שפר שעות ערב:</strong> אם יש שעות ערב חלשות (17:00-20:00), שקול להציע תפריט ערב מיוחד או הנחה על מוצרים נבחרים.</li>
+              <li class="mb-2"><i class="bi bi-box-seam me-2" style="color: #34d399;"></i><strong>קדם מוצרים בתחתית:</strong> זהה מוצרים עם מכירות נמוכות והצע אותם בחבילות או בהנחה כדי להגדיל את המכירות.</li>
+              <li class="mb-2"><i class="bi bi-graph-up me-2" style="color: #34d399;"></i><strong>עקוב אחר התוצאות:</strong> העלה דוחות חדשים כל שבוע כדי לראות אם הפעולות שלך עובדות.</li>
+            </ul>
+          {% elif current_lang == 'en' %}
+            <p class="mb-3">To achieve a monthly addition of <strong>{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</strong>, take the following actions:</p>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-calendar-check me-2" style="color: #34d399;"></i><strong>Identify weak days:</strong> Check the "Sales by Day of Week" chart and identify the day with the lowest sales. Run a special promotion on that day.</li>
+              <li class="mb-2"><i class="bi bi-clock me-2" style="color: #34d399;"></i><strong>Improve evening hours:</strong> If there are weak evening hours (17:00-20:00), consider offering a special evening menu or discount on selected products.</li>
+              <li class="mb-2"><i class="bi bi-box-seam me-2" style="color: #34d399;"></i><strong>Promote bottom products:</strong> Identify products with low sales and offer them in packages or at a discount to increase sales.</li>
+              <li class="mb-2"><i class="bi bi-graph-up me-2" style="color: #34d399;"></i><strong>Track results:</strong> Upload new reports weekly to see if your actions are working.</li>
+            </ul>
+          {% else %}
+            <p class="mb-3">Чтобы достичь месячной добавки <strong>{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</strong>, выполните следующие действия:</p>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-calendar-check me-2" style="color: #34d399;"></i><strong>Определите слабые дни:</strong> Проверьте график "Продажи по дням недели" и найдите день с самыми низкими продажами. Проведите специальную акцию в этот день.</li>
+              <li class="mb-2"><i class="bi bi-clock me-2" style="color: #34d399;"></i><strong>Улучшите вечерние часы:</strong> Если есть слабые вечерние часы (17:00-20:00), рассмотрите предложение специального вечернего меню или скидки на выбранные товары.</li>
+              <li class="mb-2"><i class="bi bi-box-seam me-2" style="color: #34d399;"></i><strong>Продвигайте товары-аутсайдеры:</strong> Найдите товары с низкими продажами и предложите их в пакетах или со скидкой, чтобы увеличить продажи.</li>
+              <li class="mb-2"><i class="bi bi-graph-up me-2" style="color: #34d399;"></i><strong>Отслеживайте результаты:</strong> Загружайте новые отчёты каждую неделю, чтобы видеть, работают ли ваши действия.</li>
+            </ul>
+          {% endif %}
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid rgba(16,185,129,0.2);">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            {% if current_lang == 'he' %}סגור{% elif current_lang == 'en' %}Close{% else %}Закрыть{% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
 {% endblock %}

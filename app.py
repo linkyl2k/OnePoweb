@@ -6452,6 +6452,9 @@ def roi_page():
     if not roi:
         snap = session.get("last_export") or {}
         roi = snap.get("roi") or {}
+    
+    print(f"📊 ROI Page: roi={bool(roi)}, monthly_gain={roi.get('monthly_gain', 0)}, roi_percent={roi.get('roi_percent', 0)}")
+    
     # הצלה: אם אין ROI בכלל – הודעה מסודרת
     has_any = bool(roi) and any(
         [
@@ -6460,6 +6463,9 @@ def roi_page():
             float(roi.get("roi_percent") or 0) != 0.0,
         ]
     )
+    
+    print(f"📊 ROI Page: has_any={has_any}")
+    
     return render_template(
         "roi.html",
         roi=roi,

@@ -4582,7 +4582,18 @@ def index():
     
     # Проверяем, что данные действительно сохранились
     saved_plots_count = len(session.get("last_export", {}).get("plots", []))
-    print(f"💾 Saved to LAST_EXPORT ({len(plots)} plots) and session ({saved_plots_count} plots). Redirecting to /result")
+    last_export_plots_count = len(LAST_EXPORT.get("plots", []))
+    print(f"💾 Saved to LAST_EXPORT ({last_export_plots_count} plots) and session ({saved_plots_count} plots). Redirecting to /result")
+    
+    # Дополнительная проверка перед редиректом
+    if not plots or len(plots) == 0:
+        print(f"⚠️ WARNING: Redirecting to /result with EMPTY plots list!")
+        print(f"⚠️ Selected options: hourly={opt_hourly}, weekday={opt_weekday}, daily={opt_daily}, top_products={opt_top_products}, payments={opt_payments}")
+        print(f"⚠️ Plots variable: {plots}, type: {type(plots)}")
+        # Если графики не выбраны, все равно редиректим, но с предупреждением
+        # В result() будет показано сообщение "Нет графиков для отображения"
+    else:
+        print(f"✅ Successfully saved {len(plots)} plots, first plot filename: {plots[0].get('filename', 'N/A') if plots else 'N/A'}")
 
     return redirect(url_for("result"))
 
@@ -6958,6 +6969,7 @@ def result():
     
     # Сначала пробуем LAST_EXPORT (глобальная переменная - работает мгновенно)
     plots_from_export = LAST_EXPORT.get("plots", [])
+    print(f"🔍 /result: Checking LAST_EXPORT - has_data={bool(LAST_EXPORT)}, plots_count={len(plots_from_export)}")
     
     if plots_from_export and len(plots_from_export) > 0:
         # Данные есть в LAST_EXPORT - используем их (самый быстрый способ)
@@ -6970,7 +6982,9 @@ def result():
         summary_ai = LAST_EXPORT.get("summary_ai", "")
         roi = LAST_EXPORT.get("roi", {})
         action_items = LAST_EXPORT.get("action_items", [])
-        print(f"📄 Loaded from LAST_EXPORT: {len(plots)} plots")
+        print(f"✅ Loaded from LAST_EXPORT: {len(plots)} plots")
+        if plots:
+            print(f"✅ First plot sample: filename={plots[0].get('filename', 'N/A')}, title={plots[0].get('title', 'N/A')}")
     else:
         # Fallback на сессию (для multi-worker на Render)
         session_data = session.get("last_export", {})
@@ -6978,6 +6992,7 @@ def result():
         
         if session_data:
             plots_from_session = session_data.get("plots", [])
+            print(f"🔍 Session plots: count={len(plots_from_session)}, type={type(plots_from_session)}")
             if plots_from_session and len(plots_from_session) > 0:
                 plots = plots_from_session
                 raw_summary = session_data.get("summary", "")
@@ -6988,9 +7003,11 @@ def result():
                 summary_ai = session_data.get("summary_ai", "")
                 roi = session_data.get("roi", {})
                 action_items = session_data.get("action_items", [])
-                print(f"📄 Loaded from session: {len(plots)} plots")
+                print(f"✅ Loaded from session: {len(plots)} plots")
+                if plots:
+                    print(f"✅ First plot sample: filename={plots[0].get('filename', 'N/A')}, title={plots[0].get('title', 'N/A')}")
             else:
-                print(f"⚠️ Session data exists but plots is empty: {plots_from_session}")
+                print(f"⚠️ Session data exists but plots is empty or invalid: {plots_from_session}")
         else:
             print(f"⚠️ No session data found!")
 
@@ -7013,26 +7030,48 @@ def result():
                 print(f"✅ Restored {len(plots)} plots from session")
         
         # Только если действительно нет данных нигде - пробуем загрузить последний отчет
+        # НО только если это не первый запрос после загрузки файла (т.е. если прошло достаточно времени)
         if not plots or len(plots) == 0:
-            u = current_user()
-            if u:
+            # Проверяем, не был ли это только что загруженный файл
+            # Если LAST_EXPORT или session были недавно обновлены, не перенаправляем
+            last_export_time = LAST_EXPORT.get("generated_at")
+            session_export_time = session_data_check.get("generated_at") if session_data_check else None
+            
+            # Если данные были сохранены менее 5 секунд назад, не перенаправляем
+            should_redirect = True
+            if last_export_time:
+                from datetime import datetime, timedelta
                 try:
-                    db = get_db()
-                    last_report = db.execute("""
-                        SELECT id, name, period_type, summary_json, created_at
-                        FROM reports
-                        WHERE user_id = ?
-                        ORDER BY created_at DESC
-                        LIMIT 1
-                    """, (u["id"],)).fetchone()
-                    
-                    if last_report:
-                        print(f"🔄 Attempting to reload from last saved report (ID: {last_report['id']})")
-                        # Перенаправляем на страницу дашборда, где пользователь может просмотреть сохраненные отчеты
-                        flash_t("results_no_graphs_reload", "info")
-                        return redirect(url_for("dashboard"))
-                except Exception as e:
-                    print(f"⚠️ Error loading last report: {e}")
+                    if isinstance(last_export_time, datetime):
+                        time_diff = datetime.now() - last_export_time
+                    else:
+                        time_diff = datetime.now() - datetime.fromisoformat(str(last_export_time))
+                    if time_diff < timedelta(seconds=5):
+                        should_redirect = False
+                        print(f"⏱️ Last export was {time_diff.total_seconds():.1f}s ago - too recent, not redirecting")
+                except:
+                    pass
+            
+            if should_redirect:
+                u = current_user()
+                if u:
+                    try:
+                        db = get_db()
+                        last_report = db.execute("""
+                            SELECT id, name, period_type, summary_json, created_at
+                            FROM reports
+                            WHERE user_id = ?
+                            ORDER BY created_at DESC
+                            LIMIT 1
+                        """, (u["id"],)).fetchone()
+                        
+                        if last_report:
+                            print(f"🔄 Attempting to reload from last saved report (ID: {last_report['id']})")
+                            # Перенаправляем на страницу дашборда, где пользователь может просмотреть сохраненные отчеты
+                            flash_t("results_no_graphs_reload", "info")
+                            return redirect(url_for("dashboard"))
+                    except Exception as e:
+                        print(f"⚠️ Error loading last report: {e}")
             
             messages.append(t("results_no_graphs"))
             print(f"⚠️ No plots found! LAST_EXPORT: {len(LAST_EXPORT.get('plots', []))} plots, Session: {len(session_data_check.get('plots', [])) if session_data_check else 0} plots, Session exists: {bool(session_data_check)}")

@@ -6996,31 +6996,46 @@ def result():
 
     messages = []
     if not plots or len(plots) == 0:
-        # Попытка загрузить последний сохраненный отчет пользователя
-        u = current_user()
-        if u:
-            try:
-                db = get_db()
-                last_report = db.execute("""
-                    SELECT id, name, period_type, summary_json, created_at
-                    FROM reports
-                    WHERE user_id = ?
-                    ORDER BY created_at DESC
-                    LIMIT 1
-                """, (u["id"],)).fetchone()
-                
-                if last_report:
-                    print(f"🔄 Attempting to reload from last saved report (ID: {last_report['id']})")
-                    # Перенаправляем на страницу дашборда, где пользователь может просмотреть сохраненные отчеты
-                    flash_t("results_no_graphs_reload", "info")
-                    return redirect(url_for("dashboard"))
-            except Exception as e:
-                print(f"⚠️ Error loading last report: {e}")
-        
-        messages.append(t("results_no_graphs"))
+        # Проверяем, есть ли данные в LAST_EXPORT или session, которые мы могли пропустить
+        # Это может произойти, если данные еще не успели сохраниться после редиректа
         session_data_check = session.get("last_export", {})
         last_export_plots = LAST_EXPORT.get("plots", [])
-        print(f"⚠️ No plots found! LAST_EXPORT: {len(last_export_plots)} plots, Session: {len(session_data_check.get('plots', [])) if session_data_check else 0} plots, Session exists: {bool(session_data_check)}")
+        
+        # Если есть данные в LAST_EXPORT или session, но plots пустой - это странно, но не перенаправляем
+        if last_export_plots or (session_data_check and session_data_check.get("plots")):
+            print(f"⚠️ Plots list is empty but data exists! LAST_EXPORT: {len(last_export_plots)} plots, Session: {len(session_data_check.get('plots', [])) if session_data_check else 0} plots")
+            # Попробуем использовать данные из LAST_EXPORT или session
+            if last_export_plots:
+                plots = last_export_plots
+                print(f"✅ Restored {len(plots)} plots from LAST_EXPORT")
+            elif session_data_check and session_data_check.get("plots"):
+                plots = session_data_check.get("plots", [])
+                print(f"✅ Restored {len(plots)} plots from session")
+        
+        # Только если действительно нет данных нигде - пробуем загрузить последний отчет
+        if not plots or len(plots) == 0:
+            u = current_user()
+            if u:
+                try:
+                    db = get_db()
+                    last_report = db.execute("""
+                        SELECT id, name, period_type, summary_json, created_at
+                        FROM reports
+                        WHERE user_id = ?
+                        ORDER BY created_at DESC
+                        LIMIT 1
+                    """, (u["id"],)).fetchone()
+                    
+                    if last_report:
+                        print(f"🔄 Attempting to reload from last saved report (ID: {last_report['id']})")
+                        # Перенаправляем на страницу дашборда, где пользователь может просмотреть сохраненные отчеты
+                        flash_t("results_no_graphs_reload", "info")
+                        return redirect(url_for("dashboard"))
+                except Exception as e:
+                    print(f"⚠️ Error loading last report: {e}")
+            
+            messages.append(t("results_no_graphs"))
+            print(f"⚠️ No plots found! LAST_EXPORT: {len(LAST_EXPORT.get('plots', []))} plots, Session: {len(session_data_check.get('plots', [])) if session_data_check else 0} plots, Session exists: {bool(session_data_check)}")
 
     # קבלת תוכנית המשתמש
     u = current_user()

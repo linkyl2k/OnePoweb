@@ -92,26 +92,42 @@
 
         <hr style="border-color: var(--border);">
 
-        <div class="row g-3">
-          <div class="col-6 col-md-4">
-            <div class="text-center p-3" style="background: rgba(16,185,129,0.08); border-radius: 10px;">
-              <div class="small text-muted">{% if current_lang == 'he' %}פוטנציאל מקסימלי{% elif current_lang == 'en' %}Maximum Potential{% else %}Максимальный потенциал{% endif %}</div>
-              <div style="font-size: 1.5rem; font-weight: bold; color: #34d399;">~{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</div>
-              <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}per month{% else %}в месяц{% endif %}</div>
+        {# ==== 3 режима оценок ==== #}
+        <div class="mb-4">
+          <h6 class="mb-3">{% if current_lang == 'he' %}תרחישי הערכה{% elif current_lang == 'en' %}Estimation Scenarios{% else %}Сценарии оценки{% endif %}</h6>
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <div class="text-center p-3" style="background: rgba(239,68,68,0.08); border-radius: 10px; border: 1px solid rgba(239,68,68,0.2);">
+                <div class="small text-muted">{% if current_lang == 'he' %}שמרני (60%){% elif current_lang == 'en' %}Conservative (60%){% else %}Консервативный (60%){% endif %}</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #ef4444;">~{{ currency_symbol }}{{ "{:,.0f}".format(roi.monthly_gain_conservative or (_gain * 0.6)) }}</div>
+                <div class="small text-muted" style="color: #f87171;">ROI: {{ "{:,.0f}".format(roi.roi_percent_conservative or (_roi * 0.6)) }}%</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="text-center p-3" style="background: rgba(16,185,129,0.08); border-radius: 10px; border: 1px solid rgba(16,185,129,0.3);">
+                <div class="small text-muted">{% if current_lang == 'he' %}בסיסי (100%){% elif current_lang == 'en' %}Base (100%){% else %}Базовый (100%){% endif %}</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #34d399;">~{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</div>
+                <div class="small text-muted" style="color: #10b981;">ROI: {{ "{:,.0f}".format(_roi) }}%</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="text-center p-3" style="background: rgba(34,197,94,0.08); border-radius: 10px; border: 1px solid rgba(34,197,94,0.2);">
+                <div class="small text-muted">{% if current_lang == 'he' %}אופטימי (140%){% elif current_lang == 'en' %}Optimistic (140%){% else %}Оптимистичный (140%){% endif %}</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #22c55e;">~{{ currency_symbol }}{{ "{:,.0f}".format(roi.monthly_gain_optimistic or (_gain * 1.4)) }}</div>
+                <div class="small text-muted" style="color: #16a34a;">ROI: {{ "{:,.0f}".format(roi.roi_percent_optimistic or (_roi * 1.4)) }}%</div>
+              </div>
             </div>
           </div>
+        </div>
+
+        <hr style="border-color: var(--border);">
+
+        <div class="row g-3">
           <div class="col-6 col-md-4">
             <div class="text-center p-3" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
               <div class="small text-muted">{% if current_lang == 'he' %}עלות השירות{% elif current_lang == 'en' %}Service Cost{% else %}Стоимость услуги{% endif %}</div>
               <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">{{ currency_symbol }}{{ "{:,.0f}".format(roi.service_cost or 149) }}</div>
               <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}per month{% else %}в месяц{% endif %}</div>
-            </div>
-          </div>
-          <div class="col-12 col-md-4">
-            <div class="text-center p-3" style="background: rgba(251,191,36,0.08); border-radius: 10px;">
-              <div class="small text-muted">{% if current_lang == 'he' %}ROI תיאורטי{% elif current_lang == 'en' %}Theoretical ROI{% else %}Теоретический ROI{% endif %}</div>
-              <div style="font-size: 1.5rem; font-weight: bold; color: #fbbf24;">{{ "{:,.0f}".format(_roi) }}%</div>
-              <div class="small text-muted">{% if current_lang == 'he' %}אם מיישמים הכל{% elif current_lang == 'en' %}if everything is implemented{% else %}если всё реализовано{% endif %}</div>
             </div>
           </div>
         </div>
@@ -131,6 +147,124 @@
         </div>
       </div>
     </div>
+
+    {# ==== How ROI is Calculated (Accordion) ==== #}
+    <div class="card mb-4" style="border-color: rgba(46,160,255,0.3);">
+      <div class="card-header" style="background: rgba(46,160,255,0.1); border-bottom: 1px solid rgba(46,160,255,0.2);">
+        <button class="btn btn-link w-100 text-start text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#roiCalculation" style="color: #34c3ff;">
+          <i class="bi bi-calculator me-2"></i>
+          <strong>{% if current_lang == 'he' %}איך מחושב ה-ROI?{% elif current_lang == 'en' %}How is ROI Calculated?{% else %}Как рассчитывается ROI?{% endif %}</strong>
+          <i class="bi bi-chevron-down float-end"></i>
+        </button>
+      </div>
+      <div id="roiCalculation" class="collapse">
+        <div class="card-body">
+          <h6>{% if current_lang == 'he' %}הנוסחה:{% elif current_lang == 'en' %}Formula:{% else %}Формула:{% endif %}</h6>
+          <div class="p-3 mb-3" style="background: rgba(0,0,0,0.2); border-radius: 8px; font-family: monospace;">
+            ROI% = (Monthly Potential Gain / Service Cost) × 100
+          </div>
+          
+          <h6 class="mt-4">{% if current_lang == 'he' %}רכיבי הפוטנציאל החודשי:{% elif current_lang == 'en' %}Monthly Potential Components:{% else %}Компоненты месячного потенциала:{% endif %}</h6>
+          <ul class="list-unstyled">
+            {% if roi.components.weak_day %}
+            <li class="mb-2">
+              <i class="bi bi-calendar-check me-2" style="color: #34d399;"></i>
+              <strong>{% if current_lang == 'he' %}יום חלש:{% elif current_lang == 'en' %}Weak Day:{% else %}Слабый день:{% endif %}</strong>
+              {% if current_lang == 'he' %}
+                סגירת {{ roi.components.weak_day.achievable_percent }}% מהפער × {{ "{:.1f}".format(roi.components.weak_day.occurrences_per_month) }} פעמים בחודש = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.weak_day.monthly_gain) }}/חודש
+              {% elif current_lang == 'en' %}
+                Closing {{ roi.components.weak_day.achievable_percent }}% of gap × {{ "{:.1f}".format(roi.components.weak_day.occurrences_per_month) }} times/month = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.weak_day.monthly_gain) }}/month
+              {% else %}
+                Закрытие {{ roi.components.weak_day.achievable_percent }}% разрыва × {{ "{:.1f}".format(roi.components.weak_day.occurrences_per_month) }} раз/месяц = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.weak_day.monthly_gain) }}/месяц
+              {% endif %}
+            </li>
+            {% endif %}
+            {% if roi.components.evening_hours %}
+            <li class="mb-2">
+              <i class="bi bi-clock me-2" style="color: #34c3ff;"></i>
+              <strong>{% if current_lang == 'he' %}שעות ערב:{% elif current_lang == 'en' %}Evening Hours:{% else %}Вечерние часы:{% endif %}</strong>
+              {% if current_lang == 'he' %}
+                +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.evening_hours.uplift_per_day) }} ליום × {{ "{:.0f}".format(roi.components.evening_hours.days_in_month_factor) }} ימים = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.evening_hours.monthly_gain) }}/חודש
+              {% elif current_lang == 'en' %}
+                +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.evening_hours.uplift_per_day) }} per day × {{ "{:.0f}".format(roi.components.evening_hours.days_in_month_factor) }} days = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.evening_hours.monthly_gain) }}/month
+              {% else %}
+                +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.evening_hours.uplift_per_day) }} в день × {{ "{:.0f}".format(roi.components.evening_hours.days_in_month_factor) }} дней = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.evening_hours.monthly_gain) }}/месяц
+              {% endif %}
+            </li>
+            {% endif %}
+            {% if roi.components.tail_products %}
+            <li class="mb-2">
+              <i class="bi bi-box-seam me-2" style="color: #fbbf24;"></i>
+              <strong>{% if current_lang == 'he' %}מוצרים חלשים:{% elif current_lang == 'en' %}Weak Products:{% else %}Слабые товары:{% endif %}</strong>
+              {% if current_lang == 'he' %}
+                קידום {{ "{:.0f}".format(roi.components.tail_products.boost_ratio * 100) }}% של {{ "{:.0f}".format(roi.components.tail_products.tail_share_cutoff * 100) }}% מההכנסות = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.tail_products.monthly_gain) }}/חודש
+              {% elif current_lang == 'en' %}
+                {{ "{:.0f}".format(roi.components.tail_products.boost_ratio * 100) }}% boost of {{ "{:.0f}".format(roi.components.tail_products.tail_share_cutoff * 100) }}% revenue = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.tail_products.monthly_gain) }}/month
+              {% else %}
+                Продвижение {{ "{:.0f}".format(roi.components.tail_products.boost_ratio * 100) }}% от {{ "{:.0f}".format(roi.components.tail_products.tail_share_cutoff * 100) }}% выручки = +{{ currency_symbol }}{{ "{:,.0f}".format(roi.components.tail_products.monthly_gain) }}/месяц
+              {% endif %}
+            </li>
+            {% endif %}
+          </ul>
+
+          <h6 class="mt-4">{% if current_lang == 'he' %}הנחות מפתח:{% elif current_lang == 'en' %}Key Assumptions:{% else %}Ключевые допущения:{% endif %}</h6>
+          <ul>
+            <li>{% if current_lang == 'he' %}רק {{ roi.components.weak_day.achievable_percent if roi.components.weak_day else 30 }}% מהפער ביום חלש ניתן לסגירה ריאלית{% elif current_lang == 'en' %}Only {{ roi.components.weak_day.achievable_percent if roi.components.weak_day else 30 }}% of weak day gap is realistically achievable{% else %}Только {{ roi.components.weak_day.achievable_percent if roi.components.weak_day else 30 }}% разрыва в слабый день реально достижимо{% endif %}</li>
+            <li>{% if current_lang == 'he' %}שעות ערב יכולות להגיע ל-25% מעוצמת הצהריים{% elif current_lang == 'en' %}Evening hours can reach 25% of midday intensity{% else %}Вечерние часы могут достичь 25% интенсивности дневных{% endif %}</li>
+            <li>{% if current_lang == 'he' %}קידום מוצרים חלשים: +5% מההכנסה שלהם{% elif current_lang == 'en' %}Weak product promotion: +5% of their revenue{% else %}Продвижение слабых товаров: +5% от их выручки{% endif %}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    {# ==== Actionable 7-Day Plan ==== #}
+    {% if action_plan and action_plan.plans %}
+    <div class="card mb-4" style="border-color: rgba(16,185,129,0.3);">
+      <div class="card-body">
+        <h5 class="mb-3">
+          <i class="bi bi-calendar-week me-2" style="color: #10b981;"></i>
+          {% if current_lang == 'he' %}תוכנית פעולה ל-7 ימים{% elif current_lang == 'en' %}7-Day Action Plan{% else %}План действий на 7 дней{% endif %}
+        </h5>
+        {% for plan in action_plan.plans %}
+        <div class="mb-4 p-3" style="background: rgba(16,185,129,0.05); border-radius: 10px; border-left: 3px solid #10b981;">
+          <h6 class="mb-2">{{ plan.category }}</h6>
+          <p class="small text-muted mb-3">{{ plan.goal }}</p>
+          <div class="table-responsive">
+            <table class="table table-sm" style="color: #e6e9ef;">
+              <thead>
+                <tr>
+                  <th style="width: 10%;">{% if current_lang == 'he' %}יום{% elif current_lang == 'en' %}Day{% else %}День{% endif %}</th>
+                  <th style="width: 40%;">{% if current_lang == 'he' %}מה לעשות{% elif current_lang == 'en' %}What to Do{% else %}Что сделать{% endif %}</th>
+                  <th style="width: 30%;">{% if current_lang == 'he' %}מה למדוד{% elif current_lang == 'en' %}What to Measure{% else %}Что измерить{% endif %}</th>
+                  <th style="width: 20%;">{% if current_lang == 'he' %}מתי לבדוק{% elif current_lang == 'en' %}When to Check{% else %}Когда проверить{% endif %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for day in plan.days %}
+                <tr>
+                  <td><strong>{{ day.day }}</strong></td>
+                  <td>{{ day.action }}</td>
+                  <td>{{ day.measure }}</td>
+                  <td>{{ day.check }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-3 p-2" style="background: rgba(0,0,0,0.2); border-radius: 6px;">
+            <small><strong>{% if current_lang == 'he' %}מעקב מטריקות:{% elif current_lang == 'en' %}Track Metrics:{% else %}Отслеживание метрик:{% endif %}</strong></small>
+            <ul class="small mb-0">
+              <li>{{ plan.metrics.daily_revenue }}</li>
+              <li>{% if current_lang == 'he' %}{{ plan.metrics.transactions }}{% elif current_lang == 'en' %}{{ plan.metrics.transactions }}{% else %}{{ plan.metrics.transactions }}{% endif %}</li>
+              <li>{% if current_lang == 'he' %}{{ plan.metrics.avg_check }}{% elif current_lang == 'en' %}{{ plan.metrics.avg_check }}{% else %}{{ plan.metrics.avg_check }}{% endif %}</li>
+            </ul>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
   {% endif %}
 </div>
 {% endblock %}

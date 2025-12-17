@@ -2095,8 +2095,15 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
 
     # ---------- סכימה ו-ROI ----------
     total_gain = float(gain_weakday + gain_evening + gain_tail)
-    out["monthly_gain"] = total_gain
+    
+    # 3 режима оценок: Conservative (0.6), Base (1.0), Optimistic (1.4)
+    out["monthly_gain_base"] = total_gain
+    out["monthly_gain_conservative"] = total_gain * 0.6
+    out["monthly_gain_optimistic"] = total_gain * 1.4
+    out["monthly_gain"] = total_gain  # Base по умолчанию для обратной совместимости
     out["roi_percent"] = (total_gain / max(1e-9, params.service_cost)) * 100.0
+    out["roi_percent_conservative"] = (total_gain * 0.6 / max(1e-9, params.service_cost)) * 100.0
+    out["roi_percent_optimistic"] = (total_gain * 1.4 / max(1e-9, params.service_cost)) * 100.0
 
     # Переводим текст в зависимости от языка
     parts = []
@@ -2144,6 +2151,406 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
 
     out["text"] = " • ".join(parts + [summary_text, disclaimer])
     return out
+
+
+def diagnose_traffic_vs_check(df, roi_data: dict, lang: str = "he") -> Dict[str, Any]:
+    """
+    Диагностика: слабый день/час из-за низкого трафика или низкого среднего чека?
+    Возвращает инсайты и данные для визуализации.
+    """
+    insights = []
+    chart_data = {}
+    
+    comps = roi_data.get("components", {})
+    
+    # 1. Диагностика слабого дня
+    if "weak_day" in comps:
+        weak = comps["weak_day"]
+        day_name = weak.get("day", "")
+        
+        if COL_DATE in df.columns and COL_SUM in df.columns:
+            ser_date = pd.to_datetime(df[COL_DATE], errors="coerce")
+            df2 = df.copy()
+            df2["__dow"] = ser_date.dt.dayofweek
+            map_he = {0:"ראשון",1:"שני",2:"שלישי",3:"רביעי",4:"חמישי",5:"שישי",6:"שבת"}
+            df2["__dow_name"] = df2["__dow"].map(map_he)
+            
+            # Находим слабый день
+            weak_day_mask = df2["__dow_name"] == day_name
+            weak_day_data = df2[weak_day_mask]
+            
+            # Находим средний день (медиана остальных)
+            other_days = df2[~weak_day_mask]
+            
+            if not weak_day_data.empty and not other_days.empty:
+                weak_transactions = len(weak_day_data)
+                weak_revenue = weak_day_data[COL_SUM].sum()
+                weak_avg_check = weak_revenue / max(1, weak_transactions)
+                
+                other_transactions = len(other_days)
+                other_revenue = other_days[COL_SUM].sum()
+                other_avg_check = other_revenue / max(1, other_transactions)
+                
+                # Сравнение
+                traffic_ratio = weak_transactions / max(1, other_transactions / max(1, len(other_days["__dow_name"].unique())))
+                check_ratio = weak_avg_check / max(1e-9, other_avg_check)
+                
+                chart_data["weak_day"] = {
+                    "day": day_name,
+                    "weak_transactions": int(weak_transactions),
+                    "weak_avg_check": float(weak_avg_check),
+                    "other_avg_transactions": float(other_transactions / max(1, len(other_days["__dow_name"].unique()))),
+                    "other_avg_check": float(other_avg_check),
+                    "traffic_ratio": float(traffic_ratio),
+                    "check_ratio": float(check_ratio)
+                }
+                
+                # Генерируем инсайты
+                if traffic_ratio < 0.7 and check_ratio > 0.9:
+                    # Низкий трафик, но чек нормальный
+                    if lang == "he":
+                        insights.append({
+                            "type": "traffic",
+                            "title": f"יום {day_name}: בעיית תנועה",
+                            "text": f"מספר העסקאות נמוך ב-{int((1-traffic_ratio)*100)}% לעומת ימים אחרים, אך הממוצע לעסקה תקין. התמקדו במשיכת יותר לקוחות."
+                        })
+                    elif lang == "en":
+                        insights.append({
+                            "type": "traffic",
+                            "title": f"{day_name}: Traffic Issue",
+                            "text": f"Transaction count is {int((1-traffic_ratio)*100)}% lower than other days, but average check is normal. Focus on attracting more customers."
+                        })
+                    else:  # ru
+                        insights.append({
+                            "type": "traffic",
+                            "title": f"{day_name}: Проблема с трафиком",
+                            "text": f"Количество транзакций на {int((1-traffic_ratio)*100)}% ниже, чем в другие дни, но средний чек нормальный. Сосредоточьтесь на привлечении большего количества клиентов."
+                        })
+                elif check_ratio < 0.7 and traffic_ratio > 0.9:
+                    # Низкий чек, но трафик нормальный
+                    if lang == "he":
+                        insights.append({
+                            "type": "check",
+                            "title": f"יום {day_name}: בעיית ממוצע",
+                            "text": f"הממוצע לעסקה נמוך ב-{int((1-check_ratio)*100)}% לעומת ימים אחרים, אך מספר העסקאות תקין. התמקדו בהגדלת ערך העסקה."
+                        })
+                    elif lang == "en":
+                        insights.append({
+                            "type": "check",
+                            "title": f"{day_name}: Average Check Issue",
+                            "text": f"Average check is {int((1-check_ratio)*100)}% lower than other days, but transaction count is normal. Focus on increasing transaction value."
+                        })
+                    else:  # ru
+                        insights.append({
+                            "type": "check",
+                            "title": f"{day_name}: Проблема со средним чеком",
+                            "text": f"Средний чек на {int((1-check_ratio)*100)}% ниже, чем в другие дни, но количество транзакций нормальное. Сосредоточьтесь на увеличении стоимости транзакции."
+                        })
+                else:
+                    # Обе проблемы
+                    if lang == "he":
+                        insights.append({
+                            "type": "both",
+                            "title": f"יום {day_name}: בעיות כפולות",
+                            "text": f"גם מספר העסקאות וגם הממוצע לעסקה נמוכים. נדרש טיפול מקיף: משיכת לקוחות + הגדלת ערך."
+                        })
+                    elif lang == "en":
+                        insights.append({
+                            "type": "both",
+                            "title": f"{day_name}: Dual Issues",
+                            "text": f"Both transaction count and average check are low. Comprehensive approach needed: attract customers + increase value."
+                        })
+                    else:  # ru
+                        insights.append({
+                            "type": "both",
+                            "title": f"{day_name}: Двойная проблема",
+                            "text": f"И количество транзакций, и средний чек низкие. Требуется комплексный подход: привлечение клиентов + увеличение стоимости."
+                        })
+    
+    # 2. Диагностика вечерних часов
+    if "evening_hours" in comps and COL_TIME in df.columns:
+        evening = comps["evening_hours"]
+        st_e, en_e = 17, 20  # evening_hours по умолчанию
+        
+        try:
+            df2 = df.copy()
+            if "שעה" not in df2.columns:
+                df2["שעה"] = pd.to_datetime(df2[COL_TIME].astype(str), errors="coerce").dt.hour
+            df2["שעה"] = pd.to_numeric(df2["שעה"], errors="coerce")
+            
+            evening_data = df2[(df2["שעה"] >= st_e) & (df2["שעה"] <= en_e)]
+            midday_data = df2[(df2["שעה"] >= 11) & (df2["שעה"] <= 14)]
+            
+            if not evening_data.empty and not midday_data.empty:
+                eve_transactions = len(evening_data)
+                eve_revenue = evening_data[COL_SUM].sum()
+                eve_avg_check = eve_revenue / max(1, eve_transactions)
+                
+                mid_transactions = len(midday_data)
+                mid_revenue = midday_data[COL_SUM].sum()
+                mid_avg_check = mid_revenue / max(1, mid_transactions)
+                
+                traffic_ratio_eve = eve_transactions / max(1, mid_transactions)
+                check_ratio_eve = eve_avg_check / max(1e-9, mid_avg_check)
+                
+                chart_data["evening_hours"] = {
+                    "evening_transactions": int(eve_transactions),
+                    "evening_avg_check": float(eve_avg_check),
+                    "midday_transactions": int(mid_transactions),
+                    "midday_avg_check": float(mid_avg_check),
+                    "traffic_ratio": float(traffic_ratio_eve),
+                    "check_ratio": float(check_ratio_eve)
+                }
+                
+                if traffic_ratio_eve < 0.5:
+                    if lang == "he":
+                        insights.append({
+                            "type": "traffic",
+                            "title": "שעות ערב: תנועה נמוכה",
+                            "text": f"מספר העסקאות בערב נמוך ב-{int((1-traffic_ratio_eve)*100)}% לעומת הצהריים. נדרש קידום פעילות ערב."
+                        })
+                    elif lang == "en":
+                        insights.append({
+                            "type": "traffic",
+                            "title": "Evening Hours: Low Traffic",
+                            "text": f"Evening transaction count is {int((1-traffic_ratio_eve)*100)}% lower than midday. Evening activity promotion needed."
+                        })
+                    else:  # ru
+                        insights.append({
+                            "type": "traffic",
+                            "title": "Вечерние часы: Низкий трафик",
+                            "text": f"Количество транзакций вечером на {int((1-traffic_ratio_eve)*100)}% ниже, чем днем. Требуется продвижение вечерней активности."
+                        })
+                elif check_ratio_eve < 0.7:
+                    if lang == "he":
+                        insights.append({
+                            "type": "check",
+                            "title": "שעות ערב: ממוצע נמוך",
+                            "text": f"הממוצע לעסקה בערב נמוך ב-{int((1-check_ratio_eve)*100)}% לעומת הצהריים. נדרש שיפור ערך העסקה."
+                        })
+                    elif lang == "en":
+                        insights.append({
+                            "type": "check",
+                            "title": "Evening Hours: Low Average",
+                            "text": f"Evening average check is {int((1-check_ratio_eve)*100)}% lower than midday. Transaction value improvement needed."
+                        })
+                    else:  # ru
+                        insights.append({
+                            "type": "check",
+                            "title": "Вечерние часы: Низкий средний чек",
+                            "text": f"Средний чек вечером на {int((1-check_ratio_eve)*100)}% ниже, чем днем. Требуется улучшение стоимости транзакции."
+                        })
+        except Exception as e:
+            print(f"Diagnosis evening hours error: {e}")
+    
+    return {"insights": insights, "chart_data": chart_data}
+
+
+def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str, Any]:
+    """
+    Генерирует конкретный план действий на 7 дней для каждой найденной возможности.
+    Возвращает план с метриками для отслеживания.
+    """
+    plans = []
+    comps = roi_data.get("components", {})
+    currency_info = get_currency(lang)
+    currency_symbol = currency_info["symbol"]
+    
+    # 1. План для слабого дня
+    if "weak_day" in comps:
+        weak = comps["weak_day"]
+        day_name = weak.get("day", "")
+        current_revenue = weak.get("current", 0)
+        target_revenue = weak.get("target", 0)
+        
+        if lang == "he":
+            plan = {
+                "category": f"יום {day_name}",
+                "goal": f"העלאת מכירות ביום {day_name} ב-{int((target_revenue - current_revenue) * 0.3)} ₪",
+                "days": [
+                    {"day": 1, "action": f"פרסם בפייסבוק/אינסטגרם על מבצע מיוחד ביום {day_name}", "measure": "מספר צפיות/לייקים", "check": "יום 2"},
+                    {"day": 2, "action": "הכן חומרי פרסום (פוסטר, סטורי)", "measure": "חומרים מוכנים", "check": "יום 3"},
+                    {"day": 3, "action": f"הפעל מבצע: הנחה 15% ביום {day_name}", "measure": "מספר לקוחות", "check": "יום 4"},
+                    {"day": 4, "action": "עקוב אחר מספר העסקאות וההכנסה", "measure": "הכנסה יומית", "check": "יום 5"},
+                    {"day": 5, "action": "בצע התאמות אם נדרש (שינוי הנחה/שעות)", "measure": "הכנסה יומית", "check": "יום 6"},
+                    {"day": 6, "action": "המשך עם המבצע", "measure": "הכנסה יומית", "check": "יום 7"},
+                    {"day": 7, "action": "סיכום: השווה הכנסה ליום {day_name} לפני ואחרי", "measure": "הכנסה שבועית", "check": "יום 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": f"מעקב יומי: {current_revenue:,.0f} → יעד: {target_revenue * 0.3 + current_revenue:,.0f} ₪",
+                    "transactions": "מספר עסקאות ביום",
+                    "avg_check": "ממוצע לעסקה"
+                }
+            }
+        elif lang == "en":
+            plan = {
+                "category": f"{day_name} Day",
+                "goal": f"Increase {day_name} sales by ${int((target_revenue - current_revenue) * 0.3):,.0f}",
+                "days": [
+                    {"day": 1, "action": f"Post on Facebook/Instagram about special promotion on {day_name}", "measure": "Views/likes count", "check": "Day 2"},
+                    {"day": 2, "action": "Prepare marketing materials (poster, story)", "measure": "Materials ready", "check": "Day 3"},
+                    {"day": 3, "action": f"Launch promotion: 15% discount on {day_name}", "measure": "Customer count", "check": "Day 4"},
+                    {"day": 4, "action": "Track transaction count and revenue", "measure": "Daily revenue", "check": "Day 5"},
+                    {"day": 5, "action": "Make adjustments if needed (change discount/hours)", "measure": "Daily revenue", "check": "Day 6"},
+                    {"day": 6, "action": "Continue with promotion", "measure": "Daily revenue", "check": "Day 7"},
+                    {"day": 7, "action": f"Summary: Compare {day_name} revenue before and after", "measure": "Weekly revenue", "check": "Day 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": f"Daily tracking: ${current_revenue:,.0f} → target: ${target_revenue * 0.3 + current_revenue:,.0f}",
+                    "transactions": "Transaction count per day",
+                    "avg_check": "Average per transaction"
+                }
+            }
+        else:  # ru
+            plan = {
+                "category": f"День {day_name}",
+                "goal": f"Увеличить продажи в {day_name} на {int((target_revenue - current_revenue) * 0.3):,.0f} ₽",
+                "days": [
+                    {"day": 1, "action": f"Опубликуйте в Facebook/Instagram о специальной акции в {day_name}", "measure": "Количество просмотров/лайков", "check": "День 2"},
+                    {"day": 2, "action": "Подготовьте рекламные материалы (постер, сторис)", "measure": "Материалы готовы", "check": "День 3"},
+                    {"day": 3, "action": f"Запустите акцию: скидка 15% в {day_name}", "measure": "Количество клиентов", "check": "День 4"},
+                    {"day": 4, "action": "Отслеживайте количество транзакций и выручку", "measure": "Дневная выручка", "check": "День 5"},
+                    {"day": 5, "action": "Внесите корректировки при необходимости (измените скидку/часы)", "measure": "Дневная выручка", "check": "День 6"},
+                    {"day": 6, "action": "Продолжайте акцию", "measure": "Дневная выручка", "check": "День 7"},
+                    {"day": 7, "action": f"Итог: Сравните выручку {day_name} до и после", "measure": "Недельная выручка", "check": "День 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": f"Ежедневный отслеживание: {current_revenue:,.0f} → цель: {target_revenue * 0.3 + current_revenue:,.0f} ₽",
+                    "transactions": "Количество транзакций в день",
+                    "avg_check": "Средний чек"
+                }
+            }
+        plans.append(plan)
+    
+    # 2. План для вечерних часов
+    if "evening_hours" in comps:
+        evening = comps["evening_hours"]
+        uplift_per_day = evening.get("uplift_per_day", 0)
+        
+        if lang == "he":
+            plan = {
+                "category": "שעות ערב (17:00-20:00)",
+                "goal": f"הגברת פעילות ערב ב-{uplift_per_day:,.0f} ₪ ליום",
+                "days": [
+                    {"day": 1, "action": "הכרז על Happy Hour 17:00-19:00 (הנחה 20% על משקאות)", "measure": "מספר לקוחות בערב", "check": "יום 2"},
+                    {"day": 2, "action": "פרסם בסטורי אינסטגרם על מבצע הערב", "measure": "צפיות בסטורי", "check": "יום 3"},
+                    {"day": 3, "action": "הפעל מבצע 'After Work' לעובדי משרדים", "measure": "הכנסה ערב", "check": "יום 4"},
+                    {"day": 4, "action": "עקוב אחר מספר העסקאות בשעות 17-20", "measure": "הכנסה ערב", "check": "יום 5"},
+                    {"day": 5, "action": "התאם שעות/הנחה לפי התוצאות", "measure": "הכנסה ערב", "check": "יום 6"},
+                    {"day": 6, "action": "המשך עם מבצע הערב", "measure": "הכנסה ערב", "check": "יום 7"},
+                    {"day": 7, "action": "סיכום: השווה הכנסה ערב לפני ואחרי", "measure": "הכנסה שבועית ערב", "check": "יום 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": f"מעקב יומי ערב: יעד +{uplift_per_day:,.0f} ₪",
+                    "transactions": "מספר עסקאות בשעות 17-20",
+                    "avg_check": "ממוצע לעסקה בערב"
+                }
+            }
+        elif lang == "en":
+            plan = {
+                "category": "Evening Hours (17:00-20:00)",
+                "goal": f"Increase evening activity by ${uplift_per_day:,.0f} per day",
+                "days": [
+                    {"day": 1, "action": "Announce Happy Hour 17:00-19:00 (20% discount on drinks)", "measure": "Evening customer count", "check": "Day 2"},
+                    {"day": 2, "action": "Post Instagram story about evening promotion", "measure": "Story views", "check": "Day 3"},
+                    {"day": 3, "action": "Launch 'After Work' promotion for office workers", "measure": "Evening revenue", "check": "Day 4"},
+                    {"day": 4, "action": "Track transaction count during 17-20", "measure": "Evening revenue", "check": "Day 5"},
+                    {"day": 5, "action": "Adjust hours/discount based on results", "measure": "Evening revenue", "check": "Day 6"},
+                    {"day": 6, "action": "Continue evening promotion", "measure": "Evening revenue", "check": "Day 7"},
+                    {"day": 7, "action": "Summary: Compare evening revenue before and after", "measure": "Weekly evening revenue", "check": "Day 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": f"Daily evening tracking: target +${uplift_per_day:,.0f}",
+                    "transactions": "Transaction count during 17-20",
+                    "avg_check": "Average per transaction (evening)"
+                }
+            }
+        else:  # ru
+            plan = {
+                "category": "Вечерние часы (17:00-20:00)",
+                "goal": f"Увеличить вечернюю активность на {uplift_per_day:,.0f} ₽ в день",
+                "days": [
+                    {"day": 1, "action": "Объявите Happy Hour 17:00-19:00 (скидка 20% на напитки)", "measure": "Количество клиентов вечером", "check": "День 2"},
+                    {"day": 2, "action": "Опубликуйте Instagram story о вечерней акции", "measure": "Просмотры сторис", "check": "День 3"},
+                    {"day": 3, "action": "Запустите акцию 'After Work' для офисных работников", "measure": "Вечерняя выручка", "check": "День 4"},
+                    {"day": 4, "action": "Отслеживайте количество транзакций в 17-20", "measure": "Вечерняя выручка", "check": "День 5"},
+                    {"day": 5, "action": "Скорректируйте часы/скидку по результатам", "measure": "Вечерняя выручка", "check": "День 6"},
+                    {"day": 6, "action": "Продолжайте вечернюю акцию", "measure": "Вечерняя выручка", "check": "День 7"},
+                    {"day": 7, "action": "Итог: Сравните вечернюю выручку до и после", "measure": "Недельная вечерняя выручка", "check": "День 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": f"Ежедневное отслеживание вечера: цель +{uplift_per_day:,.0f} ₽",
+                    "transactions": "Количество транзакций в 17-20",
+                    "avg_check": "Средний чек (вечер)"
+                }
+            }
+        plans.append(plan)
+    
+    # 3. План для товаров-аутсайдеров
+    if "tail_products" in comps:
+        tail = comps["tail_products"]
+        monthly_gain = tail.get("monthly_gain", 0)
+        
+        if lang == "he":
+            plan = {
+                "category": "מוצרים חלשים",
+                "goal": f"הגברת מכירות מוצרים חלשים ב-{monthly_gain:,.0f} ₪ לחודש",
+                "days": [
+                    {"day": 1, "action": "זהה 5-10 מוצרים עם מכירות נמוכות", "measure": "רשימת מוצרים", "check": "יום 2"},
+                    {"day": 2, "action": "צור חבילות: מוצר חזק + מוצר חלש במחיר מיוחד", "measure": "מספר חבילות", "check": "יום 3"},
+                    {"day": 3, "action": "הצג חבילות במיקום בולט (קופה/תפריט)", "measure": "מספר חבילות נמכרות", "check": "יום 4"},
+                    {"day": 4, "action": "עקוב אחר מכירות החבילות", "measure": "מכירות חבילות", "check": "יום 5"},
+                    {"day": 5, "action": "התאם מחירים/הרכב חבילות לפי תוצאות", "measure": "מכירות חבילות", "check": "יום 6"},
+                    {"day": 6, "action": "המשך עם חבילות", "measure": "מכירות חבילות", "check": "יום 7"},
+                    {"day": 7, "action": "סיכום: השווה מכירות מוצרים חלשים לפני ואחרי", "measure": "מכירות חבילות שבועיות", "check": "יום 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": f"מעקב יומי: מכירות מוצרים חלשים",
+                    "transactions": "מספר חבילות נמכרות",
+                    "avg_check": "ממוצע ערך חבילה"
+                }
+            }
+        elif lang == "en":
+            plan = {
+                "category": "Weak Products",
+                "goal": f"Increase weak product sales by ${monthly_gain:,.0f} per month",
+                "days": [
+                    {"day": 1, "action": "Identify 5-10 products with low sales", "measure": "Product list", "check": "Day 2"},
+                    {"day": 2, "action": "Create packages: strong product + weak product at special price", "measure": "Number of packages", "check": "Day 3"},
+                    {"day": 3, "action": "Display packages in prominent location (counter/menu)", "measure": "Packages sold", "check": "Day 4"},
+                    {"day": 4, "action": "Track package sales", "measure": "Package sales", "check": "Day 5"},
+                    {"day": 5, "action": "Adjust prices/package composition based on results", "measure": "Package sales", "check": "Day 6"},
+                    {"day": 6, "action": "Continue with packages", "measure": "Package sales", "check": "Day 7"},
+                    {"day": 7, "action": "Summary: Compare weak product sales before and after", "measure": "Weekly package sales", "check": "Day 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": "Daily tracking: weak product sales",
+                    "transactions": "Number of packages sold",
+                    "avg_check": "Average package value"
+                }
+            }
+        else:  # ru
+            plan = {
+                "category": "Слабые товары",
+                "goal": f"Увеличить продажи слабых товаров на {monthly_gain:,.0f} ₽ в месяц",
+                "days": [
+                    {"day": 1, "action": "Определите 5-10 товаров с низкими продажами", "measure": "Список товаров", "check": "День 2"},
+                    {"day": 2, "action": "Создайте пакеты: сильный товар + слабый товар по специальной цене", "measure": "Количество пакетов", "check": "День 3"},
+                    {"day": 3, "action": "Разместите пакеты на видном месте (касса/меню)", "measure": "Проданные пакеты", "check": "День 4"},
+                    {"day": 4, "action": "Отслеживайте продажи пакетов", "measure": "Продажи пакетов", "check": "День 5"},
+                    {"day": 5, "action": "Скорректируйте цены/состав пакетов по результатам", "measure": "Продажи пакетов", "check": "День 6"},
+                    {"day": 6, "action": "Продолжайте с пакетами", "measure": "Продажи пакетов", "check": "День 7"},
+                    {"day": 7, "action": "Итог: Сравните продажи слабых товаров до и после", "measure": "Недельные продажи пакетов", "check": "День 8"}
+                ],
+                "metrics": {
+                    "daily_revenue": "Ежедневное отслеживание: продажи слабых товаров",
+                    "transactions": "Количество проданных пакетов",
+                    "avg_check": "Средняя стоимость пакета"
+                }
+            }
+        plans.append(plan)
+    
+    return {"plans": plans}
 
 
 def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
@@ -4819,6 +5226,10 @@ def export_pdf():
     roi_text     = _esc(roi.get("text") or "")
     roi_gain     = float(roi.get("monthly_gain") or 0.0)
     roi_pct      = float(roi.get("roi_percent") or 0.0)
+    roi_gain_cons = float(roi.get("monthly_gain_conservative") or (roi_gain * 0.6))
+    roi_gain_opt = float(roi.get("monthly_gain_optimistic") or (roi_gain * 1.4))
+    roi_pct_cons = float(roi.get("roi_percent_conservative") or (roi_pct * 0.6))
+    roi_pct_opt = float(roi.get("roi_percent_optimistic") or (roi_pct * 1.4))
     weak_gain    = float(c_weak.get("monthly_gain") or 0.0)
     evening_note = _esc(str(c_evening.get("note") or "ניצול שעות ערב"))
     evening_gain = float(c_evening.get("monthly_gain") or 0.0)
@@ -4904,7 +5315,41 @@ def export_pdf():
             </div>
             """
             + roi_table_html +
-            "</section>"
+            """
+            <div class="roi-scenarios" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+              <div style="font-size: 0.9em; margin-bottom: 10px; font-weight: bold;">""" + (
+                "תרחישי הערכה:" if current_lang == 'he' else 
+                ("Сценарии оценки:" if current_lang == 'ru' else "Estimation Scenarios:")
+              ) + """</div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 6px; border: 1px solid rgba(239,68,68,0.3);">
+                  <div style="font-size: 0.75em; color: #f87171;">""" + (
+                    "שמרני (60%)" if current_lang == 'he' else 
+                    ("Консервативный (60%)" if current_lang == 'ru' else "Conservative (60%)")
+                  ) + """</div>
+                  <div style="font-size: 1.1em; font-weight: bold; color: #ef4444;">""" + f"{currency_symbol}{roi_gain_cons:,.0f}" + """</div>
+                  <div style="font-size: 0.7em; color: #f87171;">ROI: """ + f"{roi_pct_cons:,.0f}%" + """</div>
+                </div>
+                <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(16,185,129,0.1); border-radius: 6px; border: 1px solid rgba(16,185,129,0.3);">
+                  <div style="font-size: 0.75em; color: #10b981;">""" + (
+                    "בסיסי (100%)" if current_lang == 'he' else 
+                    ("Базовый (100%)" if current_lang == 'ru' else "Base (100%)")
+                  ) + """</div>
+                  <div style="font-size: 1.1em; font-weight: bold; color: #34d399;">""" + f"{currency_symbol}{roi_gain:,.0f}" + """</div>
+                  <div style="font-size: 0.7em; color: #10b981;">ROI: """ + f"{roi_pct:,.0f}%" + """</div>
+                </div>
+                <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(34,197,94,0.1); border-radius: 6px; border: 1px solid rgba(34,197,94,0.3);">
+                  <div style="font-size: 0.75em; color: #16a34a;">""" + (
+                    "אופטימי (140%)" if current_lang == 'he' else 
+                    ("Оптимистичный (140%)" if current_lang == 'ru' else "Optimistic (140%)")
+                  ) + """</div>
+                  <div style="font-size: 1.1em; font-weight: bold; color: #22c55e;">""" + f"{currency_symbol}{roi_gain_opt:,.0f}" + """</div>
+                  <div style="font-size: 0.7em; color: #16a34a;">ROI: """ + f"{roi_pct_opt:,.0f}%" + """</div>
+                </div>
+              </div>
+            </div>
+            """
+            + "</section>"
         )
 
     # ---------- 4) HTML מלא ----------
@@ -6466,10 +6911,33 @@ def roi_page():
     
     print(f"📊 ROI Page: has_any={has_any}")
     
+    # Генерируем дополнительные данные для новых блоков
+    current_lang = get_language()
+    diagnosis = {}
+    action_plan = {}
+    
+    if has_any:
+        # Для диагностики нужен dataframe, но его нет в LAST_EXPORT
+        # Создаем упрощенную диагностику на основе компонентов
+        # (в реальности нужно было бы сохранять dataframe или пересчитывать)
+        diagnosis = {"insights": [], "chart_data": {}}  # Упрощенная версия
+        
+        # Генерируем actionable план на 7 дней
+        # Создаем пустой dataframe для совместимости (функция ожидает его)
+        import pandas as pd
+        empty_df = pd.DataFrame()
+        try:
+            action_plan = generate_7day_action_plan(empty_df, roi, current_lang)
+        except Exception as e:
+            print(f"Action plan generation error: {e}")
+            action_plan = {"plans": []}
+    
     return render_template(
         "roi.html",
         roi=roi,
         has_any=has_any,
+        diagnosis=diagnosis,
+        action_plan=action_plan,
         title="ROI משוער",
         active="roi",
     )

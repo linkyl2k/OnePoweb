@@ -838,7 +838,9 @@ TRANSLATIONS = {
 def get_language():
     """Получить текущий язык из сессии, по умолчанию 'he'"""
     from flask import session
-    return session.get("language", "he")
+    lang = session.get("language", "he")
+    print(f"🔍 get_language() called, returning: {lang}, session.get('language') = {session.get('language')}")
+    return lang
 
 def t(key, lang=None):
     """Перевести ключ на указанный язык или текущий язык из сессии"""
@@ -3824,6 +3826,7 @@ def index():
             currency_info = get_currency(current_lang)
             currency_symbol = currency_info["symbol"]
             
+            print(f"📊 Hourly chart: current_lang={current_lang}, currency_symbol={currency_symbol}")
             if current_lang == "he":
                 ax.set_title(rtl(f"מכירות לפי שעה ({currency_symbol}) {hour_start}:00–{hour_end}:00"))
                 ax.set_xlabel(rtl("שעה"))
@@ -3914,6 +3917,7 @@ def index():
                 currency_info = get_currency(current_lang)
                 currency_symbol = currency_info["symbol"]
                 
+                print(f"📊 Weekday chart (first path): current_lang={current_lang}, currency_symbol={currency_symbol}, names={names[:3] if names else []}")
                 if current_lang == "he":
                     ax.set_title(rtl(f"מכירות לפי יום בשבוע ({currency_symbol})"))
                     ax.set_xlabel(rtl("יום בשבוע"))
@@ -3960,22 +3964,28 @@ def index():
             fig = plt.figure(figsize=(10, 4))
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
             # Переводим заголовок
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
-                plt.title(rtl("מכירות יומיות"))
+                plt.title(rtl(f"מכירות יומיות ({currency_symbol})"))
             elif current_lang == "en":
-                plt.title("Daily Sales")
+                plt.title(f"Daily Sales ({currency_symbol})")
             else:  # ru
-                plt.title(t("chart_daily_sales"))
+                plt.title(f"{t('chart_daily_sales')} ({currency_symbol})")
             # Переводим подписи осей
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
                 plt.xlabel(rtl("תאריך"))
-                plt.ylabel(rtl("סה\"כ (₪)"))
+                plt.ylabel(rtl(f"סה\"כ ({currency_symbol})"))
             elif current_lang == "en":
                 plt.xlabel("Date")
-                plt.ylabel("Total (₪)")
+                plt.ylabel(f"Total ({currency_symbol})")
             else:  # ru
                 plt.xlabel("Дата")
-                plt.ylabel(t("chart_axis_total"))
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
             plt.xticks(rotation=60)
             fname = _save_fig(fig, "daily.png")
 
@@ -4116,14 +4126,15 @@ def index():
                     fig, ax = plt.subplots(figsize=(6, 6))
                     ax.pie(values, labels=labels, autopct="%1.0f%%", startangle=90)
                     # Переводим заголовок
+                    currency_info = get_currency(current_lang)
+                    currency_symbol = currency_info["symbol"]
+                    
                     if current_lang == "he":
-                        ax.set_title(_rtl("פילוח אמצעי תשלום (₪)"))
+                        ax.set_title(_rtl(f"פילוח אמצעי תשלום ({currency_symbol})"))
                     elif current_lang == "en":
-                        currency_sym = get_currency("en")["symbol"]
-                        ax.set_title(f"Payment Methods Breakdown ({currency_sym})")
+                        ax.set_title(f"Payment Methods Breakdown ({currency_symbol})")
                     else:  # ru
-                        currency_sym = get_currency(current_lang)["symbol"]
-                        ax.set_title(t("chart_payment_methods") + f" ({currency_sym})")
+                        ax.set_title(f"{t('chart_payment_methods')} ({currency_symbol})")
 
                     fname = _save_fig(fig, "payments.png")
 
@@ -4261,11 +4272,24 @@ def index():
                     # יצירת heatmap
                     im = ax.imshow(heatmap_data.values, cmap='YlOrRd', aspect='auto')
                     
+                    # Маппинг дней недели на разные языки
+                    day_mapping = {
+                        "he": {"ראשון": "ראשון", "שני": "שני", "שלישי": "שלישי", "רביעי": "רביעי", "חמישי": "חמישי", "שישי": "שישי", "שבת": "שבת"},
+                        "en": {"ראשון": "Sunday", "שני": "Monday", "שלישי": "Tuesday", "רביעי": "Wednesday", "חמישי": "Thursday", "שישי": "Friday", "שבת": "Saturday"},
+                        "ru": {"ראשון": "Воскресенье", "שני": "Понедельник", "שלישי": "Вторник", "רביעי": "Среда", "חמישי": "Четверг", "שישי": "Пятница", "שבת": "Суббота"}
+                    }
+                    
+                    # Переводим дни недели в зависимости от языка
+                    if current_lang in day_mapping:
+                        translated_days = [day_mapping[current_lang].get(d, d) for d in heatmap_data.index]
+                    else:
+                        translated_days = [rtl(d) for d in heatmap_data.index]
+                    
                     # הגדרת labels
                     ax.set_xticks(range(len(heatmap_data.columns)))
                     ax.set_xticklabels([f'{int(h)}:00' for h in heatmap_data.columns])
                     ax.set_yticks(range(len(heatmap_data.index)))
-                    ax.set_yticklabels([rtl(d) for d in heatmap_data.index])
+                    ax.set_yticklabels(translated_days)
                     
                     # Переводим заголовки и подписи осей
                     if current_lang == "he":
@@ -4364,32 +4388,36 @@ def index():
                     weekday_total = compare[compare['is_weekend'] == False]['total'].values[0]
                     weekend_total = compare[compare['is_weekend'] == True]['total'].values[0]
                     ax1.bar(labels, [weekday_total, weekend_total], color=colors)
+                    
                     # Переводим заголовки и подписи осей
+                    currency_info = get_currency(current_lang)
+                    currency_symbol = currency_info["symbol"]
+                    
                     if current_lang == "he":
-                        ax1.set_title(rtl('סה"כ מכירות'))
-                        ax1.set_ylabel(rtl('₪'))
+                        ax1.set_title(rtl(f'סה"כ מכירות'))
+                        ax1.set_ylabel(rtl(currency_symbol))
                         ax2.set_title(rtl('ממוצע עסקה'))
-                        ax2.set_ylabel(rtl('₪'))
+                        ax2.set_ylabel(rtl(currency_symbol))
                     elif current_lang == "en":
                         ax1.set_title("Total Sales")
-                        ax1.set_ylabel("₪")
+                        ax1.set_ylabel(currency_symbol)
                         ax2.set_title("Average Transaction")
-                        ax2.set_ylabel("₪")
+                        ax2.set_ylabel(currency_symbol)
                     else:  # ru
                         ax1.set_title(t("summary_total_sales"))
-                        ax1.set_ylabel(t("chart_axis_currency"))
+                        ax1.set_ylabel(currency_symbol)
                         ax2.set_title("Средняя транзакция")
-                        ax2.set_ylabel(t("chart_axis_currency"))
+                        ax2.set_ylabel(currency_symbol)
                     
                     for i, v in enumerate([weekday_total, weekend_total]):
-                        ax1.text(i, v + v*0.02, f'₪{v:,.0f}', ha='center', fontsize=10)
+                        ax1.text(i, v + v*0.02, f'{currency_symbol}{v:,.0f}', ha='center', fontsize=10)
                     
                     # גרף 2: ממוצע ליום
                     weekday_avg = compare[compare['is_weekend'] == False]['avg'].values[0]
                     weekend_avg = compare[compare['is_weekend'] == True]['avg'].values[0]
                     ax2.bar(labels, [weekday_avg, weekend_avg], color=colors)
                     for i, v in enumerate([weekday_avg, weekend_avg]):
-                        ax2.text(i, v + v*0.02, f'₪{v:,.0f}', ha='center', fontsize=10)
+                        ax2.text(i, v + v*0.02, f'{currency_symbol}{v:,.0f}', ha='center', fontsize=10)
                     
                     plt.tight_layout()
                     fname = _save_fig(fig, "weekend_compare.png")
@@ -4408,8 +4436,8 @@ def index():
                     
                     plots.append({
                         "filename": fname,
-                        "title": "סופ\"ש מול ימי חול",
-                        "note": "האם סופ\"ש חזק יותר או חלש יותר",
+                        "title": chart_title,
+                        "note": "האם סופ\"ש חזק יותר או חלש יותר" if current_lang == "he" else ("Is weekend stronger or weaker?" if current_lang == "en" else "Выходные сильнее или слабее?"),
                         "ai": ai
                     })
             else:
@@ -4851,10 +4879,7 @@ def demo_analysis():
 
     if not plots:
         messages.append("לא הופקו גרפים—בדוק שהעמודות בדוח תואמות (תאריך, שעה, סכום (₪) לפחות).")
-
-    return _render()
-
-
+        return _render()
 
     # ============ גרפים + הסברים ============
     # 1) לפי שעה
@@ -4865,20 +4890,21 @@ def demo_analysis():
             fig = plt.figure(figsize=(9,4))
             plt.bar(hourly["שעה עגולה"], hourly[COL_SUM])
             # Переводим заголовки и подписи осей
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
-                plt.title(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00")
+                plt.title(f"מכירות לפי שעה ({currency_symbol}) {hour_start}:00–{hour_end}:00")
                 plt.xlabel("שעה")
-                plt.ylabel('סה"כ (₪)')
+                plt.ylabel(f'סה"כ ({currency_symbol})')
             elif current_lang == "en":
-                currency_sym = get_currency("en")["symbol"]
-                plt.title(f"Sales by Hour ({currency_sym}) {hour_start}:00–{hour_end}:00")
+                plt.title(f"Sales by Hour ({currency_symbol}) {hour_start}:00–{hour_end}:00")
                 plt.xlabel("Hour")
-                plt.ylabel(f"Total ({currency_sym})")
+                plt.ylabel(f"Total ({currency_symbol})")
             else:  # ru
-                currency_sym = get_currency(current_lang)["symbol"]
-                plt.title(t("chart_sales_by_hour") + f" ({currency_sym}) {hour_start}:00–{hour_end}:00")
+                plt.title(f"{t('chart_sales_by_hour')} ({currency_symbol}) {hour_start}:00–{hour_end}:00")
                 plt.xlabel(t("chart_axis_hour"))
-                plt.ylabel(t("chart_axis_total") + f" ({currency_sym})")
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
             fname = _save_fig(fig, "hourly.png")
 
             best_hour_row = hourly.loc[hourly[COL_SUM].idxmax()] if not hourly.empty else None
@@ -4926,6 +4952,7 @@ def demo_analysis():
             currency_info = get_currency(current_lang)
             currency_symbol = currency_info["symbol"]
             
+            print(f"📊 Weekday chart (second path): current_lang={current_lang}, currency_symbol={currency_symbol}")
             if current_lang == "he":
                 plt.title(f"מכירות לפי יום בשבוע ({currency_symbol})")
                 plt.xlabel("יום")
@@ -5030,15 +5057,18 @@ def demo_analysis():
             fig = plt.figure(figsize=(9,4))
             plt.bar(revenue[COL_ITEM], revenue[COL_SUM])
             # Переводим заголовки и подписи осей
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
                 plt.title("Top 10 — הכנסות לפי מוצר")
-                plt.ylabel('סה"כ (₪)')
+                plt.ylabel(f'סה"כ ({currency_symbol})')
             elif current_lang == "en":
                 plt.title("Top 10 — Revenue by Product")
-                plt.ylabel("Total (₪)")
+                plt.ylabel(f"Total ({currency_symbol})")
             else:  # ru
                 plt.title("Top 10 — " + t("chart_top_revenue"))
-                plt.ylabel(t("chart_axis_total"))
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
             plt.xticks(rotation=40, ha="right")
             fname2 = _save_fig(fig, "top_rev.png")
             
@@ -5066,12 +5096,15 @@ def demo_analysis():
             fig = plt.figure(figsize=(6, 6))
             plt.pie(pay[COL_SUM], labels=pay[COL_PAY], autopct="%1.0f%%", startangle=90)
             # Переводим заголовок
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
-                plt.title("פילוח אמצעי תשלום (₪)")
+                plt.title(f"פילוח אמצעי תשלום ({currency_symbol})")
             elif current_lang == "en":
-                plt.title("Payment Methods Breakdown (₪)")
+                plt.title(f"Payment Methods Breakdown ({currency_symbol})")
             else:  # ru
-                plt.title(t("chart_payment_methods") + " (₪)")
+                plt.title(f"{t('chart_payment_methods')} ({currency_symbol})")
             fname = _save_fig(fig, "payments.png")
 
             total = float(pay[COL_SUM].sum()) or 1.0
@@ -5090,17 +5123,12 @@ def demo_analysis():
 
     if not plots:
         messages.append("לא הופקו גרפים—בדוק שהעמודות בדוח תואמות (תאריך, שעה, סכום (₪) לפחות).")
+        return _render()
 
-    # שמירת מצב אחרון לייצוא PDF
-    LAST_EXPORT["generated_at"] = datetime.now()
-    LAST_EXPORT["plots"] = plots
-    # סיכום קצר
-    total_sum = float(df[COL_SUM].sum())
-    days = df[COL_DATE].nunique()
-    avg_day = total_sum / days if days else 0.0
-# ---------------- ייצוא PDF ----------------
-# ---------------- ייצוא PDF ----------------
-# ---------------- ייצוא PDF ----------------
+    # Этот код не должен выполняться, так как есть return redirect выше
+    # Но оставляем его для совместимости, если по какой-то причине код дойдет сюда
+    print(f"⚠️ WARNING: Reached code after return redirect! This should not happen.")
+    return _render()
 @app.route("/export/pdf")
 def export_pdf():
     """

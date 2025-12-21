@@ -12,8 +12,18 @@
   <meta property="og:title" content="OnePoweb – ניתוח קופה חכם">
   <meta property="og:description" content="העלה דוח קופה, קבל גרפים ודו״ח PDF מסודר. בקרוב – הסברי AI לעסק שלך.">
   <meta property="og:image" content="{{ url_for('static', filename='img/onepoweb_icon_only_48.png', _external=True) }}">
+  <meta property="og:image:width" content="48">
+  <meta property="og:image:height" content="48">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:url" content="{{ request.url }}">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OnePoweb">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="OnePoweb – ניתוח קופה חכם">
+  <meta name="twitter:description" content="העלה דוח קופה, קבל גרפים ודו״ח PDF מסודר. בקרוב – הסברי AI לעסק שלך.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='img/onepoweb_icon_only_48.png', _external=True) }}">
 
   <!-- Bootstrap RTL/LTR -->
   {% if current_lang == 'he' %}
@@ -28,12 +38,17 @@
 
   <!-- Favicon / App Icons -->
   <!-- Classic favicon.ico for browsers / Google -->
-  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
-
-  <!-- High‑res PNG icon (tabs, PWA, etc.) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/onepoweb_icon_only_32.png') }}">
   <link rel="icon" type="image/png" sizes="48x48" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
-  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" sizes="48x48" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
+  
+  <!-- Additional meta for search engines -->
+  <link rel="canonical" href="{{ request.url }}">
+  <meta name="theme-color" content="#0d2a44">
   <meta name="color-scheme" content="light dark">
   
   <style>

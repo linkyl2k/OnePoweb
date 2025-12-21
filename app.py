@@ -304,6 +304,11 @@ TRANSLATIONS = {
         "signup_terms": "אני מסכים לתנאי השימוש",
         "signup_button": "הירשם",
         "signup_have_account": "יש לך כבר חשבון?",
+        "password_requirements": "דרישות סיסמה:",
+        "password_length": "8-32 תווים",
+        "password_english": "אותיות אנגליות בלבד",
+        "password_upper": "אות גדולה (A-Z)",
+        "password_digit": "ספרה (0-9)",
         
         # Профиль
         "profile_title": "הפרופיל שלי",
@@ -462,6 +467,11 @@ TRANSLATIONS = {
         "signup_terms": "I agree to the Terms of Service",
         "signup_button": "Sign Up",
         "signup_have_account": "Already have an account?",
+        "password_requirements": "Password Requirements:",
+        "password_length": "8-32 characters",
+        "password_english": "English letters only",
+        "password_upper": "Uppercase letter (A-Z)",
+        "password_digit": "Digit (0-9)",
         
         # Profile
         "profile_title": "My Profile",

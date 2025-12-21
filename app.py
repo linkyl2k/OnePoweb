@@ -836,9 +836,9 @@ TRANSLATIONS = {
 }
 
 def get_language():
-    """Получить текущий язык из сессии, по умолчанию 'he'"""
+    """Получить текущий язык из сессии, по умолчанию 'en'"""
     from flask import session
-    lang = session.get("language", "he")
+    lang = session.get("language", "en")
     print(f"🔍 get_language() called, returning: {lang}, session.get('language') = {session.get('language')}")
     return lang
 
@@ -847,7 +847,7 @@ def t(key, lang=None):
     if lang is None:
         lang = get_language()
     
-    translations = TRANSLATIONS.get(lang, TRANSLATIONS["he"])
+    translations = TRANSLATIONS.get(lang, TRANSLATIONS["en"])
     return translations.get(key, key)  # Возвращаем ключ, если перевод не найден
 
 # Context processor для шаблонов

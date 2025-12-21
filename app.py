@@ -3704,6 +3704,7 @@ def set_currency(currency_code):
 def index():
     messages, plots = [], []
     current_lang = get_language()  # Получаем текущий язык
+    print(f"🌐 index(): current_lang = {current_lang}")
 
     def _render():
         return render_template("index.html",
@@ -3801,6 +3802,7 @@ def index():
     # 1️⃣ מכירות לפי שעה — הכי חשוב: מתי צריך עובדים
     # ------------------------------------------------------------------
     if opt_hourly:
+        print(f"📊 Creating hourly chart, current_lang = {current_lang}")
         try:
             if HOUR_COL not in df.columns and COL_TIME in df.columns:
                 tmp_time = pd.to_datetime(df[COL_TIME].astype(str), errors="coerce")
@@ -3819,20 +3821,21 @@ def index():
             fig, ax = plt.subplots(figsize=(9, 4))
             ax.bar(hourly[HOUR_COL], hourly[COL_SUM], align="center")
             # Переводим заголовки и подписи осей
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
-                ax.set_title(rtl(f"מכירות לפי שעה (₪) {hour_start}:00–{hour_end}:00"))
+                ax.set_title(rtl(f"מכירות לפי שעה ({currency_symbol}) {hour_start}:00–{hour_end}:00"))
                 ax.set_xlabel(rtl("שעה"))
-                ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
+                ax.set_ylabel(rtl(f'סה"כ ({currency_symbol})'))
             elif current_lang == "en":
-                currency_sym = get_currency("en")["symbol"]
-                ax.set_title(f"Sales by Hour ({currency_sym}) {hour_start}:00–{hour_end}:00")
+                ax.set_title(f"Sales by Hour ({currency_symbol}) {hour_start}:00–{hour_end}:00")
                 ax.set_xlabel("Hour")
-                ax.set_ylabel(f"Total ({currency_sym})")
+                ax.set_ylabel(f"Total ({currency_symbol})")
             else:  # ru
-                currency_sym = get_currency(current_lang)["symbol"]
-                ax.set_title(f"Продажи по часам ({currency_sym}) {hour_start}:00–{hour_end}:00")
+                ax.set_title(f"Продажи по часам ({currency_symbol}) {hour_start}:00–{hour_end}:00")
                 ax.set_xlabel(t("chart_axis_hour"))
-                ax.set_ylabel(t("chart_axis_total") + f" ({currency_sym})")
+                ax.set_ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
             ax.set_xticks(list(range(hour_start, hour_end + 1)))
             ax.set_xlim(hour_start - 0.5, hour_end + 0.5)
             fname = _save_fig(fig, "hourly.png")
@@ -3886,27 +3889,43 @@ def index():
             if by_wd.empty:
                 messages.append("אין נתונים לגרף 'מכירות לפי יום בשבוע'.")
             else:
-                names = [ _rtl(str(x)) for x in by_wd["יום בשבוע"].tolist() ]
+                # Порядок дней на иврите (как в данных)
+                order_he = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"]
+                # Маппинг дней недели на разные языки
+                day_mapping = {
+                    "he": {"ראשון": "ראשון", "שני": "שני", "שלישי": "שלישי", "רביעי": "רביעי", "חמישי": "חמישי", "שישי": "שישי", "שבת": "שבת"},
+                    "en": {"ראשון": "Sunday", "שני": "Monday", "שלישי": "Tuesday", "רביעי": "Wednesday", "חמישי": "Thursday", "שישי": "Friday", "שבת": "Saturday"},
+                    "ru": {"ראשון": "Воскресенье", "שני": "Понедельник", "שלישי": "Вторник", "רביעי": "Среда", "חמישי": "Четверг", "שישי": "Пятница", "שבת": "Суббота"}
+                }
+                
+                # Переводим дни недели в зависимости от языка
+                if current_lang in day_mapping:
+                    names = [day_mapping[current_lang].get(x, x) for x in by_wd["יום בשבוע"].tolist()]
+                else:
+                    names = [ _rtl(str(x)) for x in by_wd["יום בשבוע"].tolist() ]
+                
                 xpos  = list(range(len(names)))
                 values = by_wd[COL_SUM].tolist()
 
                 fig, ax = plt.subplots(figsize=(8, 4))
                 ax.bar(xpos, values)
+                
                 # Переводим заголовки и подписи осей
+                currency_info = get_currency(current_lang)
+                currency_symbol = currency_info["symbol"]
+                
                 if current_lang == "he":
-                    ax.set_title(rtl("מכירות לפי יום בשבוע (₪)"))
+                    ax.set_title(rtl(f"מכירות לפי יום בשבוע ({currency_symbol})"))
                     ax.set_xlabel(rtl("יום בשבוע"))
-                    ax.set_ylabel(rtl(f'סה"כ ({get_currency("he")["symbol"]})'))
+                    ax.set_ylabel(rtl(f'סה"כ ({currency_symbol})'))
                 elif current_lang == "en":
-                    currency_sym = get_currency("en")["symbol"]
-                    ax.set_title(f"Sales by Day of Week ({currency_sym})")
+                    ax.set_title(f"Sales by Day of Week ({currency_symbol})")
                     ax.set_xlabel("Day of Week")
-                    ax.set_ylabel(f"Total ({currency_sym})")
+                    ax.set_ylabel(f"Total ({currency_symbol})")
                 else:  # ru
-                    currency_sym = get_currency(current_lang)["symbol"]
-                    ax.set_title(t("chart_sales_by_weekday") + f" ({currency_sym})")
+                    ax.set_title(f"{t('chart_sales_by_weekday')} ({currency_symbol})")
                     ax.set_xlabel(t("chart_axis_day"))
-                    ax.set_ylabel(t("chart_axis_total") + f" ({currency_sym})")
+                    ax.set_ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
                 ax.set_xticks(xpos)
                 ax.set_xticklabels(names, rotation=0)
                 fname = _save_fig(fig, "by_weekday.png")
@@ -4881,6 +4900,7 @@ def demo_analysis():
 
     # 2) לפי יום בשבוע
     if opt_weekday:
+        print(f"📊 Creating weekday chart, current_lang = {current_lang}")
         try:
             # Порядок дней на иврите (как в данных)
             order_he = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"]
@@ -4943,18 +4963,21 @@ def demo_analysis():
             fig = plt.figure(figsize=(10,4))
             plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
             # Переводим заголовки и подписи осей
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
-                plt.title("מכירות יומיות (₪)")
+                plt.title(f"מכירות יומיות ({currency_symbol})")
                 plt.xlabel("תאריך")
-                plt.ylabel('סה"כ (₪)')
+                plt.ylabel(f'סה"כ ({currency_symbol})')
             elif current_lang == "en":
-                plt.title("Daily Sales (₪)")
+                plt.title(f"Daily Sales ({currency_symbol})")
                 plt.xlabel("Date")
-                plt.ylabel("Total (₪)")
+                plt.ylabel(f"Total ({currency_symbol})")
             else:  # ru
-                plt.title(t("chart_daily_sales") + " (₪)")
+                plt.title(f"{t('chart_daily_sales')} ({currency_symbol})")
                 plt.xlabel("Дата")
-                plt.ylabel(t("chart_axis_total"))
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
             plt.xticks(rotation=60)
             fname = _save_fig(fig, "daily.png")
 

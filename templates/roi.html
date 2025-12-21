@@ -219,62 +219,62 @@
 
     {# ==== Actionable 7-Day Plan ==== #}
     {% if action_plan and action_plan.plans %}
-    <div class="card mb-4" style="background: linear-gradient(135deg, rgba(6,182,212,0.08) 0%, rgba(16,185,129,0.08) 100%); border: 2px solid rgba(16,185,129,0.3); box-shadow: 0 8px 32px rgba(16,185,129,0.15); border-radius: 16px; overflow: hidden;">
+    <div class="card mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
       <div class="card-body p-4">
         <div class="d-flex align-items-center mb-4">
-          <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-left: 12px; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">
-            <i class="bi bi-calendar-check" style="font-size: 24px; color: white;"></i>
+          <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-left: 12px;">
+            <i class="bi bi-calendar-check" style="font-size: 24px; color: #e6e9ef;"></i>
           </div>
           <div>
-            <h4 class="mb-0" style="color: #10b981; font-weight: 700; font-size: 1.5rem;">
+            <h4 class="mb-0" style="color: #e6e9ef; font-weight: 600; font-size: 1.4rem;">
               {% if current_lang == 'he' %}תוכנית פעולה ל-7 ימים{% elif current_lang == 'en' %}7-Day Action Plan{% else %}План действий на 7 дней{% endif %}
             </h4>
-            <p class="text-muted mb-0 small">{% if current_lang == 'he' %}צעדים קונקרטיים לשיפור העסק{% elif current_lang == 'en' %}Concrete steps to improve your business{% else %}Конкретные шаги для улучшения бизнеса{% endif %}</p>
+            <p class="text-muted mb-0 small" style="color: #a0aec0;">{% if current_lang == 'he' %}צעדים קונקרטיים לשיפור העסק{% elif current_lang == 'en' %}Concrete steps to improve your business{% else %}Конкретные шаги для улучшения бизнеса{% endif %}</p>
           </div>
         </div>
         
         {% for plan in action_plan.plans %}
-        <div class="mb-4 p-4" style="background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(6,182,212,0.08) 100%); border-radius: 14px; border: 1px solid rgba(16,185,129,0.25); box-shadow: 0 4px 16px rgba(0,0,0,0.1); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(16,185,129,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.1)';">
+        <div class="mb-4 p-3" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.12)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.08)';">
           <div class="d-flex align-items-start mb-3">
-            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-left: 12px; flex-shrink: 0;">
-              <i class="bi bi-target" style="font-size: 20px; color: white;"></i>
+            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-left: 12px; flex-shrink: 0;">
+              <i class="bi bi-target" style="font-size: 20px; color: #e6e9ef;"></i>
             </div>
             <div style="flex: 1;">
-              <h5 class="mb-2" style="color: #10b981; font-weight: 600; font-size: 1.2rem;">{{ plan.category }}</h5>
+              <h5 class="mb-2" style="color: #e6e9ef; font-weight: 600; font-size: 1.1rem;">{{ plan.category }}</h5>
               <p class="mb-0" style="color: #a0aec0; font-size: 0.95rem; line-height: 1.6;">{{ plan.goal }}</p>
             </div>
           </div>
           
-          <div class="table-responsive" style="border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.2);">
+          <div class="table-responsive" style="border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.2);">
             <table class="table table-sm mb-0" style="color: #e6e9ef; margin-bottom: 0;">
-              <thead style="background: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(6,182,212,0.15) 100%);">
+              <thead style="background: rgba(255,255,255,0.05);">
                 <tr>
-                  <th style="width: 10%; padding: 14px 12px; font-weight: 600; color: #10b981; border-bottom: 2px solid rgba(16,185,129,0.3);">
-                    <i class="bi bi-calendar-day me-1"></i>{% if current_lang == 'he' %}יום{% elif current_lang == 'en' %}Day{% else %}День{% endif %}
+                  <th style="width: 10%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <i class="bi bi-calendar-day me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}יום{% elif current_lang == 'en' %}Day{% else %}День{% endif %}
                   </th>
-                  <th style="width: 40%; padding: 14px 12px; font-weight: 600; color: #10b981; border-bottom: 2px solid rgba(16,185,129,0.3);">
-                    <i class="bi bi-check-circle me-1"></i>{% if current_lang == 'he' %}מה לעשות{% elif current_lang == 'en' %}What to Do{% else %}Что сделать{% endif %}
+                  <th style="width: 40%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <i class="bi bi-check-circle me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}מה לעשות{% elif current_lang == 'en' %}What to Do{% else %}Что сделать{% endif %}
                   </th>
-                  <th style="width: 30%; padding: 14px 12px; font-weight: 600; color: #10b981; border-bottom: 2px solid rgba(16,185,129,0.3);">
-                    <i class="bi bi-graph-up me-1"></i>{% if current_lang == 'he' %}מה למדוד{% elif current_lang == 'en' %}What to Measure{% else %}Что измерить{% endif %}
+                  <th style="width: 30%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <i class="bi bi-graph-up me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}מה למדוד{% elif current_lang == 'en' %}What to Measure{% else %}Что измерить{% endif %}
                   </th>
-                  <th style="width: 20%; padding: 14px 12px; font-weight: 600; color: #10b981; border-bottom: 2px solid rgba(16,185,129,0.3);">
-                    <i class="bi bi-clock me-1"></i>{% if current_lang == 'he' %}מתי לבדוק{% elif current_lang == 'en' %}When to Check{% else %}Когда проверить{% endif %}
+                  <th style="width: 20%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <i class="bi bi-clock me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}מתי לבדוק{% elif current_lang == 'en' %}When to Check{% else %}Когда проверить{% endif %}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {% for day in plan.days %}
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(16,185,129,0.1)';" onmouseout="this.style.background='transparent';">
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.background='transparent';">
                   <td style="padding: 12px; vertical-align: middle;">
-                    <span style="display: inline-block; width: 32px; height: 32px; background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); border-radius: 8px; text-align: center; line-height: 32px; font-weight: 700; color: white; font-size: 0.9rem;">{{ day.day }}</span>
+                    <span style="display: inline-block; width: 32px; height: 32px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; text-align: center; line-height: 32px; font-weight: 600; color: #e6e9ef; font-size: 0.9rem;">{{ day.day }}</span>
                   </td>
                   <td style="padding: 12px; vertical-align: middle; color: #e6e9ef; line-height: 1.5;">{{ day.action }}</td>
                   <td style="padding: 12px; vertical-align: middle; color: #cbd5e0; line-height: 1.5;">
-                    <i class="bi bi-bar-chart me-1" style="color: #06b6d4; font-size: 0.85rem;"></i>{{ day.measure }}
+                    <i class="bi bi-bar-chart me-1" style="color: #a0aec0; font-size: 0.85rem;"></i>{{ day.measure }}
                   </td>
                   <td style="padding: 12px; vertical-align: middle; color: #a0aec0; font-weight: 500;">
-                    <i class="bi bi-calendar-check me-1" style="color: #10b981; font-size: 0.85rem;"></i>{{ day.check }}
+                    <i class="bi bi-calendar-check me-1" style="color: #a0aec0; font-size: 0.85rem;"></i>{{ day.check }}
                   </td>
                 </tr>
                 {% endfor %}
@@ -282,28 +282,28 @@
             </table>
           </div>
           
-          <div class="mt-4 p-3" style="background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(16,185,129,0.1) 100%); border-radius: 10px; border: 1px solid rgba(6,182,212,0.2);">
+          <div class="mt-3 p-3" style="background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
             <div class="d-flex align-items-center mb-2">
-              <i class="bi bi-speedometer2 me-2" style="color: #06b6d4; font-size: 1.1rem;"></i>
-              <strong style="color: #06b6d4; font-size: 0.95rem;">{% if current_lang == 'he' %}מעקב מטריקות{% elif current_lang == 'en' %}Track Metrics{% else %}Отслеживание метрик{% endif %}</strong>
+              <i class="bi bi-speedometer2 me-2" style="color: #a0aec0; font-size: 1rem;"></i>
+              <strong style="color: #e6e9ef; font-size: 0.95rem;">{% if current_lang == 'he' %}מעקב מטריקות{% elif current_lang == 'en' %}Track Metrics{% else %}Отслеживание метрик{% endif %}</strong>
             </div>
             <div class="row g-2">
               <div class="col-md-4">
-                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 3px solid #10b981;">
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2);">
                   <div style="font-size: 0.8rem; color: #a0aec0; margin-bottom: 4px;">{% if current_lang == 'he' %}הכנסה יומית{% elif current_lang == 'en' %}Daily Revenue{% else %}Дневная выручка{% endif %}</div>
-                  <div style="color: #10b981; font-weight: 600; font-size: 0.9rem;">{{ plan.metrics.daily_revenue }}</div>
+                  <div style="color: #e6e9ef; font-weight: 600; font-size: 0.9rem;">{{ plan.metrics.daily_revenue }}</div>
                 </div>
               </div>
               <div class="col-md-4">
-                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 3px solid #06b6d4;">
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2);">
                   <div style="font-size: 0.8rem; color: #a0aec0; margin-bottom: 4px;">{% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}Transactions{% else %}Транзакции{% endif %}</div>
-                  <div style="color: #06b6d4; font-weight: 600; font-size: 0.9rem;">{{ plan.metrics.transactions }}</div>
+                  <div style="color: #e6e9ef; font-weight: 600; font-size: 0.9rem;">{{ plan.metrics.transactions }}</div>
                 </div>
               </div>
               <div class="col-md-4">
-                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 3px solid #10b981;">
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2);">
                   <div style="font-size: 0.8rem; color: #a0aec0; margin-bottom: 4px;">{% if current_lang == 'he' %}ממוצע לעסקה{% elif current_lang == 'en' %}Avg Transaction{% else %}Средний чек{% endif %}</div>
-                  <div style="color: #10b981; font-weight: 600; font-size: 0.9rem;">{{ plan.metrics.avg_check }}</div>
+                  <div style="color: #e6e9ef; font-weight: 600; font-size: 0.9rem;">{{ plan.metrics.avg_check }}</div>
                 </div>
               </div>
             </div>

@@ -6796,7 +6796,7 @@ def profile_edit():
             flash("האימות לא תואם את הסיסמה החדשה", "danger")
             return render_template("profile_edit.html", user=u)
         # Password validation
-        current_lang = session.get('lang', 'en')
+        current_lang = get_language()
         is_valid, error_msg = validate_password(password, current_lang)
         if not is_valid:
             flash(error_msg, "danger")
@@ -6832,6 +6832,7 @@ from datetime import datetime
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+    from flask import request, session, render_template, redirect, url_for, flash
     # בGET: שומרים קוד הפניה אם קיים
     if request.method == "GET":
         ref = request.args.get("ref")
@@ -6878,7 +6879,7 @@ def signup():
         return render_template("signup.html", **form_data)
 
     # Password validation
-    current_lang = session.get('lang', 'en')
+    current_lang = get_language()
     is_valid, error_msg = validate_password(password, current_lang)
     if not is_valid:
         flash(error_msg, "danger")
@@ -6918,7 +6919,13 @@ def signup():
             db.commit()
 
     # שליחת מייל אימות
-    send_verification_email(email, verification_token)
+    try:
+        send_verification_email(email, verification_token)
+    except Exception as e:
+        print(f"⚠️ Error sending verification email: {e}")
+        import traceback
+        traceback.print_exc()
+        # Продолжаем даже если email не отправился - пользователь уже создан
     
     # מעבירים לדף בדיקת אימייל
     return redirect(url_for("signup_check_email", email=email))

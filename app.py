@@ -4882,23 +4882,42 @@ def demo_analysis():
     # 2) לפי יום בשבוע
     if opt_weekday:
         try:
-            order = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"]
-            by_wd = df.groupby("יום בשבוע")[COL_SUM].sum().reindex(order).reset_index()
+            # Порядок дней на иврите (как в данных)
+            order_he = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"]
+            # Маппинг дней недели на разные языки
+            day_mapping = {
+                "he": {"ראשון": "ראשון", "שני": "שני", "שלישי": "שלישי", "רביעי": "רביעי", "חמישי": "חמישי", "שישי": "שישי", "שבת": "שבת"},
+                "en": {"ראשון": "Sunday", "שני": "Monday", "שלישי": "Tuesday", "רביעי": "Wednesday", "חמישי": "Thursday", "שישי": "Friday", "שבת": "Saturday"},
+                "ru": {"ראשון": "Воскресенье", "שני": "Понедельник", "שלישי": "Вторник", "רביעי": "Среда", "חמישי": "Четверг", "שישי": "Пятница", "שבת": "Суббота"}
+            }
+            
+            by_wd = df.groupby("יום בשבוע")[COL_SUM].sum().reindex(order_he).reset_index()
+            
+            # Переводим дни недели в зависимости от языка
+            if current_lang in day_mapping:
+                by_wd["יום בשבוע_translated"] = by_wd["יום בשבוע"].map(day_mapping[current_lang])
+            else:
+                by_wd["יום בשבוע_translated"] = by_wd["יום בשבוע"]
+            
             fig = plt.figure(figsize=(8,4))
-            plt.bar(by_wd["יום בשבוע"], by_wd[COL_SUM])
+            plt.bar(by_wd["יום בשבוע_translated"], by_wd[COL_SUM])
+            
             # Переводим заголовки и подписи осей
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
             if current_lang == "he":
-                plt.title("מכירות לפי יום בשבוע (₪)")
+                plt.title(f"מכירות לפי יום בשבוע ({currency_symbol})")
                 plt.xlabel("יום")
-                plt.ylabel('סה"כ (₪)')
+                plt.ylabel(f'סה"כ ({currency_symbol})')
             elif current_lang == "en":
-                plt.title("Sales by Day of Week (₪)")
+                plt.title(f"Sales by Day of Week ({currency_symbol})")
                 plt.xlabel("Day")
-                plt.ylabel("Total (₪)")
+                plt.ylabel(f"Total ({currency_symbol})")
             else:  # ru
-                plt.title(t("chart_sales_by_weekday") + " (₪)")
+                plt.title(f"{t('chart_sales_by_weekday')} ({currency_symbol})")
                 plt.xlabel(t("chart_axis_day"))
-                plt.ylabel(t("chart_axis_total"))
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
             fname = _save_fig(fig, "by_weekday.png")
 
             top = by_wd.sort_values(COL_SUM, ascending=False).iloc[0] if not by_wd.empty else None

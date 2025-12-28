@@ -6036,6 +6036,18 @@ def paypal_create_order():
         if not u:
             return jsonify({"error": "User not found"}), 401
         
+        # Get user ID safely (handle sqlite3.Row object)
+        try:
+            if hasattr(u, 'keys') and "id" in u.keys():
+                user_id = u["id"]
+            else:
+                u_dict = dict(u)
+                user_id = u_dict.get("id")
+            if not user_id:
+                return jsonify({"error": "User ID not found"}), 401
+        except (KeyError, TypeError, AttributeError):
+            return jsonify({"error": "User ID not found"}), 401
+        
         # Calculate price with referral discount
         base_price_usd = PLAN_PRICES[plan]["usd"]
         # Handle both dict-like access and Row access
@@ -6059,7 +6071,7 @@ def paypal_create_order():
         
         # If price is 0 (fully covered by discount), activate immediately
         if net_price_usd <= 0:
-            return activate_subscription(u["id"], plan, referral_discount)
+            return activate_subscription(user_id, plan, referral_discount)
         
         access_token = get_paypal_access_token()
         if not access_token:
@@ -6086,10 +6098,21 @@ def paypal_create_order():
         start_time = datetime.utcnow() + timedelta(minutes=1)  # Start in 1 minute
         start_time_str = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
         
-        # Get user info
-        user_first_name = u.get("first_name") or "User"
-        user_last_name = u.get("last_name") or ""
-        user_email = u.get("email") or ""
+        # Get user info (handle sqlite3.Row object)
+        try:
+            if hasattr(u, 'keys') and "first_name" in u.keys():
+                user_first_name = u["first_name"] or "User"
+                user_last_name = u["last_name"] or ""
+                user_email = u["email"] or ""
+            else:
+                u_dict = dict(u)
+                user_first_name = u_dict.get("first_name") or "User"
+                user_last_name = u_dict.get("last_name") or ""
+                user_email = u_dict.get("email") or ""
+        except (KeyError, TypeError, AttributeError):
+            user_first_name = "User"
+            user_last_name = ""
+            user_email = ""
         
         subscription_data = {
             "plan_id": plan_id,
@@ -6113,7 +6136,7 @@ def paypal_create_order():
                 "return_url": url_for("paypal_subscription_return", _external=True),
                 "cancel_url": url_for("subscribe", plan=plan, _external=True)
             },
-            "custom_id": str(u["id"])
+            "custom_id": str(user_id)
         }
         
         # If discount, we need to apply it (for subscriptions, PayPal handles discounts differently)

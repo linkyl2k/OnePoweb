@@ -6204,6 +6204,222 @@ def paypal_capture_order():
     return jsonify({"error": "Use return URL instead"}), 400
 
 
+@app.route("/api/paypal/create-subscription-id", methods=["POST"])
+@login_required
+def paypal_create_subscription_id():
+    """Create PayPal subscription and return ID only (no redirect) for inline payment"""
+    try:
+        data = request.get_json() or {}
+        plan = data.get("plan", "basic")
+        
+        if plan not in ("basic", "pro"):
+            return jsonify({"error": "Invalid plan"}), 400
+        
+        u = current_user()
+        if not u:
+            return jsonify({"error": "User not found"}), 401
+        
+        # Get user ID safely
+        try:
+            if hasattr(u, 'keys') and "id" in u.keys():
+                user_id = u["id"]
+            else:
+                u_dict = dict(u)
+                user_id = u_dict.get("id")
+            if not user_id:
+                return jsonify({"error": "User ID not found"}), 401
+        except (KeyError, TypeError, AttributeError):
+            return jsonify({"error": "User ID not found"}), 401
+        
+        # Calculate price with referral discount
+        base_price_usd = PLAN_PRICES[plan]["usd"]
+        try:
+            if hasattr(u, 'keys') and "referral_discount" in u.keys():
+                referral_discount = int(u["referral_discount"] or 0)
+            elif "referral_discount" in dict(u).keys():
+                referral_discount = int(dict(u)["referral_discount"] or 0)
+            else:
+                referral_discount = 0
+        except (KeyError, TypeError, AttributeError):
+            referral_discount = 0
+        
+        if referral_discount > 0:
+            discount_percent = min(referral_discount, 50)
+            discount_usd = int(base_price_usd * discount_percent / 100)
+        else:
+            discount_usd = 0
+        
+        net_price_usd = base_price_usd - discount_usd
+        
+        # If price is 0 (fully covered by discount), activate immediately
+        if net_price_usd <= 0:
+            result = activate_subscription(user_id, plan, referral_discount)
+            return result
+        
+        access_token = get_paypal_access_token()
+        if not access_token:
+            print("[PayPal] Failed to get access token")
+            return jsonify({"error": "PayPal payment system is not configured."}), 500
+        
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Get or create subscription plan
+        plan_id = get_or_create_paypal_plan(plan, base_price_usd)
+        if not plan_id:
+            return jsonify({"error": "Failed to create subscription plan."}), 500
+        
+        # Get user info safely
+        try:
+            if hasattr(u, 'keys') and "first_name" in u.keys():
+                user_first_name = u["first_name"] or "User"
+                user_last_name = u["last_name"] or ""
+                user_email = u["email"] or ""
+            else:
+                u_dict = dict(u)
+                user_first_name = u_dict.get("first_name") or "User"
+                user_last_name = u_dict.get("last_name") or ""
+                user_email = u_dict.get("email") or ""
+        except (KeyError, TypeError, AttributeError):
+            user_first_name = "User"
+            user_last_name = ""
+            user_email = ""
+        
+        from datetime import datetime, timedelta
+        start_time = datetime.utcnow() + timedelta(minutes=1)
+        start_time_str = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        
+        subscription_data = {
+            "plan_id": plan_id,
+            "start_time": start_time_str,
+            "subscriber": {
+                "name": {
+                    "given_name": user_first_name,
+                    "surname": user_last_name
+                },
+                "email_address": user_email
+            },
+            "application_context": {
+                "brand_name": "OnePoweb",
+                "locale": "en-US",
+                "shipping_preference": "NO_SHIPPING",
+                "user_action": "SUBSCRIBE_NOW",
+                "payment_method": {
+                    "payer_selected": "PAYPAL",
+                    "payee_preferred": "IMMEDIATE_PAYMENT_REQUIRED"
+                }
+            },
+            "custom_id": str(user_id)
+        }
+        
+        print(f"[PayPal] Creating subscription (inline): {subscription_data}")
+        
+        response = requests.post(
+            f"{PAYPAL_API_URL}/v1/billing/subscriptions",
+            headers=headers,
+            json=subscription_data
+        )
+        
+        print(f"[PayPal] Response status: {response.status_code}")
+        print(f"[PayPal] Response body: {response.text[:500]}")
+        
+        if response.status_code in [200, 201]:
+            subscription = response.json()
+            subscription_id = subscription.get("id")
+            
+            # Store subscription info in session
+            session["pending_subscription"] = {
+                "subscription_id": subscription_id,
+                "plan": plan,
+                "amount_usd": net_price_usd,
+                "discount_used": discount_usd
+            }
+            
+            # Return ONLY the subscription ID - no approval_url
+            # PayPal SDK will handle the payment inline
+            return jsonify({"id": subscription_id})
+        else:
+            print(f"[PayPal] Error: {response.text}")
+            return jsonify({"error": f"PayPal error: {response.status_code}"}), 500
+            
+    except Exception as e:
+        print(f"[PayPal] Exception in create-subscription-id: {str(e)}")
+        import traceback
+        print(f"[PayPal] Traceback: {traceback.format_exc()}")
+        return jsonify({"error": f"Payment error: {str(e)}"}), 500
+
+
+@app.route("/api/paypal/activate-subscription", methods=["POST"])
+@login_required
+def paypal_activate_subscription_api():
+    """Activate subscription after inline payment approval"""
+    try:
+        data = request.get_json() or {}
+        subscription_id = data.get("subscription_id")
+        plan = data.get("plan", "basic")
+        
+        if not subscription_id:
+            return jsonify({"error": "Subscription ID required"}), 400
+        
+        u = current_user()
+        if not u:
+            return jsonify({"error": "User not found"}), 401
+        
+        # Get user ID safely
+        try:
+            if hasattr(u, 'keys') and "id" in u.keys():
+                user_id = u["id"]
+            else:
+                u_dict = dict(u)
+                user_id = u_dict.get("id")
+        except (KeyError, TypeError, AttributeError):
+            return jsonify({"error": "User ID not found"}), 401
+        
+        # Verify subscription with PayPal
+        access_token = get_paypal_access_token()
+        if access_token:
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json"
+            }
+            response = requests.get(
+                f"{PAYPAL_API_URL}/v1/billing/subscriptions/{subscription_id}",
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                sub_data = response.json()
+                status = sub_data.get("status")
+                print(f"[PayPal] Subscription {subscription_id} status: {status}")
+                
+                if status not in ["ACTIVE", "APPROVED"]:
+                    return jsonify({"error": f"Subscription not active: {status}"}), 400
+            else:
+                print(f"[PayPal] Warning: Could not verify subscription: {response.status_code}")
+        
+        # Get discount from session
+        pending = session.get("pending_subscription", {})
+        discount_used = pending.get("discount_used", 0)
+        
+        # Activate subscription
+        result = activate_subscription(user_id, plan, {"subscription_id": subscription_id, "discount": discount_used})
+        
+        # Clear pending subscription
+        session.pop("pending_subscription", None)
+        
+        # Return success response
+        success_url = url_for("subscribe_success", plan=plan)
+        return jsonify({"success": True, "redirect": success_url})
+        
+    except Exception as e:
+        print(f"[PayPal] Exception in activate-subscription: {str(e)}")
+        import traceback
+        print(f"[PayPal] Traceback: {traceback.format_exc()}")
+        return jsonify({"error": f"Activation error: {str(e)}"}), 500
+
+
 @app.route("/api/paypal/subscription-return")
 @login_required
 def paypal_subscription_return():

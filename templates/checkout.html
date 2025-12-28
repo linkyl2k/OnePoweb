@@ -158,10 +158,10 @@ paypal.Buttons({
     height: 45
   },
   
-  // Create subscription on server
+  // Create subscription on server - returns subscription ID only, no redirect
   createSubscription: function(data, actions) {
     console.log('[PayPal] Creating subscription for plan:', plan);
-    return fetch('/api/paypal/create-order', {
+    return fetch('/api/paypal/create-subscription-id', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -190,33 +190,54 @@ paypal.Buttons({
         window.location.href = data.redirect;
         return actions.reject();
       }
-      // For subscriptions, redirect to approval URL
-      if (data.approval_url) {
-        console.log('[PayPal] Redirecting to approval URL:', data.approval_url);
-        window.location.href = data.approval_url;
-        return actions.reject();
-      }
       if (!data.id) {
         console.error('[PayPal] No subscription ID in response');
         throw new Error('No subscription ID received');
       }
       console.log('[PayPal] Subscription created:', data.id);
+      // Return subscription ID - PayPal SDK will handle the rest inline
       return data.id;
     })
     .catch(err => {
       console.error('[PayPal] Fetch error:', err);
-      // Don't throw here - let onError handle it
       return Promise.reject(err);
     });
   },
   
-  // For subscriptions, PayPal redirects to approval_url
-  // After approval, user is redirected back to return_url
-  // onApprove is not called for subscriptions, so we don't need it
+  // Handle successful subscription approval (inline flow)
   onApprove: function(data, actions) {
-    // This won't be called for subscriptions (redirect flow)
-    // But we keep it for error handling
-    console.log('[PayPal] onApprove called (unexpected for subscriptions)');
+    console.log('[PayPal] Subscription approved! ID:', data.subscriptionID);
+    
+    // Show loading state
+    document.getElementById('payment-status').style.display = 'block';
+    document.getElementById('paypal-button-container').style.display = 'none';
+    
+    // Activate subscription on server
+    return fetch('/api/paypal/activate-subscription', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        subscription_id: data.subscriptionID,
+        plan: plan
+      })
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log('[PayPal] Activation result:', result);
+      if (result.success) {
+        window.location.href = result.redirect || '/subscribe-success?plan=' + plan;
+      } else {
+        throw new Error(result.error || 'Failed to activate subscription');
+      }
+    })
+    .catch(err => {
+      console.error('[PayPal] Activation error:', err);
+      document.getElementById('payment-status').style.display = 'none';
+      document.getElementById('paypal-button-container').style.display = 'block';
+      alert('Error activating subscription. Please contact support.');
+    });
   },
   
   onError: function(err) {
@@ -249,7 +270,7 @@ if (paypal.CardFields) {
   const cardFields = paypal.CardFields({
     createSubscription: function(data, actions) {
       console.log('[CardFields] Creating subscription for plan:', plan);
-      return fetch('/api/paypal/create-order', {
+      return fetch('/api/paypal/create-subscription-id', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -261,6 +282,10 @@ if (paypal.CardFields) {
         if (data.error) {
           throw new Error(data.error);
         }
+        if (data.redirect) {
+          window.location.href = data.redirect;
+          return null;
+        }
         if (data.id) {
           return data.id;
         }
@@ -269,8 +294,25 @@ if (paypal.CardFields) {
     },
     onApprove: function(data) {
       console.log('[CardFields] Subscription approved:', data.subscriptionID);
-      // Redirect to success page
-      window.location.href = '/subscribe-success?plan=' + plan;
+      // Activate subscription on server
+      return fetch('/api/paypal/activate-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          subscription_id: data.subscriptionID,
+          plan: plan
+        })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          window.location.href = result.redirect || '/subscribe-success?plan=' + plan;
+        } else {
+          throw new Error(result.error || 'Failed to activate');
+        }
+      });
     },
     onError: function(err) {
       console.error('[CardFields] Error:', err);

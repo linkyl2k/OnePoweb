@@ -138,7 +138,8 @@
   <!-- Back Button -->
   <div class="text-center">
     <a href="{{ url_for('profile') }}" class="btn" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 24px;">
-      <i class="bi bi-arrow-right me-2"></i> חזרה לפרופיל
+      <i class="bi bi-arrow-right me-2"></i> 
+      {% if current_lang == 'he' %}חזרה לפרופיל{% elif current_lang == 'en' %}Back to Profile{% else %}Вернуться к профилю{% endif %}
     </a>
   </div>
 </div>

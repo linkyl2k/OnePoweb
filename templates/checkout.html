@@ -119,7 +119,7 @@
 
 {% if paypal_client_id and paypal_client_id != 'YOUR_PAYPAL_CLIENT_ID' %}
 <!-- PayPal SDK with Subscriptions support -->
-<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&vault=true&intent=subscription"></script>
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&vault=true&intent=subscription&enable-funding=card"></script>
 <script>
 const plan = "{{ plan }}";
 

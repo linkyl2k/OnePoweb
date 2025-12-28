@@ -6133,6 +6133,7 @@ def paypal_create_order():
                     "payer_selected": "PAYPAL",
                     "payee_preferred": "IMMEDIATE_PAYMENT_REQUIRED"
                 },
+                "landing_page": "BILLING",
                 "return_url": url_for("paypal_subscription_return", _external=True),
                 "cancel_url": url_for("subscribe", plan=plan, _external=True)
             },
@@ -6162,6 +6163,11 @@ def paypal_create_order():
             for link in subscription.get("links", []):
                 if link.get("rel") == "approve":
                     approval_url = link.get("href")
+                    # Add parameters to directly show card form
+                    if approval_url:
+                        # Add fundingSource parameter to skip login and show card form directly
+                        separator = "&" if "?" in approval_url else "?"
+                        approval_url = f"{approval_url}{separator}fundingSource=card"
                     break
             
             if not approval_url:

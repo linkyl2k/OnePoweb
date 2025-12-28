@@ -5760,6 +5760,8 @@ def get_paypal_access_token():
     )
     if response.status_code == 200:
         return response.json().get("access_token")
+    else:
+        print(f"[PayPal] Failed to get access token: {response.status_code} - {response.text}")
     return None
 
 
@@ -5767,6 +5769,7 @@ def get_or_create_paypal_product():
     """Создает или получает продукт в PayPal (выполнить один раз)"""
     access_token = get_paypal_access_token()
     if not access_token:
+        print("[PayPal] No access token available for product creation")
         return None
     
     headers = {
@@ -5787,6 +5790,8 @@ def get_or_create_paypal_product():
             if product.get("name") == "OnePoweb":
                 print(f"[PayPal] Found existing product: {product.get('id')}")
                 return product.get("id")
+    else:
+        print(f"[PayPal] Failed to list products: {response.status_code} - {response.text[:500]}")
     
     # Создаем новый продукт
     product_data = {
@@ -5796,6 +5801,7 @@ def get_or_create_paypal_product():
         "category": "SOFTWARE"
     }
     
+    print(f"[PayPal] Creating new product: {product_data}")
     response = requests.post(
         f"{PAYPAL_API_URL}/v1/catalogs/products",
         headers=headers,
@@ -5807,7 +5813,7 @@ def get_or_create_paypal_product():
         print(f"[PayPal] Created product: {product_id}")
         return product_id
     
-    print(f"[PayPal] Failed to create product: {response.text}")
+    print(f"[PayPal] Failed to create product: {response.status_code} - {response.text[:500]}")
     return None
 
 
@@ -5818,6 +5824,7 @@ def get_or_create_paypal_plan(plan_name, price_usd):
     """
     access_token = get_paypal_access_token()
     if not access_token:
+        print("[PayPal] No access token available for plan creation")
         return None
     
     # Сначала получаем или создаем продукт
@@ -5847,6 +5854,8 @@ def get_or_create_paypal_plan(plan_name, price_usd):
                 plan_id = plan.get("id")
                 print(f"[PayPal] Found existing plan: {plan_id}")
                 return plan_id
+    else:
+        print(f"[PayPal] Failed to list plans: {response.status_code} - {response.text[:500]}")
     
     # Создаем новый план
     plan_data = {
@@ -5876,6 +5885,7 @@ def get_or_create_paypal_plan(plan_name, price_usd):
         }
     }
     
+    print(f"[PayPal] Creating new plan: {plan_name_search} with price ${price_usd}")
     response = requests.post(
         f"{PAYPAL_API_URL}/v1/billing/plans",
         headers=headers,
@@ -5887,7 +5897,7 @@ def get_or_create_paypal_plan(plan_name, price_usd):
         print(f"[PayPal] Created plan: {plan_id}")
         return plan_id
     else:
-        print(f"[PayPal] Failed to create plan: {response.text}")
+        print(f"[PayPal] Failed to create plan: {response.status_code} - {response.text[:500]}")
         return None
 
 
@@ -5944,6 +5954,13 @@ def create_paypal_subscription_plan(plan_name, price_usd):
     else:
         print(f"[PayPal] Failed to create plan: {response.text}")
         return None
+
+
+@app.route("/paypal-debug")
+@login_required
+def paypal_debug():
+    """Debug page for PayPal payment testing"""
+    return render_template("paypal_debug.html")
 
 
 @app.route("/subscribe")
@@ -6047,7 +6064,9 @@ def paypal_create_order():
         access_token = get_paypal_access_token()
         if not access_token:
             print("[PayPal] Failed to get access token")
-            return jsonify({"error": "PayPal not configured"}), 500
+            print(f"[PayPal] PAYPAL_CLIENT_ID configured: {bool(PAYPAL_CLIENT_ID)}")
+            print(f"[PayPal] PAYPAL_SECRET configured: {bool(PAYPAL_SECRET)}")
+            return jsonify({"error": "PayPal payment system is not configured. Please contact support."}), 500
         
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -6059,7 +6078,8 @@ def paypal_create_order():
         plan_id = get_or_create_paypal_plan(plan, base_price_usd)
         if not plan_id:
             print("[PayPal] Failed to get/create subscription plan")
-            return jsonify({"error": "Failed to create subscription plan"}), 500
+            print(f"[PayPal] Plan: {plan}, Price: {base_price_usd}")
+            return jsonify({"error": "Failed to create subscription plan. Please contact support."}), 500
         
         # Calculate start time (immediate payment)
         from datetime import datetime, timedelta
@@ -6140,8 +6160,10 @@ def paypal_create_order():
             return jsonify({"error": f"PayPal error: {response.status_code}"}), 500
             
     except Exception as e:
-        print(f"[PayPal] Exception: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        print(f"[PayPal] Exception in create-order: {str(e)}")
+        import traceback
+        print(f"[PayPal] Traceback: {traceback.format_exc()}")
+        return jsonify({"error": f"Payment system error: {str(e)}"}), 500
 
 
 @app.route("/api/paypal/capture-order", methods=["POST"])

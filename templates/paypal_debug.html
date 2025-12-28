@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #0070ba;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #005a94;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: #f00;
+        }
+        .success {
+            color: #0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 PayPal Payment Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Тест 1: Проверка API endpoint</h2>
+        <p>Проверяем, отвечает ли /api/paypal/create-order</p>
+        <button onclick="testCreateOrder('basic')">Test BASIC Plan</button>
+        <button onclick="testCreateOrder('pro')">Test PRO Plan</button>
+        <div id="log1" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Тест 2: Проверка PayPal SDK</h2>
+        <p>Проверяем, загружен ли PayPal SDK</p>
+        <button onclick="testPayPalSDK()">Check PayPal SDK</button>
+        <div id="log2" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Тест 3: Полная симуляция платежа</h2>
+        <p>Полный процесс создания подписки</p>
+        <button onclick="testFullFlow('basic')">Simulate BASIC Payment</button>
+        <button onclick="testFullFlow('pro')">Simulate PRO Payment</button>
+        <div id="log3" class="log"></div>
+    </div>
+
+    <script>
+        function log(logId, message, type = 'info') {
+            const logEl = document.getElementById(logId);
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f00' : type === 'success' ? '#0f0' : '#fff';
+            logEl.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog(logId) {
+            document.getElementById(logId).innerHTML = '';
+        }
+
+        async function testCreateOrder(plan) {
+            clearLog('log1');
+            log('log1', `Тестируем создание заказа для плана: ${plan}...`);
+            
+            try {
+                log('log1', 'Отправка запроса на /api/paypal/create-order...');
+                const response = await fetch('/api/paypal/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ plan: plan })
+                });
+                
+                log('log1', `Получен статус ответа: ${response.status} ${response.statusText}`);
+                
+                const data = await response.json();
+                log('log1', `Получены данные: ${JSON.stringify(data, null, 2)}`);
+                
+                if (response.ok) {
+                    if (data.error) {
+                        log('log1', `❌ ОШИБКА: ${data.error}`, 'error');
+                    } else if (data.approval_url) {
+                        log('log1', `✅ УСПЕХ! Получен approval_url`, 'success');
+                        log('log1', `Subscription ID: ${data.id}`, 'success');
+                        log('log1', `Approval URL: ${data.approval_url}`, 'success');
+                    } else if (data.redirect) {
+                        log('log1', `✅ УСПЕХ! Получен redirect (оплата не нужна)`, 'success');
+                        log('log1', `Redirect: ${data.redirect}`, 'success');
+                    } else {
+                        log('log1', `⚠️  ПРЕДУПРЕЖДЕНИЕ: Ответ не содержит ни approval_url, ни redirect`, 'error');
+                    }
+                } else {
+                    log('log1', `❌ HTTP ОШИБКА: ${response.status}`, 'error');
+                    if (data.error) {
+                        log('log1', `Сообщение об ошибке: ${data.error}`, 'error');
+                    }
+                }
+            } catch (err) {
+                log('log1', `❌ ИСКЛЮЧЕНИЕ: ${err.message}`, 'error');
+                log('log1', `Stack trace: ${err.stack}`, 'error');
+            }
+        }
+
+        function testPayPalSDK() {
+            clearLog('log2');
+            log('log2', 'Проверка PayPal SDK...');
+            
+            if (typeof paypal !== 'undefined') {
+                log('log2', '✅ PayPal SDK загружен успешно!', 'success');
+                log('log2', `paypal object: ${JSON.stringify(Object.keys(paypal), null, 2)}`, 'success');
+                
+                if (typeof paypal.Buttons === 'function') {
+                    log('log2', '✅ paypal.Buttons доступен', 'success');
+                } else {
+                    log('log2', '❌ paypal.Buttons не найден', 'error');
+                }
+            } else {
+                log('log2', '❌ PayPal SDK НЕ загружен!', 'error');
+                log('log2', 'Возможные причины:', 'error');
+                log('log2', '1. PAYPAL_CLIENT_ID не настроен', 'error');
+                log('log2', '2. Блокируется ad-blocker', 'error');
+                log('log2', '3. Проблемы с сетью', 'error');
+            }
+        }
+
+        async function testFullFlow(plan) {
+            clearLog('log3');
+            log('log3', `🚀 Начинаем полную симуляцию оплаты для плана: ${plan}`);
+            
+            // Step 1: Check SDK
+            log('log3', '\n--- Шаг 1: Проверка SDK ---');
+            if (typeof paypal === 'undefined') {
+                log('log3', '❌ PayPal SDK не загружен!', 'error');
+                return;
+            }
+            log('log3', '✅ PayPal SDK загружен', 'success');
+            
+            // Step 2: Create order
+            log('log3', '\n--- Шаг 2: Создание заказа ---');
+            try {
+                const response = await fetch('/api/paypal/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ plan: plan })
+                });
+                
+                log('log3', `Статус ответа: ${response.status}`);
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    log('log3', `❌ ОШИБКА: ${data.error || 'Unknown error'}`, 'error');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    log('log3', `❌ ОШИБКА от сервера: ${data.error}`, 'error');
+                    return;
+                }
+                
+                if (data.approval_url) {
+                    log('log3', '✅ Заказ создан успешно!', 'success');
+                    log('log3', `Subscription ID: ${data.id}`, 'success');
+                    log('log3', `\n📍 Следующий шаг: перенаправление на PayPal`, 'success');
+                    log('log3', `URL: ${data.approval_url}`, 'success');
+                    log('log3', `\nВ реальной ситуации пользователь будет перенаправлен сейчас.`, 'success');
+                } else if (data.redirect) {
+                    log('log3', '✅ Оплата не требуется (скидка покрыла стоимость)', 'success');
+                    log('log3', `Redirect: ${data.redirect}`, 'success');
+                } else {
+                    log('log3', '⚠️  Неожиданный ответ от сервера', 'error');
+                    log('log3', `Data: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+                
+            } catch (err) {
+                log('log3', `❌ ИСКЛЮЧЕНИЕ: ${err.message}`, 'error');
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
+

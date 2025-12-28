@@ -144,6 +144,12 @@ paypal.Buttons({
     })
     .then(response => {
       console.log('[PayPal] Response status:', response.status);
+      if (!response.ok) {
+        return response.json().then(data => {
+          console.error('[PayPal] Server error response:', data);
+          throw new Error(data.error || 'Server error');
+        });
+      }
       return response.json();
     })
     .then(data => {
@@ -154,21 +160,27 @@ paypal.Buttons({
       }
       // If payment not needed (credits cover it), redirect
       if (data.redirect) {
+        console.log('[PayPal] Redirecting to:', data.redirect);
         window.location.href = data.redirect;
-        return null;
+        return actions.reject();
       }
       // For subscriptions, redirect to approval URL
       if (data.approval_url) {
         console.log('[PayPal] Redirecting to approval URL:', data.approval_url);
         window.location.href = data.approval_url;
-        return null;
+        return actions.reject();
+      }
+      if (!data.id) {
+        console.error('[PayPal] No subscription ID in response');
+        throw new Error('No subscription ID received');
       }
       console.log('[PayPal] Subscription created:', data.id);
       return data.id;
     })
     .catch(err => {
       console.error('[PayPal] Fetch error:', err);
-      throw err;
+      // Don't throw here - let onError handle it
+      return Promise.reject(err);
     });
   },
   
@@ -183,12 +195,21 @@ paypal.Buttons({
   
   onError: function(err) {
     console.error('PayPal Error:', err);
+    console.error('Error details:', JSON.stringify(err, null, 2));
     const lang = "{{ current_lang }}";
+    
+    let errorMsg = '';
+    if (err && err.message) {
+      errorMsg = err.message;
+    } else if (typeof err === 'string') {
+      errorMsg = err;
+    }
+    
     const alertMsg = lang === 'he'
-      ? 'שגיאה בתשלום. נסה שוב או צור קשר.'
+      ? 'שגיאה בתשלום: ' + (errorMsg || 'נסה שוב או צור קשר.')
       : lang === 'en'
-      ? 'Payment error. Try again or contact us.'
-      : 'Ошибка платежа. Попробуйте снова или свяжитесь с нами.';
+      ? 'Payment error: ' + (errorMsg || 'Try again or contact us.')
+      : 'Ошибка платежа: ' + (errorMsg || 'Попробуйте снова или свяжитесь с нами.');
     alert(alertMsg);
   },
   

@@ -78,7 +78,33 @@
         {% if current_lang == 'he' %}תשלום מאובטח{% elif current_lang == 'en' %}Secure Payment{% else %}Безопасная оплата{% endif %}
       </h6>
       
+      <!-- Card Fields (inline form) -->
+      <div id="card-form" class="mb-3" style="display: none;">
+        <div class="mb-3">
+          <label class="form-label small text-muted">{% if current_lang == 'he' %}מספר כרטיס{% elif current_lang == 'en' %}Card Number{% else %}Номер карты{% endif %}</label>
+          <div id="card-number" style="height: 45px; border: 1px solid #ced4da; border-radius: 6px; padding: 12px;"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label class="form-label small text-muted">{% if current_lang == 'he' %}תוקף{% elif current_lang == 'en' %}Expiry{% else %}Срок действия{% endif %}</label>
+            <div id="card-expiry" style="height: 45px; border: 1px solid #ced4da; border-radius: 6px; padding: 12px;"></div>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label small text-muted">CVV</label>
+            <div id="card-cvv" style="height: 45px; border: 1px solid #ced4da; border-radius: 6px; padding: 12px;"></div>
+          </div>
+        </div>
+        <button id="card-submit" class="btn btn-primary w-100" style="height: 45px; border-radius: 6px;">
+          {% if current_lang == 'he' %}אישור תשלום{% elif current_lang == 'en' %}Confirm Payment{% else %}Подтвердить оплату{% endif %}
+        </button>
+      </div>
+      
       <div id="paypal-button-container"></div>
+      
+      <button id="show-card-form" class="btn btn-outline-secondary w-100 mt-3" style="display: none;">
+        <i class="bi bi-credit-card me-2"></i>
+        {% if current_lang == 'he' %}שלם באמצעות כרטיס אשראי{% elif current_lang == 'en' %}Pay with Credit Card{% else %}Оплатить картой{% endif %}
+      </button>
       
       <div id="payment-status" class="text-center mt-3" style="display: none;">
         <div class="spinner-border text-primary" role="status">
@@ -118,8 +144,8 @@
 </div>
 
 {% if paypal_client_id and paypal_client_id != 'YOUR_PAYPAL_CLIENT_ID' %}
-<!-- PayPal SDK with Subscriptions support -->
-<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&vault=true&intent=subscription&enable-funding=card"></script>
+<!-- PayPal SDK with Subscriptions and Card Fields support -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&vault=true&intent=subscription&enable-funding=card&components=buttons,card-fields"></script>
 <script>
 const plan = "{{ plan }}";
 
@@ -217,6 +243,91 @@ paypal.Buttons({
     console.log('Payment cancelled');
   }
 }).render('#paypal-button-container');
+
+// Initialize Card Fields for inline card payment
+if (paypal.CardFields) {
+  const cardFields = paypal.CardFields({
+    createSubscription: function(data, actions) {
+      console.log('[CardFields] Creating subscription for plan:', plan);
+      return fetch('/api/paypal/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ plan: plan })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        if (data.id) {
+          return data.id;
+        }
+        throw new Error('No subscription ID received');
+      });
+    },
+    onApprove: function(data) {
+      console.log('[CardFields] Subscription approved:', data.subscriptionID);
+      // Redirect to success page
+      window.location.href = '/subscribe-success?plan=' + plan;
+    },
+    onError: function(err) {
+      console.error('[CardFields] Error:', err);
+      const lang = "{{ current_lang }}";
+      const alertMsg = lang === 'he'
+        ? 'שגיאה בתשלום בכרטיס. נסה שוב.'
+        : lang === 'en'
+        ? 'Card payment error. Try again.'
+        : 'Ошибка оплаты картой. Попробуйте снова.';
+      alert(alertMsg);
+    }
+  });
+
+  // Check if card fields are eligible
+  if (cardFields.isEligible()) {
+    console.log('[CardFields] Card fields are eligible');
+    
+    // Render card fields
+    cardFields.NumberField().render('#card-number');
+    cardFields.ExpiryField().render('#card-expiry');
+    cardFields.CVVField().render('#card-cvv');
+    
+    // Show card form and button
+    document.getElementById('card-form').style.display = 'block';
+    document.getElementById('show-card-form').style.display = 'block';
+    
+    // Handle submit button
+    document.getElementById('card-submit').addEventListener('click', function() {
+      console.log('[CardFields] Submit button clicked');
+      cardFields.submit();
+    });
+    
+    // Toggle between PayPal buttons and card form
+    document.getElementById('show-card-form').addEventListener('click', function() {
+      const cardForm = document.getElementById('card-form');
+      const paypalButtons = document.getElementById('paypal-button-container');
+      if (cardForm.style.display === 'none') {
+        cardForm.style.display = 'block';
+        paypalButtons.style.display = 'none';
+        this.textContent = this.textContent.replace('Credit Card', 'PayPal').replace('כרטיס אשראי', 'PayPal').replace('картой', 'PayPal');
+      } else {
+        cardForm.style.display = 'none';
+        paypalButtons.style.display = 'block';
+        const lang = "{{ current_lang }}";
+        this.innerHTML = '<i class="bi bi-credit-card me-2"></i>' + 
+          (lang === 'he' ? 'שלם באמצעות כרטיס אשראי' : 
+           lang === 'en' ? 'Pay with Credit Card' : 
+           'Оплатить картой');
+      }
+    });
+  } else {
+    console.log('[CardFields] Card fields are NOT eligible - will use redirect flow');
+  }
+} else {
+  console.log('[CardFields] CardFields not available in SDK');
+}
+
 </script>
 {% endif %}
 {% endblock %}

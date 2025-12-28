@@ -7178,7 +7178,13 @@ def signup():
         )
         db.commit()
     except sqlite3.IntegrityError:
-        flash("האימייל או שם המשתמש כבר קיימים", "danger")
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("האימייל או שם המשתמש כבר קיימים", "danger")
+        elif current_lang == 'en':
+            flash("Email or username already exists", "danger")
+        else:
+            flash("Email или имя пользователя уже существуют", "danger")
         return render_template("signup.html", **form_data)
 
     # קבלת המשתמש החדש (בלי כניסה אוטומטית - צריך לאמת מייל)

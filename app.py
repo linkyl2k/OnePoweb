@@ -7148,7 +7148,13 @@ def signup():
 
     # בדיקת התאמת סיסמאות
     if password != confirm_password:
-        flash("הסיסמאות אינן תואמות", "danger")
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("הסיסמאות אינן תואמות", "danger")
+        elif current_lang == 'en':
+            flash("Passwords do not match", "danger")
+        else:
+            flash("Пароли не совпадают", "danger")
         return render_template("signup.html", **form_data)
 
     # Password validation

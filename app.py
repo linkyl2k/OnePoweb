@@ -7137,7 +7137,13 @@ def signup():
 
     # אם לא סומן – נחזיר הודעת שגיאה
     if not agree_terms:
-        flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
+        elif current_lang == 'en':
+            flash("You must agree to the Terms of Use and Privacy Policy to register.", "danger")
+        else:
+            flash("Вы должны согласиться с Условиями использования и Политикой конфиденциальности для регистрации.", "danger")
         return render_template("signup.html", **form_data)
 
     # בדיקת התאמת סיסמאות

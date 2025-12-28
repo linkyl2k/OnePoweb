@@ -15,11 +15,17 @@
           </div>
           
           <!-- Title -->
-          <h2 class="mb-3" style="color: #fff;">בדוק את האימייל שלך 📬</h2>
+          <h2 class="mb-3" style="color: #fff;">
+            {% if current_lang == 'he' %}בדוק את האימייל שלך 📬
+            {% elif current_lang == 'en' %}Check Your Email 📬
+            {% else %}Проверьте вашу почту 📬{% endif %}
+          </h2>
           
           <!-- Message -->
           <p class="mb-4" style="color: var(--muted); font-size: 1.1rem; line-height: 1.7;">
-            שלחנו קישור אימות לכתובת:
+            {% if current_lang == 'he' %}שלחנו קישור אימות לכתובת:
+            {% elif current_lang == 'en' %}We sent a verification link to:
+            {% else %}Мы отправили ссылку для подтверждения на:{% endif %}
             <br>
             <strong style="color: #1abc9c;">{{ email }}</strong>
           </p>
@@ -28,10 +34,14 @@
           <div class="mb-4 p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
             <p class="mb-2 small" style="color: var(--text);">
               <i class="bi bi-info-circle me-1"></i>
-              לחץ על הקישור במייל כדי להשלים את ההרשמה ולהתחבר.
+              {% if current_lang == 'he' %}לחץ על הקישור במייל כדי להשלים את ההרשמה ולהתחבר.
+              {% elif current_lang == 'en' %}Click the link in the email to complete registration and login.
+              {% else %}Нажмите на ссылку в письме, чтобы завершить регистрацию и войти.{% endif %}
             </p>
             <p class="mb-0 small text-muted">
-              הקישור תקף ל-24 שעות.
+              {% if current_lang == 'he' %}הקישור תקף ל-24 שעות.
+              {% elif current_lang == 'en' %}The link is valid for 24 hours.
+              {% else %}Ссылка действительна в течение 24 часов.{% endif %}
             </p>
           </div>
           
@@ -39,17 +49,26 @@
           <div class="mb-4 p-3" style="background: rgba(251,191,36,0.08); border-radius: 12px; border: 1px solid rgba(251,191,36,0.2);">
             <p class="mb-0 small" style="color: #fbbf24;">
               <i class="bi bi-exclamation-triangle me-1"></i>
-              לא מצאת? בדוק בתיקיית הספאם / דואר זבל
+              {% if current_lang == 'he' %}לא מצאת? בדוק בתיקיית הספאם / דואר זבל
+              {% elif current_lang == 'en' %}Can't find it? Check your spam / junk folder
+              {% else %}Не нашли? Проверьте папку "Спам" / "Нежелательная почта"{% endif %}
             </p>
           </div>
           
           <!-- Resend form -->
           <div class="mb-4">
-            <p class="small text-muted mb-2">לא קיבלת את המייל?</p>
+            <p class="small text-muted mb-2">
+              {% if current_lang == 'he' %}לא קיבלת את המייל?
+              {% elif current_lang == 'en' %}Didn't receive the email?
+              {% else %}Не получили письмо?{% endif %}
+            </p>
             <form method="POST" action="{{ url_for('resend_verification') }}" class="d-inline">
               <input type="hidden" name="email" value="{{ email }}">
               <button type="submit" class="btn" style="background: rgba(46,160,255,0.1); color: #2ea0ff; border: 1px solid rgba(46,160,255,0.3); border-radius: 10px; padding: 10px 24px;">
-                <i class="bi bi-arrow-repeat me-2"></i>שלח שוב
+                <i class="bi bi-arrow-repeat me-2"></i>
+                {% if current_lang == 'he' %}שלח שוב
+                {% elif current_lang == 'en' %}Resend
+                {% else %}Отправить снова{% endif %}
               </button>
             </form>
           </div>
@@ -57,7 +76,10 @@
           <!-- Back to login -->
           <div class="pt-3" style="border-top: 1px solid rgba(255,255,255,0.08);">
             <a href="{{ url_for('login') }}" class="text-muted small">
-              <i class="bi bi-arrow-right me-1"></i>חזרה להתחברות
+              <i class="bi bi-arrow-right me-1"></i>
+              {% if current_lang == 'he' %}חזרה להתחברות
+              {% elif current_lang == 'en' %}Back to Login
+              {% else %}Вернуться к входу{% endif %}
             </a>
           </div>
           

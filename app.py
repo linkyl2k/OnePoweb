@@ -7220,7 +7220,9 @@ def signup():
 def signup_check_email():
     """דף שמציג הודעה לבדוק את האימייל"""
     email = request.args.get("email", "")
-    return render_template("signup_check_email.html", email=email, title="בדוק את האימייל שלך")
+    current_lang = get_language()
+    title = "בדוק את האימייל שלך" if current_lang == 'he' else ("Check Your Email" if current_lang == 'en' else "Проверьте вашу почту")
+    return render_template("signup_check_email.html", email=email, title=title, current_lang=current_lang)
 
 
 @app.route("/verify-email/<token>")

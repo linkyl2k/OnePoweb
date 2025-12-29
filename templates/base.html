@@ -398,7 +398,7 @@
                   <a class="dropdown-item plan-option {% if effective == 'basic' %}current{% endif %}" href="{{ url_for('subscribe', plan='basic') }}">
                     <div class="plan-option-header">
                       <span class="plan-name basic-text">BASIC</span>
-                      <span class="plan-price">$9/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
+                      <span class="plan-price">$15/{% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}month{% else %}месяц{% endif %}</span>
                     </div>
                     <small class="text-muted">{% if current_lang == 'he' %}+ השוואת תקופות{% elif current_lang == 'en' %}+ Period comparison{% else %}+ Сравнение периодов{% endif %}</small>
                     {% if effective == 'basic' %}<i class="bi bi-check-circle-fill current-mark"></i>{% endif %}

@@ -114,7 +114,7 @@
           <div class="d-flex flex-column gap-2">
             <a class="btn w-100" href="{{ url_for('subscribe', plan='basic') }}" style="background: rgba(46,160,255,0.15); color: #2ea0ff; border: 1px solid rgba(46,160,255,0.3); border-radius: 10px; padding: 12px;">
               <i class="bi bi-star me-2"></i>
-              {% if current_lang == 'he' %}מנוי BASIC — $9/חודש{% elif current_lang == 'en' %}BASIC Subscription — $9/month{% else %}Подписка BASIC — $9/месяц{% endif %}
+              {% if current_lang == 'he' %}מנוי BASIC — $15/חודש{% elif current_lang == 'en' %}BASIC Subscription — $15/month{% else %}Подписка BASIC — $15/месяц{% endif %}
             </a>
             <a class="btn w-100" href="{{ url_for('subscribe', plan='pro') }}" style="background: linear-gradient(90deg, #10b981, #34d399); color: #fff; border: none; border-radius: 10px; padding: 12px; font-weight: 600;">
               <i class="bi bi-rocket-takeoff me-2"></i>

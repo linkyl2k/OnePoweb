@@ -28,7 +28,7 @@ PAYPAL_API_URL = "https://api-m.sandbox.paypal.com" if PAYPAL_MODE == "sandbox" 
 
 # Prices in USD
 PLAN_PRICES = {
-    "basic": {"usd": 9},
+    "basic": {"usd": 15},
     "pro": {"usd": 20}
 }
 
@@ -750,7 +750,7 @@ TRANSLATIONS = {
         "pricing_free_price": "$0",
         "pricing_basic": "Basic",
         "pricing_basic_desc": "Графики без AI",
-        "pricing_basic_price": "$9/месяц",
+        "pricing_basic_price": "$15/месяц",
         "pricing_basic_features": "Все графики, без AI",
         "pricing_pro": "Pro",
         "pricing_pro_desc": "Графики + AI-инсайты",

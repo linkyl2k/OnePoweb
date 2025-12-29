@@ -514,60 +514,388 @@
 <!-- מודל להשוואת תקופות -->
 {% if reports|length >= 2 %}
 <div class="modal fade" id="compareModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title"><i class="bi bi-bar-chart me-2"></i>{% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Compare Periods{% else %}Сравнить периоды{% endif %}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <h5 class="modal-title mb-0"><i class="bi bi-bar-chart me-2"></i>{% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Compare Periods{% else %}Сравнить периоды{% endif %}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{{ url_for('dashboard_compare') }}" id="compareForm">
-        <div class="modal-body">
-          <p class="text-muted mb-3">{% if current_lang == 'he' %}בחר שתי תקופות להשוואה:{% elif current_lang == 'en' %}Select two periods to compare:{% else %}Выберите два периода для сравнения:{% endif %}</p>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">{% if current_lang == 'he' %}תקופה ראשונה (ישנה יותר){% elif current_lang == 'en' %}First Period (older){% else %}Первый период (старше){% endif %}</label>
-            <select name="report1_id" class="form-select" required>
-              {% for report in reports %}
-              {% set pt = report.get('period_type', 'month') %}
-              <option value="{{ report.id }}">
-                {{ report.name }} 
-                {% if pt == 'month' %}📅{% elif pt == 'week' %}📆{% elif pt == 'day' %}📌{% endif %}
-                ({{ report.period_start or '?' }})
-              </option>
-              {% endfor %}
-            </select>
+        <div class="modal-body p-4">
+          <p class="text-muted mb-4">{% if current_lang == 'he' %}בחר שתי תקופות מאותו סוג להשוואה:{% elif current_lang == 'en' %}Select two periods of the same type to compare:{% else %}Выберите два периода одного типа для сравнения:{% endif %}</p>
+          
+          <!-- Tabs for period types -->
+          <ul class="nav nav-pills mb-4" id="periodTypeTabs" role="tablist" style="border-bottom: 2px solid #e9ecef;">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="months-tab" data-bs-toggle="tab" data-bs-target="#months" type="button" role="tab" style="border-radius: 8px 8px 0 0; font-weight: 500;">
+                <i class="bi bi-calendar-month me-2"></i>
+                {% if current_lang == 'he' %}חודשים{% elif current_lang == 'en' %}Months{% else %}Месяцы{% endif %}
+                <span class="badge bg-primary ms-2">{{ reports_by_type.month|length }}</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="weeks-tab" data-bs-toggle="tab" data-bs-target="#weeks" type="button" role="tab" style="border-radius: 8px 8px 0 0; font-weight: 500;">
+                <i class="bi bi-calendar-week me-2"></i>
+                {% if current_lang == 'he' %}שבועות{% elif current_lang == 'en' %}Weeks{% else %}Недели{% endif %}
+                <span class="badge bg-success ms-2">{{ reports_by_type.week|length }}</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="days-tab" data-bs-toggle="tab" data-bs-target="#days" type="button" role="tab" style="border-radius: 8px 8px 0 0; font-weight: 500;">
+                <i class="bi bi-calendar-day me-2"></i>
+                {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}Days{% else %}Дни{% endif %}
+                <span class="badge bg-info ms-2">{{ reports_by_type.day|length }}</span>
+              </button>
+            </li>
+            {% if reports_by_type.custom|length > 0 %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom" type="button" role="tab" style="border-radius: 8px 8px 0 0; font-weight: 500;">
+                <i class="bi bi-calendar-event me-2"></i>
+                {% if current_lang == 'he' %}מותאם אישית{% elif current_lang == 'en' %}Custom{% else %}Другое{% endif %}
+                <span class="badge bg-secondary ms-2">{{ reports_by_type.custom|length }}</span>
+              </button>
+            </li>
+            {% endif %}
+          </ul>
+          
+          <!-- Tab content -->
+          <div class="tab-content" id="periodTypeTabContent">
+            <!-- Months Tab -->
+            <div class="tab-pane fade show active" id="months" role="tabpanel">
+              {% if reports_by_type.month|length >= 2 %}
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check me-2" style="color: #667eea;"></i>
+                    {% if current_lang == 'he' %}תקופה ראשונה (ישנה יותר){% elif current_lang == 'en' %}First Period (older){% else %}Первый период (старше){% endif %}
+                  </label>
+                  <select name="report1_id" class="form-select period-select" data-period-type="month" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר חודש...{% elif current_lang == 'en' %}Select month...{% else %}Выберите месяц...{% endif %}</option>
+                    {% for report in reports_by_type.month %}
+                    <option value="{{ report.id }}">
+                      📅 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check-fill me-2" style="color: #764ba2;"></i>
+                    {% if current_lang == 'he' %}תקופה שנייה (חדשה יותר){% elif current_lang == 'en' %}Second Period (newer){% else %}Второй период (новее){% endif %}
+                  </label>
+                  <select name="report2_id" class="form-select period-select" data-period-type="month" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר חודש...{% elif current_lang == 'en' %}Select month...{% else %}Выберите месяц...{% endif %}</option>
+                    {% for report in reports_by_type.month %}
+                    <option value="{{ report.id }}" {% if loop.first %}selected{% endif %}>
+                      📅 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              {% else %}
+              <div class="alert alert-warning mb-0" style="border-radius: 12px;">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {% if current_lang == 'he' %}נדרשים לפחות 2 דוחות חודשיים להשוואה{% elif current_lang == 'en' %}At least 2 monthly reports required for comparison{% else %}Необходимо минимум 2 месячных отчета для сравнения{% endif %}
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Weeks Tab -->
+            <div class="tab-pane fade" id="weeks" role="tabpanel">
+              {% if reports_by_type.week|length >= 2 %}
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check me-2" style="color: #10b981;"></i>
+                    {% if current_lang == 'he' %}תקופה ראשונה (ישנה יותר){% elif current_lang == 'en' %}First Period (older){% else %}Первый период (старше){% endif %}
+                  </label>
+                  <select name="report1_id" class="form-select period-select" data-period-type="week" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר שבוע...{% elif current_lang == 'en' %}Select week...{% else %}Выберите неделю...{% endif %}</option>
+                    {% for report in reports_by_type.week %}
+                    <option value="{{ report.id }}">
+                      📆 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check-fill me-2" style="color: #059669;"></i>
+                    {% if current_lang == 'he' %}תקופה שנייה (חדשה יותר){% elif current_lang == 'en' %}Second Period (newer){% else %}Второй период (новее){% endif %}
+                  </label>
+                  <select name="report2_id" class="form-select period-select" data-period-type="week" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר שבוע...{% elif current_lang == 'en' %}Select week...{% else %}Выберите неделю...{% endif %}</option>
+                    {% for report in reports_by_type.week %}
+                    <option value="{{ report.id }}" {% if loop.first %}selected{% endif %}>
+                      📆 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              {% else %}
+              <div class="alert alert-warning mb-0" style="border-radius: 12px;">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {% if current_lang == 'he' %}נדרשים לפחות 2 דוחות שבועיים להשוואה{% elif current_lang == 'en' %}At least 2 weekly reports required for comparison{% else %}Необходимо минимум 2 недельных отчета для сравнения{% endif %}
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Days Tab -->
+            <div class="tab-pane fade" id="days" role="tabpanel">
+              {% if reports_by_type.day|length >= 2 %}
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check me-2" style="color: #3b82f6;"></i>
+                    {% if current_lang == 'he' %}תקופה ראשונה (ישנה יותר){% elif current_lang == 'en' %}First Period (older){% else %}Первый период (старше){% endif %}
+                  </label>
+                  <select name="report1_id" class="form-select period-select" data-period-type="day" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר יום...{% elif current_lang == 'en' %}Select day...{% else %}Выберите день...{% endif %}</option>
+                    {% for report in reports_by_type.day %}
+                    <option value="{{ report.id }}">
+                      📌 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check-fill me-2" style="color: #2563eb;"></i>
+                    {% if current_lang == 'he' %}תקופה שנייה (חדשה יותר){% elif current_lang == 'en' %}Second Period (newer){% else %}Второй период (новее){% endif %}
+                  </label>
+                  <select name="report2_id" class="form-select period-select" data-period-type="day" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר יום...{% elif current_lang == 'en' %}Select day...{% else %}Выберите день...{% endif %}</option>
+                    {% for report in reports_by_type.day %}
+                    <option value="{{ report.id }}" {% if loop.first %}selected{% endif %}>
+                      📌 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              {% else %}
+              <div class="alert alert-warning mb-0" style="border-radius: 12px;">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {% if current_lang == 'he' %}נדרשים לפחות 2 דוחות יומיים להשוואה{% elif current_lang == 'en' %}At least 2 daily reports required for comparison{% else %}Необходимо минимум 2 дневных отчета для сравнения{% endif %}
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Custom Tab -->
+            {% if reports_by_type.custom|length > 0 %}
+            <div class="tab-pane fade" id="custom" role="tabpanel">
+              {% if reports_by_type.custom|length >= 2 %}
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check me-2" style="color: #6b7280;"></i>
+                    {% if current_lang == 'he' %}תקופה ראשונה (ישנה יותר){% elif current_lang == 'en' %}First Period (older){% else %}Первый период (старше){% endif %}
+                  </label>
+                  <select name="report1_id" class="form-select period-select" data-period-type="custom" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר תקופה...{% elif current_lang == 'en' %}Select period...{% else %}Выберите период...{% endif %}</option>
+                    {% for report in reports_by_type.custom %}
+                    <option value="{{ report.id }}">
+                      📋 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold mb-2">
+                    <i class="bi bi-calendar-check-fill me-2" style="color: #4b5563;"></i>
+                    {% if current_lang == 'he' %}תקופה שנייה (חדשה יותר){% elif current_lang == 'en' %}Second Period (newer){% else %}Второй период (новее){% endif %}
+                  </label>
+                  <select name="report2_id" class="form-select period-select" data-period-type="custom" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 12px;">
+                    <option value="">{% if current_lang == 'he' %}בחר תקופה...{% elif current_lang == 'en' %}Select period...{% else %}Выберите период...{% endif %}</option>
+                    {% for report in reports_by_type.custom %}
+                    <option value="{{ report.id }}" {% if loop.first %}selected{% endif %}>
+                      📋 {{ report.name }} ({{ report.period_start or '?' }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              {% else %}
+              <div class="alert alert-warning mb-0" style="border-radius: 12px;">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {% if current_lang == 'he' %}נדרשים לפחות 2 דוחות מותאמים אישית להשוואה{% elif current_lang == 'en' %}At least 2 custom reports required for comparison{% else %}Необходимо минимум 2 пользовательских отчета для сравнения{% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">{% if current_lang == 'he' %}תקופה שנייה (חדשה יותר){% elif current_lang == 'en' %}Second Period (newer){% else %}Второй период (новее){% endif %}</label>
-            <select name="report2_id" class="form-select" required>
-              {% for report in reports %}
-              {% set pt = report.get('period_type', 'month') %}
-              <option value="{{ report.id }}" {% if loop.first %}selected{% endif %}>
-                {{ report.name }}
-                {% if pt == 'month' %}📅{% elif pt == 'week' %}📆{% elif pt == 'day' %}📌{% endif %}
-                ({{ report.period_start or '?' }})
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="alert alert-info small mb-0">
-            <i class="bi bi-info-circle"></i> {% if current_lang == 'he' %}מומלץ להשוות תקופות מאותו סוג (חודש מול חודש, שבוע מול שבוע){% elif current_lang == 'en' %}Recommended to compare periods of the same type (month vs month, week vs week){% else %}Рекомендуется сравнивать периоды одного типа (месяц с месяцем, неделя с неделей){% endif %}
+          
+          <div class="alert alert-info mt-4 mb-0" style="border-radius: 12px; background: rgba(46,160,255,0.1); border: none;">
+            <i class="bi bi-info-circle me-2"></i>
+            <small>{% if current_lang == 'he' %}מומלץ להשוות תקופות מאותו סוג לקבלת תוצאות מדויקות יותר{% elif current_lang == 'en' %}Recommended to compare periods of the same type for more accurate results{% else %}Рекомендуется сравнивать периоды одного типа для более точных результатов{% endif %}</small>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('cancel') }}</button>
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-bar-chart me-1"></i> {% if current_lang == 'he' %}השווה{% elif current_lang == 'en' %}Compare{% else %}Сравнить{% endif %}
+        <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 16px 24px;">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 10px 20px;">{{ t('cancel') }}</button>
+          <button type="submit" class="btn btn-primary" style="border-radius: 8px; padding: 10px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+            <i class="bi bi-bar-chart me-2"></i> {% if current_lang == 'he' %}השווה{% elif current_lang == 'en' %}Compare{% else %}Сравнить{% endif %}
           </button>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<script>
+// Handle tab switching and form validation
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('compareForm');
+  if (!form) return;
+  
+  // Reset selects when switching tabs
+  const tabButtons = document.querySelectorAll('#periodTypeTabs button[data-bs-toggle="tab"]');
+  tabButtons.forEach(btn => {
+    btn.addEventListener('shown.bs.tab', function(e) {
+      const targetId = e.target.getAttribute('data-bs-target');
+      const activePane = document.querySelector(targetId);
+      
+      // Clear all selects and reset required
+      document.querySelectorAll('.period-select').forEach(select => {
+        const isInActivePane = activePane && activePane.contains(select);
+        if (!isInActivePane) {
+          select.value = '';
+          select.removeAttribute('required');
+          select.style.borderColor = '#e9ecef';
+        } else {
+          select.setAttribute('required', 'required');
+        }
+      });
+    });
+  });
+  
+  // Form validation - ensure selects from active tab are filled
+  form.addEventListener('submit', function(e) {
+    const activeTab = document.querySelector('#periodTypeTabs .nav-link.active');
+    if (!activeTab) {
+      e.preventDefault();
+      return;
+    }
+    
+    const targetId = activeTab.getAttribute('data-bs-target');
+    const activeTabPane = document.querySelector(targetId);
+    if (!activeTabPane) {
+      e.preventDefault();
+      return;
+    }
+    
+    const selects = activeTabPane.querySelectorAll('.period-select[required]');
+    
+    let isValid = true;
+    selects.forEach(select => {
+      if (!select.value) {
+        isValid = false;
+        select.style.borderColor = '#ef4444';
+        select.style.borderWidth = '2px';
+      } else {
+        select.style.borderColor = '#10b981';
+        select.style.borderWidth = '2px';
+      }
+    });
+    
+    if (!isValid) {
+      e.preventDefault();
+      {% if current_lang == 'he' %}
+      alert('אנא בחר את שני התקופות להשוואה');
+      {% elif current_lang == 'en' %}
+      alert('Please select both periods for comparison');
+      {% else %}
+      alert('Пожалуйста, выберите оба периода для сравнения');
+      {% endif %}
+    }
+  });
+  
+  // Visual feedback on select change
+  document.querySelectorAll('.period-select').forEach(select => {
+    select.addEventListener('change', function() {
+      if (this.value) {
+        this.style.borderColor = '#10b981';
+        this.style.borderWidth = '2px';
+      } else {
+        this.style.borderColor = '#e9ecef';
+        this.style.borderWidth = '2px';
+      }
+    });
+    
+    // Initial state check
+    if (select.value) {
+      select.style.borderColor = '#10b981';
+      select.style.borderWidth = '2px';
+    }
+  });
+});
+</script>
 {% endif %}
 
 <style>
   .card { border-radius: 12px; }
   .card-header { border-radius: 12px 12px 0 0 !important; }
   .badge { font-weight: 500; }
+  
+  /* Modal styles */
+  #compareModal .modal-content {
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  }
+  
+  #compareModal .nav-pills .nav-link {
+    color: #6c757d;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-right: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  #compareModal .nav-pills .nav-link:hover {
+    color: #667eea;
+    background-color: rgba(102, 126, 234, 0.1);
+    border-bottom-color: rgba(102, 126, 234, 0.3);
+  }
+  
+  #compareModal .nav-pills .nav-link.active {
+    color: #667eea;
+    background-color: rgba(102, 126, 234, 0.1);
+    border-bottom-color: #667eea;
+    font-weight: 600;
+  }
+  
+  #compareModal .form-select {
+    transition: all 0.3s ease;
+  }
+  
+  #compareModal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+  }
+  
+  #compareModal .period-select {
+    font-size: 15px;
+  }
+  
+  #compareModal .tab-pane {
+    animation: fadeIn 0.3s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  #compareModal .alert {
+    border-left: 4px solid;
+  }
+  
+  #compareModal .alert-info {
+    border-left-color: #3b82f6;
+  }
+  
+  #compareModal .alert-warning {
+    border-left-color: #f59e0b;
+  }
 </style>
 {% endblock %}

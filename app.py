@@ -4995,9 +4995,26 @@ def index():
     LAST_EXPORT["saved_report_id"] = saved_report_id
     
     # שמירה ב-session (למקרה של multi-worker на Render)
-    session["last_export"] = export_data
+    # Сохраняем данные более надежно - копируем все ключи явно
+    session["last_export"] = {
+        "generated_at": export_data.get("generated_at"),
+        "lang": export_data.get("lang"),
+        "plots": export_data.get("plots", []),
+        "summary": export_data.get("summary", ""),
+        "summary_ai": export_data.get("summary_ai", ""),
+        "roi": export_data.get("roi", {}),
+        "action_items": export_data.get("action_items", []),
+        "saved_report_id": export_data.get("saved_report_id")
+    }
     session.permanent = True  # Делаем сессию постоянной для надежности
     session.modified = True
+    
+    # Дополнительная проверка сохранения
+    saved_check = session.get("last_export", {})
+    if saved_check.get("roi"):
+        print(f"✅ ROI data saved to session: monthly_gain={saved_check['roi'].get('monthly_gain', 0)}")
+    else:
+        print(f"⚠️ Warning: ROI data not found in session after save!")
     
     # Проверяем, что данные действительно сохранились
     saved_plots_count = len(session.get("last_export", {}).get("plots", []))
@@ -7643,14 +7660,52 @@ def resend_verification():
 def roi_page():
     # Используем те же данные, что и для result/pdf:
     # сначала LAST_EXPORT, потом session["last_export"]
-    roi = LAST_EXPORT.get("roi") or {}
-    if not roi:
-        snap = session.get("last_export") or {}
-        roi = snap.get("roi") or {}
+    current_lang = get_language()
+    
+    # Пробуем получить данные из нескольких источников
+    roi = {}
+    export_data = {}
+    
+    # 1. Сначала пробуем LAST_EXPORT (глобальная переменная - самый быстрый)
+    if LAST_EXPORT.get("roi"):
+        roi = LAST_EXPORT.get("roi", {})
+        export_data = LAST_EXPORT
+        print(f"📊 ROI Page: Loaded from LAST_EXPORT")
+    else:
+        # 2. Fallback на session (для multi-worker на Render)
+        session_data = session.get("last_export", {})
+        if session_data:
+            roi = session_data.get("roi", {})
+            export_data = session_data
+            print(f"📊 ROI Page: Loaded from session")
+    
+    # Если данных все еще нет, пробуем загрузить из последнего сохраненного отчета
+    if not roi or not any([
+        bool(roi.get("text")),
+        float(roi.get("monthly_gain") or 0) != 0.0,
+        float(roi.get("roi_percent") or 0) != 0.0,
+    ]):
+        # Пробуем загрузить из последнего отчета пользователя
+        if session.get("uid"):
+            try:
+                u = current_user()
+                if u:
+                    reports = get_user_reports(u["id"], limit=1)
+                    if reports:
+                        latest_report = reports[0]
+                        summary_json = latest_report.get("summary_json")
+                        if summary_json:
+                            summary = json.loads(summary_json)
+                            # Пробуем восстановить ROI из summary
+                            if summary.get("roi"):
+                                roi = summary.get("roi", {})
+                                print(f"📊 ROI Page: Loaded from latest report")
+            except Exception as e:
+                print(f"⚠️ Error loading ROI from report: {e}")
     
     print(f"📊 ROI Page: roi={bool(roi)}, monthly_gain={roi.get('monthly_gain', 0)}, roi_percent={roi.get('roi_percent', 0)}")
     
-    # הצלה: אם אין ROI בכלל – הודעה מסודרת
+    # Проверка наличия данных
     has_any = bool(roi) and any(
         [
             bool(roi.get("text")),
@@ -7661,26 +7716,68 @@ def roi_page():
     
     print(f"📊 ROI Page: has_any={has_any}")
     
+    # Если данных нет, пробуем загрузить из последнего отчета перед перенаправлением
+    if not has_any:
+        # Пробуем загрузить из последнего отчета пользователя
+        if session.get("uid"):
+            try:
+                u = current_user()
+                if u:
+                    reports = get_user_reports(u["id"], limit=1)
+                    if reports:
+                        latest_report = reports[0]
+                        summary_json = latest_report.get("summary_json")
+                        if summary_json:
+                            summary = json.loads(summary_json)
+                            # Пробуем восстановить ROI из summary
+                            if summary.get("roi"):
+                                roi = summary.get("roi", {})
+                                # Обновляем has_any
+                                has_any = bool(roi) and any([
+                                    bool(roi.get("text")),
+                                    float(roi.get("monthly_gain") or 0) != 0.0,
+                                    float(roi.get("roi_percent") or 0) != 0.0,
+                                ])
+                                if has_any:
+                                    print(f"✅ Restored ROI from latest report, has_any={has_any}")
+                                    # Обновляем LAST_EXPORT и session для будущих запросов
+                                    LAST_EXPORT["roi"] = roi
+                                    if session.get("last_export"):
+                                        session["last_export"]["roi"] = roi
+                                        session.modified = True
+            except Exception as e:
+                print(f"⚠️ Error loading ROI from report: {e}")
+        
+        # Если все еще нет данных, перенаправляем на result с сообщением
+        if not has_any:
+            current_lang = get_language()
+            if current_lang == "ru":
+                flash("Нет данных ROI для отображения. Пожалуйста, загрузите отчет сначала.", "warning")
+            elif current_lang == "en":
+                flash("No ROI data available. Please upload a report first.", "warning")
+            else:
+                flash("אין נתוני ROI להצגה. אנא העלה דוח קודם.", "warning")
+            return redirect(url_for("result"))
+    
     # Генерируем дополнительные данные для новых блоков
-    current_lang = get_language()
     diagnosis = {}
     action_plan = {}
     
-    if has_any:
-        # Для диагностики нужен dataframe, но его нет в LAST_EXPORT
-        # Создаем упрощенную диагностику на основе компонентов
-        # (в реальности нужно было бы сохранять dataframe или пересчитывать)
-        diagnosis = {"insights": [], "chart_data": {}}  # Упрощенная версия
-        
-        # Генерируем actionable план на 7 дней
-        # Создаем пустой dataframe для совместимости (функция ожидает его)
-        import pandas as pd
-        empty_df = pd.DataFrame()
-        try:
-            action_plan = generate_7day_action_plan(empty_df, roi, current_lang)
-        except Exception as e:
-            print(f"Action plan generation error: {e}")
-            action_plan = {"plans": []}
+    # Для диагностики нужен dataframe, но его нет в LAST_EXPORT
+    # Создаем упрощенную диагностику на основе компонентов
+    diagnosis = {"insights": [], "chart_data": {}}  # Упрощенная версия
+    
+    # Генерируем actionable план на 7 дней
+    # Создаем пустой dataframe для совместимости (функция ожидает его)
+    import pandas as pd
+    empty_df = pd.DataFrame()
+    try:
+        action_plan = generate_7day_action_plan(empty_df, roi, current_lang)
+    except Exception as e:
+        print(f"⚠️ Action plan generation error: {e}")
+        import traceback
+        traceback.print_exc()
+        action_plan = {"plans": []}
     
     return render_template(
         "roi.html",
@@ -7749,6 +7846,24 @@ def result():
                 print(f"⚠️ Session data exists but plots is empty or invalid: {plots_from_session}")
         else:
             print(f"⚠️ No session data found!")
+    
+    # Дополнительная проверка: если данные потеряны, пробуем восстановить из последнего отчета
+    if (not plots or len(plots) == 0) and session.get("uid"):
+        try:
+            u = current_user()
+            if u:
+                reports = get_user_reports(u["id"], limit=1)
+                if reports:
+                    latest_report = reports[0]
+                    summary_json = latest_report.get("summary_json")
+                    if summary_json:
+                        summary_data = json.loads(summary_json)
+                        # Пробуем восстановить ROI
+                        if summary_data.get("roi"):
+                            roi = summary_data.get("roi", {})
+                            print(f"✅ Restored ROI from latest report")
+        except Exception as e:
+            print(f"⚠️ Error restoring data from report: {e}")
 
     messages = []
     if not plots or len(plots) == 0:

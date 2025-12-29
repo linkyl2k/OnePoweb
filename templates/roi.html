@@ -302,7 +302,17 @@
                     <div style="width: 56px; height: 56px; margin: 0 auto 1rem; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
                       <i class="bi bi-calendar-x text-white" style="font-size: 1.5rem;"></i>
                     </div>
-                    <h6 class="mb-2">{% if current_lang == 'he' %}יום '{{ c.day }}' חלש{% elif current_lang == 'en' %}Weak '{{ c.day }}'{% else %}Слабый '{{ c.day }}'{% endif %}</h6>
+                    <h6 class="mb-2">
+                      {% if current_lang == 'he' %}
+                        יום '{{ c.day }}' חלש
+                      {% elif current_lang == 'en' %}
+                        {% set day_en = {'ראשון': 'Sunday', 'שני': 'Monday', 'שלישי': 'Tuesday', 'רביעי': 'Wednesday', 'חמישי': 'Thursday', 'שישי': 'Friday', 'שבת': 'Saturday'}.get(c.day, c.day) %}
+                        Weak '{{ day_en }}'
+                      {% else %}
+                        {% set day_ru = {'ראשון': 'Воскресенье', 'שני': 'Понедельник', 'שלישי': 'Вторник', 'רביעי': 'Среда', 'חמישי': 'Четверг', 'שישי': 'Пятница', 'שבת': 'Суббота'}.get(c.day, c.day) %}
+                        Слабый '{{ day_ru }}'
+                      {% endif %}
+                    </h6>
                     <div class="small text-muted mb-3">
                       {% if current_lang == 'he' %}סגירת {{ c.achievable_percent or 30 }}% מהפער{% elif current_lang == 'en' %}Close {{ c.achievable_percent or 30 }}% gap{% else %}Закрыть {{ c.achievable_percent or 30 }}% разрыва{% endif %}
                     </div>
@@ -543,34 +553,34 @@
           </div>
           
           <div class="table-responsive" style="border-radius: 8px; overflow: hidden; background: rgba(13,42,68,0.5);">
-            <table class="table table-sm mb-0" style="color: #e6e9ef; margin-bottom: 0;">
-              <thead style="background: rgba(13,42,68,0.6);">
+            <table class="table table-sm mb-0" style="color: #e6e9ef; margin-bottom: 0; background: transparent !important;">
+              <thead style="background: rgba(13,42,68,0.6) !important;">
                 <tr>
-                  <th style="width: 10%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(46,160,255,0.2);">
+                  <th style="width: 10%; padding: 14px 12px; font-weight: 600; color: #e6e9ef !important; border-bottom: 1px solid rgba(46,160,255,0.2); background: rgba(13,42,68,0.6) !important;">
                     <i class="bi bi-calendar-day me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}יום{% elif current_lang == 'en' %}Day{% else %}День{% endif %}
                   </th>
-                  <th style="width: 40%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(46,160,255,0.2);">
+                  <th style="width: 40%; padding: 14px 12px; font-weight: 600; color: #e6e9ef !important; border-bottom: 1px solid rgba(46,160,255,0.2); background: rgba(13,42,68,0.6) !important;">
                     <i class="bi bi-check-circle me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}מה לעשות{% elif current_lang == 'en' %}What to Do{% else %}Что сделать{% endif %}
                   </th>
-                  <th style="width: 30%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(46,160,255,0.2);">
+                  <th style="width: 30%; padding: 14px 12px; font-weight: 600; color: #e6e9ef !important; border-bottom: 1px solid rgba(46,160,255,0.2); background: rgba(13,42,68,0.6) !important;">
                     <i class="bi bi-graph-up me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}מה למדוד{% elif current_lang == 'en' %}What to Measure{% else %}Что измерить{% endif %}
                   </th>
-                  <th style="width: 20%; padding: 14px 12px; font-weight: 600; color: #e6e9ef; border-bottom: 1px solid rgba(46,160,255,0.2);">
+                  <th style="width: 20%; padding: 14px 12px; font-weight: 600; color: #e6e9ef !important; border-bottom: 1px solid rgba(46,160,255,0.2); background: rgba(13,42,68,0.6) !important;">
                     <i class="bi bi-clock me-1" style="color: #a0aec0;"></i>{% if current_lang == 'he' %}מתי לבדוק{% elif current_lang == 'en' %}When to Check{% else %}Когда проверить{% endif %}
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style="background: rgba(13,42,68,0.5) !important;">
                 {% for day in plan.days %}
-                <tr style="border-bottom: 1px solid rgba(46,160,255,0.1); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(13,42,68,0.6)';" onmouseout="this.style.background='transparent';">
-                  <td style="padding: 12px; vertical-align: middle;">
+                <tr style="border-bottom: 1px solid rgba(46,160,255,0.1); transition: background 0.2s ease; background: rgba(13,42,68,0.5) !important;" onmouseover="this.style.background='rgba(13,42,68,0.7) !important';" onmouseout="this.style.background='rgba(13,42,68,0.5) !important';">
+                  <td style="padding: 12px; vertical-align: middle; background: transparent !important; color: #e6e9ef !important;">
                     <span style="display: inline-block; width: 32px; height: 32px; background: rgba(13,42,68,0.7); border: 1px solid rgba(46,160,255,0.3); border-radius: 8px; text-align: center; line-height: 32px; font-weight: 600; color: #e6e9ef; font-size: 0.9rem;">{{ day.day }}</span>
                   </td>
-                  <td style="padding: 12px; vertical-align: middle; color: #e6e9ef; line-height: 1.5;">{{ day.action }}</td>
-                  <td style="padding: 12px; vertical-align: middle; color: #cbd5e0; line-height: 1.5;">
+                  <td style="padding: 12px; vertical-align: middle; color: #e6e9ef !important; line-height: 1.5; background: transparent !important;">{{ day.action }}</td>
+                  <td style="padding: 12px; vertical-align: middle; color: #cbd5e0 !important; line-height: 1.5; background: transparent !important;">
                     <i class="bi bi-bar-chart me-1" style="color: #a0aec0; font-size: 0.85rem;"></i>{{ day.measure }}
                   </td>
-                  <td style="padding: 12px; vertical-align: middle; color: #a0aec0; font-weight: 500;">
+                  <td style="padding: 12px; vertical-align: middle; color: #a0aec0 !important; font-weight: 500; background: transparent !important;">
                     <i class="bi bi-calendar-check me-1" style="color: #a0aec0; font-size: 0.85rem;"></i>{{ day.check }}
                   </td>
                 </tr>

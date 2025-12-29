@@ -2379,10 +2379,21 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
     currency_info = get_currency(lang)
     currency_symbol = currency_info["symbol"]
     
+    # Маппинг дней недели на разные языки
+    day_translation = {
+        "he": {"ראשון": "ראשון", "שני": "שני", "שלישי": "שלישי", "רביעי": "רביעי", 
+               "חמישי": "חמישי", "שישי": "שישי", "שבת": "שבת"},
+        "en": {"ראשון": "Sunday", "שני": "Monday", "שלישי": "Tuesday", "רביעי": "Wednesday",
+               "חמישי": "Thursday", "שישי": "Friday", "שבת": "Saturday"},
+        "ru": {"ראשון": "Воскресенье", "שני": "Понедельник", "שלישי": "Вторник", "רביעי": "Среда",
+               "חמישי": "Четверг", "שישי": "Пятница", "שבת": "Суббота"}
+    }
+    
     # 1. План для слабого дня
     if "weak_day" in comps:
         weak = comps["weak_day"]
-        day_name = weak.get("day", "")
+        day_name_he = weak.get("day", "")  # Исходное имя на иврите
+        day_name = day_translation.get(lang, day_translation["he"]).get(day_name_he, day_name_he)  # Переводим на нужный язык
         current_revenue = weak.get("current", 0)
         target_revenue = weak.get("target", 0)
         

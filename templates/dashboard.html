@@ -50,6 +50,7 @@
 
   {% if comparison %}
   <!-- השוואת תקופות אוטומטית - Enhanced -->
+  {% set comp_currency_symbol = (comparison_currency.symbol if comparison_currency else currency_symbol) %}
   <div class="card shadow-sm mb-4" style="border: none; border-radius: 16px; overflow: hidden;">
     <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
       <div class="d-flex justify-content-between align-items-center">
@@ -66,11 +67,11 @@
         <div class="col-md-5">
           <div class="border rounded-3 p-3 bg-light h-100">
             <h6 class="text-muted mb-2">{{ comparison.get('report1_name', ('תקופה קודמת' if current_lang == 'he' else 'Previous Period' if current_lang == 'en' else 'Предыдущий период')) }}</h6>
-            <p class="h3 mb-1 text-primary">{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period1.total) }}</p>
+            <p class="h3 mb-1 text-primary">{{ comp_currency_symbol }}{{ "{:,.0f}".format(comparison.period1.total) }}</p>
             <div class="d-flex flex-wrap gap-2 text-muted small">
               <span><i class="bi bi-calendar"></i> {{ comparison.period1.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
               <span><i class="bi bi-receipt"></i> {{ comparison.period1.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}trans.{% else %}транз.{% endif %}</span>
-              <span><i class="bi bi-cart"></i> {{ currency_symbol }}{{ "{:,.0f}".format(comparison.period1.avg_ticket|default(0)) }} {% if current_lang == 'he' %}ממוצע{% elif current_lang == 'en' %}avg{% else %}средн.{% endif %}</span>
+              <span><i class="bi bi-cart"></i> {{ comp_currency_symbol }}{{ "{:,.0f}".format(comparison.period1.avg_ticket|default(0)) }} {% if current_lang == 'he' %}ממוצע{% elif current_lang == 'en' %}avg{% else %}средн.{% endif %}</span>
             </div>
           </div>
         </div>
@@ -91,11 +92,11 @@
         <div class="col-md-5">
           <div class="border rounded-3 p-3 h-100" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
             <h6 class="text-dark mb-2" style="color: #2d5016 !important;">{{ comparison.get('report2_name', ('תקופה אחרונה' if current_lang == 'he' else 'Latest Period' if current_lang == 'en' else 'Последний период')) }}</h6>
-            <p class="h3 mb-1" style="color: #1b5e20 !important; font-weight: 700;">{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period2.total) }}</p>
+            <p class="h3 mb-1" style="color: #1b5e20 !important; font-weight: 700;">{{ comp_currency_symbol }}{{ "{:,.0f}".format(comparison.period2.total) }}</p>
             <div class="d-flex flex-wrap gap-2 small" style="color: #2d5016 !important;">
               <span><i class="bi bi-calendar"></i> {{ comparison.period2.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
               <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}trans.{% else %}транз.{% endif %}</span>
-              <span><i class="bi bi-cart"></i> {{ currency_symbol }}{{ "{:,.0f}".format(comparison.period2.avg_ticket|default(0)) }} {% if current_lang == 'he' %}ממוצע{% elif current_lang == 'en' %}avg{% else %}средн.{% endif %}</span>
+              <span><i class="bi bi-cart"></i> {{ comp_currency_symbol }}{{ "{:,.0f}".format(comparison.period2.avg_ticket|default(0)) }} {% if current_lang == 'he' %}ממוצע{% elif current_lang == 'en' %}avg{% else %}средн.{% endif %}</span>
             </div>
           </div>
         </div>
@@ -139,7 +140,7 @@
             <div class="text-center p-3 rounded-3" style="background: rgba(139,92,246,0.08);">
               <div class="small text-muted">{% if current_lang == 'he' %}הפרש מוחלט{% elif current_lang == 'en' %}Absolute Diff{% else %}Абс. разница{% endif %}</div>
               <div class="h5 mb-0 {{ 'text-success' if (comparison.period2.total - comparison.period1.total) > 0 else 'text-danger' }}">
-                {{ '+' if (comparison.period2.total - comparison.period1.total) > 0 else '' }}{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period2.total - comparison.period1.total) }}
+                {{ '+' if (comparison.period2.total - comparison.period1.total) > 0 else '' }}{{ comp_currency_symbol }}{{ "{:,.0f}".format(comparison.period2.total - comparison.period1.total) }}
               </div>
             </div>
           </div>
@@ -160,7 +161,7 @@
                   <div class="small {{ 'text-success' if data.change_pct > 0 else 'text-danger' if data.change_pct < 0 else 'text-muted' }}">
                     {% if data.change_pct > 0 %}↑{% elif data.change_pct < 0 %}↓{% else %}={% endif %} {{ data.change_pct|abs }}%
                   </div>
-                  <div class="small text-muted">{{ currency_symbol }}{{ "{:,.0f}".format(data.period2) }}</div>
+                  <div class="small text-muted">{{ comp_currency_symbol }}{{ "{:,.0f}".format(data.period2) }}</div>
                 </div>
               </div>
               {% endfor %}
@@ -218,7 +219,7 @@
                 {% for ph in comparison.peak_hours.period1[:3] %}
                 <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(0,0,0,0.02);">
                   <span><i class="bi bi-clock me-1"></i>{{ ph.hour }}</span>
-                  <span class="fw-semibold">{{ currency_symbol }}{{ "{:,.0f}".format(ph.total) }}</span>
+                  <span class="fw-semibold">{{ comp_currency_symbol }}{{ "{:,.0f}".format(ph.total) }}</span>
                 </div>
                 {% endfor %}
               </div>
@@ -227,7 +228,7 @@
                 {% for ph in comparison.peak_hours.period2[:3] %}
                 <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(16,185,129,0.05);">
                   <span><i class="bi bi-clock me-1"></i>{{ ph.hour }}</span>
-                  <span class="fw-semibold text-success">{{ currency_symbol }}{{ "{:,.0f}".format(ph.total) }}</span>
+                  <span class="fw-semibold text-success">{{ comp_currency_symbol }}{{ "{:,.0f}".format(ph.total) }}</span>
                 </div>
                 {% endfor %}
               </div>
@@ -249,7 +250,7 @@
                 {% for prod in comparison.top_products.period1[:5] %}
                 <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(0,0,0,0.02);">
                   <span class="text-truncate me-2" style="max-width: 150px;">{{ prod.name }}</span>
-                  <span class="fw-semibold">{{ currency_symbol }}{{ "{:,.0f}".format(prod.total) }}</span>
+                  <span class="fw-semibold">{{ comp_currency_symbol }}{{ "{:,.0f}".format(prod.total) }}</span>
                 </div>
                 {% endfor %}
               </div>
@@ -258,7 +259,7 @@
                 {% for prod in comparison.top_products.period2[:5] %}
                 <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(139,92,246,0.05);">
                   <span class="text-truncate me-2" style="max-width: 150px;">{{ prod.name }}</span>
-                  <span class="fw-semibold" style="color: #8b5cf6;">{{ currency_symbol }}{{ "{:,.0f}".format(prod.total) }}</span>
+                  <span class="fw-semibold" style="color: #8b5cf6;">{{ comp_currency_symbol }}{{ "{:,.0f}".format(prod.total) }}</span>
                 </div>
                 {% endfor %}
               </div>
@@ -343,8 +344,11 @@
                   —
                 {% endif %}
               </td>
-              <td><strong>{{ currency_symbol }}{{ "{:,.0f}".format(summary.get('total_sales', 0)) }}</strong></td>
-              <td>{{ currency_symbol }}{{ "{:,.0f}".format(summary.get('avg_daily', 0)) }}</td>
+              {% set report_currency_code = report.get('currency') or 'USD' %}
+              {% set report_currency_info = get_currency_by_code(report_currency_code) %}
+              {% set report_currency_symbol = report_currency_info.symbol %}
+              <td><strong>{{ report_currency_symbol }}{{ "{:,.0f}".format(summary.get('total_sales', 0)) }}</strong></td>
+              <td>{{ report_currency_symbol }}{{ "{:,.0f}".format(summary.get('avg_daily', 0)) }}</td>
               <td><small>{{ report.created_at[:10] if report.created_at else '—' }}</small></td>
               <td>
                 <form method="POST" action="{{ url_for('dashboard_delete_report', report_id=report.id) }}" 

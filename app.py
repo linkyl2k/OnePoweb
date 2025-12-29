@@ -86,6 +86,15 @@ def get_currency(lang: str = None) -> dict:
     default_code = default_currencies.get(lang, "USD")
     return AVAILABLE_CURRENCIES.get(default_code, AVAILABLE_CURRENCIES["USD"])
 
+def get_currency_by_code(currency_code: str) -> dict:
+    """
+    Возвращает информацию о валюте по коду.
+    Returns: {"symbol": "₪", "name": "ILS", "code": "ILS"}
+    """
+    if currency_code and currency_code in AVAILABLE_CURRENCIES:
+        return AVAILABLE_CURRENCIES[currency_code]
+    return AVAILABLE_CURRENCIES.get("USD", {"symbol": "$", "name": "USD", "code": "USD"})
+
 def send_contact_email(name: str, email: str, message: str, subject: str = "general"):
     """שליחת הודעת צור קשר למייל"""
     
@@ -873,6 +882,10 @@ def inject_translations():
     user_currency_code = session.get("currency")
     current_currency_code = currency["code"]
     
+    # Добавляем функцию для получения валюты по коду
+    def get_currency_by_code_helper(code):
+        return get_currency_by_code(code)
+    
     # Порядок валют по популярности
     currency_order = ["USD", "EUR", "GBP", "JPY", "CNY", "INR", "CAD", "AUD", "CHF", "ILS", "RUB", 
                       "PLN", "SEK", "NOK", "DKK", "CZK", "HUF", "UAH", "KZT", "KGS"]
@@ -892,6 +905,10 @@ def inject_translations():
                 "is_selected": is_selected
             })
     
+    # Helper function for templates to get currency by code
+    def get_currency_by_code_helper(code):
+        return get_currency_by_code(code)
+    
     return {
         "t": t,
         "current_lang": current_lang,
@@ -899,6 +916,8 @@ def inject_translations():
         "currency_symbol": currency["symbol"],
         "currency_display": currency["display"],
         "available_currencies": currencies_list,
+        "get_currency_by_code": get_currency_by_code_helper,
+        "AVAILABLE_CURRENCIES": AVAILABLE_CURRENCIES,
         "languages": {
             "he": "עברית",
             "en": "English", 
@@ -1173,6 +1192,7 @@ def ensure_subscription_columns():
             period_end DATE,
             encrypted_data BLOB NOT NULL,
             summary_json TEXT,
+            currency TEXT DEFAULT 'USD',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
         )
@@ -3451,6 +3471,7 @@ def ensure_tables():
         period_end DATE,                             -- סוף תקופה
         encrypted_data BLOB NOT NULL,                -- נתונים מוצפנים (DataFrame)
         summary_json TEXT,                           -- סיכום מהיר (לא מוצפן)
+        currency TEXT DEFAULT 'USD',                 -- валюта отчета
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
@@ -3538,6 +3559,17 @@ def save_report(user_id: int, df: pd.DataFrame, name: str = None, period_type: s
     """
     db = get_db()
     
+    # Get current currency from session
+    from flask import session
+    current_currency = session.get("currency", "USD")
+    
+    # Add currency column to reports table if it doesn't exist
+    try:
+        db.execute("ALTER TABLE reports ADD COLUMN currency TEXT DEFAULT 'USD'")
+        db.commit()
+    except:
+        pass  # Column already exists
+    
     # זיהוי תקופה אוטומטי
     period_start = None
     period_end = None
@@ -3591,9 +3623,9 @@ def save_report(user_id: int, df: pd.DataFrame, name: str = None, period_type: s
     }
     
     cursor = db.execute("""
-        INSERT INTO reports (user_id, name, period_type, period_start, period_end, encrypted_data, summary_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (user_id, name, period_type, period_start, period_end, encrypted, json.dumps(summary, ensure_ascii=False)))
+        INSERT INTO reports (user_id, name, period_type, period_start, period_end, encrypted_data, summary_json, currency)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (user_id, name, period_type, period_start, period_end, encrypted, json.dumps(summary, ensure_ascii=False), current_currency))
     db.commit()
     
     return cursor.lastrowid
@@ -3627,7 +3659,7 @@ def get_user_reports(user_id: int, limit: int = 50, period_type: str = None) -> 
     
     if period_type:
         rows = db.execute("""
-            SELECT id, name, period_type, period_start, period_end, summary_json, created_at
+            SELECT id, name, period_type, period_start, period_end, summary_json, created_at, currency
             FROM reports
             WHERE user_id = ? AND period_type = ?
             ORDER BY period_start DESC, created_at DESC
@@ -7315,6 +7347,7 @@ def dashboard():
     
     # השוואת תקופות אם יש לפחות 2 דוחות מאותו סוג
     comparison = None
+    comparison_currency = None
     if len(reports) >= 2:
         try:
             # מחפשים שני דוחות מאותו סוג תקופה
@@ -7324,6 +7357,13 @@ def dashboard():
                 comparison = compare_periods(df1, df2)
                 comparison["report1_name"] = reports[1].get("name", "דוח קודם")
                 comparison["report2_name"] = reports[0].get("name", "דוח אחרון")
+                # Use currency from the first report (newer one), or fallback to current currency
+                comparison_currency_code = reports[0].get("currency") or reports[1].get("currency")
+                if comparison_currency_code:
+                    comparison_currency = get_currency_by_code(comparison_currency_code)
+                else:
+                    current_lang = get_language()
+                    comparison_currency = get_currency(current_lang)
         except Exception as e:
             print(f"⚠️ שגיאה בהשוואת תקופות: {e}")
     
@@ -7333,6 +7373,9 @@ def dashboard():
         "day": "ימים",
         "custom": "מותאם אישית"
     }
+    
+    # Get current language for currency fallback
+    current_lang = get_language()
     
     return render_template("dashboard.html",
                           user=u,
@@ -7344,6 +7387,7 @@ def dashboard():
                           total_reports=len(reports),
                           latest_summary=latest_summary,
                           comparison=comparison,
+                          comparison_currency=comparison_currency,
                           active="dashboard",
                           title="לוח בקרה")
 
@@ -7512,7 +7556,7 @@ def signup():
     if not agree_terms:
         current_lang = get_language()
         if current_lang == 'he':
-            flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
+        flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
         elif current_lang == 'en':
             flash("You must agree to the Terms of Use and Privacy Policy to register.", "danger")
         else:
@@ -7523,7 +7567,7 @@ def signup():
     if password != confirm_password:
         current_lang = get_language()
         if current_lang == 'he':
-            flash("הסיסמאות אינן תואמות", "danger")
+        flash("הסיסמאות אינן תואמות", "danger")
         elif current_lang == 'en':
             flash("Passwords do not match", "danger")
         else:
@@ -7553,7 +7597,7 @@ def signup():
     except sqlite3.IntegrityError:
         current_lang = get_language()
         if current_lang == 'he':
-            flash("האימייל או שם המשתמש כבר קיימים", "danger")
+        flash("האימייל או שם המשתמש כבר קיימים", "danger")
         elif current_lang == 'en':
             flash("Email or username already exists", "danger")
         else:
@@ -7750,7 +7794,7 @@ def roi_page():
         
         # Если все еще нет данных, перенаправляем на result с сообщением
         if not has_any:
-            current_lang = get_language()
+    current_lang = get_language()
             if current_lang == "ru":
                 flash("Нет данных ROI для отображения. Пожалуйста, загрузите отчет сначала.", "warning")
             elif current_lang == "en":
@@ -7763,21 +7807,21 @@ def roi_page():
     diagnosis = {}
     action_plan = {}
     
-    # Для диагностики нужен dataframe, но его нет в LAST_EXPORT
-    # Создаем упрощенную диагностику на основе компонентов
-    diagnosis = {"insights": [], "chart_data": {}}  # Упрощенная версия
-    
-    # Генерируем actionable план на 7 дней
-    # Создаем пустой dataframe для совместимости (функция ожидает его)
-    import pandas as pd
-    empty_df = pd.DataFrame()
-    try:
-        action_plan = generate_7day_action_plan(empty_df, roi, current_lang)
-    except Exception as e:
+        # Для диагностики нужен dataframe, но его нет в LAST_EXPORT
+        # Создаем упрощенную диагностику на основе компонентов
+        diagnosis = {"insights": [], "chart_data": {}}  # Упрощенная версия
+        
+        # Генерируем actionable план на 7 дней
+        # Создаем пустой dataframe для совместимости (функция ожидает его)
+        import pandas as pd
+        empty_df = pd.DataFrame()
+        try:
+            action_plan = generate_7day_action_plan(empty_df, roi, current_lang)
+        except Exception as e:
         print(f"⚠️ Action plan generation error: {e}")
         import traceback
         traceback.print_exc()
-        action_plan = {"plans": []}
+            action_plan = {"plans": []}
     
     return render_template(
         "roi.html",

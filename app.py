@@ -7807,21 +7807,21 @@ def roi_page():
     diagnosis = {}
     action_plan = {}
     
-        # Для диагностики нужен dataframe, но его нет в LAST_EXPORT
-        # Создаем упрощенную диагностику на основе компонентов
-        diagnosis = {"insights": [], "chart_data": {}}  # Упрощенная версия
-        
-        # Генерируем actionable план на 7 дней
-        # Создаем пустой dataframe для совместимости (функция ожидает его)
-        import pandas as pd
-        empty_df = pd.DataFrame()
-        try:
-            action_plan = generate_7day_action_plan(empty_df, roi, current_lang)
-        except Exception as e:
+    # Для диагностики нужен dataframe, но его нет в LAST_EXPORT
+    # Создаем упрощенную диагностику на основе компонентов
+    diagnosis = {"insights": [], "chart_data": {}}  # Упрощенная версия
+    
+    # Генерируем actionable план на 7 дней
+    # Создаем пустой dataframe для совместимости (функция ожидает его)
+    import pandas as pd
+    empty_df = pd.DataFrame()
+    try:
+        action_plan = generate_7day_action_plan(empty_df, roi, current_lang)
+    except Exception as e:
         print(f"⚠️ Action plan generation error: {e}")
         import traceback
         traceback.print_exc()
-            action_plan = {"plans": []}
+        action_plan = {"plans": []}
     
     return render_template(
         "roi.html",

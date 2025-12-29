@@ -7367,15 +7367,31 @@ def dashboard():
         except Exception as e:
             print(f"⚠️ שגיאה בהשוואת תקופות: {e}")
     
-    period_type_labels = {
-        "month": "חודשים",
-        "week": "שבועות",
-        "day": "ימים",
-        "custom": "מותאם אישית"
-    }
-    
-    # Get current language for currency fallback
+    # Get current language for currency fallback and labels
     current_lang = get_language()
+    
+    # Period type labels based on current language
+    if current_lang == "he":
+        period_type_labels = {
+            "month": "חודשים",
+            "week": "שבועות",
+            "day": "ימים",
+            "custom": "מותאם אישית"
+        }
+    elif current_lang == "en":
+        period_type_labels = {
+            "month": "Months",
+            "week": "Weeks",
+            "day": "Days",
+            "custom": "Custom"
+        }
+    else:  # ru
+        period_type_labels = {
+            "month": "Месяцы",
+            "week": "Недели",
+            "day": "Дни",
+            "custom": "Настраиваемый"
+        }
     
     return render_template("dashboard.html",
                           user=u,
@@ -7426,11 +7442,22 @@ def dashboard_compare():
 def dashboard_delete_report(report_id):
     """מחיקת דוח"""
     u = current_user()
+    current_lang = get_language()
     
     if delete_report(report_id, u["id"]):
-        flash("הדוח נמחק בהצלחה", "success")
+        if current_lang == "he":
+            flash("הדוח נמחק בהצלחה", "success")
+        elif current_lang == "en":
+            flash("Report deleted successfully", "success")
+        else:
+            flash("Отчет успешно удален", "success")
     else:
-        flash("שגיאה במחיקת הדוח", "danger")
+        if current_lang == "he":
+            flash("שגיאה במחיקת הדוח", "danger")
+        elif current_lang == "en":
+            flash("Error deleting report", "danger")
+        else:
+            flash("Ошибка при удалении отчета", "danger")
     
     return redirect(url_for("dashboard"))
 

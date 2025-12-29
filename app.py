@@ -1356,6 +1356,17 @@ COLUMN_MAP = {
     "сумма транзакции": COL_SUM,
     "итого": COL_SUM,
     "Итого": COL_SUM,
+    "ИТОГО": COL_SUM,
+    # Варианты с символами валют
+    "Итого_₽": COL_SUM,
+    "Итого ₽": COL_SUM,
+    "итого_₽": COL_SUM,
+    "Сумма_₽": COL_SUM,
+    "Сумма ₽": COL_SUM,
+    "סכום (₪)": COL_SUM,
+    "סכום_₪": COL_SUM,
+    "total ($)": COL_SUM,
+    "total_$": COL_SUM,
 
     # מחיר ליחידה
     "מחיר": COL_UNIT,
@@ -2570,6 +2581,10 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
     יוצר רשימת פעולות קונקרטיות ומעשיות על בסיס ניתוח הנתונים.
     מחזיר רשימה של dicts: [{priority, category, action, impact, how_to}]
     """
+    # Получаем символ валюты
+    currency_info = get_currency(lang)
+    currency_symbol = currency_info["symbol"]
+    
     actions = []
     comps = roi_data.get("components", {})
     
@@ -3032,8 +3047,8 @@ def _read_report(file_storage_or_path):
         """מנרמל שם עמודה לחיפוש"""
         s = str(s).strip().lower()
         s = s.replace("_", " ").replace("-", " ")
-        # מסיר סוגריים וסימני מטבע
-        s = re.sub(r'[₪$€\(\)\[\]]', '', s)
+        # מסיר סוגריים וסימני מטבע (включая рубль ₽)
+        s = re.sub(r'[₪$€₽£¥\(\)\[\]]', '', s)
         # מסיר символы № и другие специальные символы
         s = re.sub(r'[№#]', '', s)
         # מסיר רווחים כפולים

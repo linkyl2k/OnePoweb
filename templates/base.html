@@ -107,6 +107,49 @@
       color: #ef4444;
       animation: pulse-urgent 1s ease-in-out infinite;
     }
+    /* Dark navbar styling */
+    .navbar {
+      color: #fff;
+    }
+    .navbar-brand {
+      color: #fff !important;
+    }
+    .navbar-brand:hover {
+      color: #60a5fa !important;
+    }
+    .navbar .nav-link {
+      color: rgba(255, 255, 255, 0.85) !important;
+    }
+    .navbar .nav-link:hover {
+      color: #60a5fa !important;
+    }
+    .navbar .nav-link.active {
+      color: #60a5fa !important;
+      font-weight: 600;
+    }
+    .navbar-toggler {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    .navbar .dropdown-menu {
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    .navbar .dropdown-item {
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .navbar .dropdown-item:hover {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+    }
+    .navbar .dropdown-item.active {
+      background: rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+    }
+    
     /* Tablet & Mobile navbar - cleaner vertical layout for iPad and smaller */
     @media (max-width: 1199.98px) {
       .navbar {
@@ -117,10 +160,11 @@
       /* Collapsed menu styling */
       #nav {
         margin-top: 0.75rem;
-        background: rgba(248, 250, 252, 0.98);
+        background: rgba(15, 23, 42, 0.95);
         border-radius: 12px;
         padding: 0.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       
       /* All nav items vertical */
@@ -151,20 +195,24 @@
         text-align: left !important;
         border-radius: 8px !important;
         transition: all 0.2s ease;
-        background: white;
+        background: rgba(30, 41, 59, 0.6);
         margin-bottom: 0.25rem;
+        color: rgba(255, 255, 255, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
       
       #nav .navbar-nav .nav-link:hover {
-        background: linear-gradient(90deg, rgba(16,185,129,0.1), rgba(46,160,255,0.08)) !important;
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.15)) !important;
         transform: translateX(4px);
+        color: #60a5fa !important;
+        border-color: rgba(96, 165, 250, 0.3);
       }
       
       /* Separator between menu sections */
       #nav .navbar-nav.ms-auto {
         margin-top: 0.75rem !important;
         padding-top: 0.75rem !important;
-        border-top: 2px solid rgba(0,0,0,0.06) !important;
+        border-top: 2px solid rgba(255, 255, 255, 0.1) !important;
       }
       
       /* Buttons full width and styled */
@@ -179,10 +227,20 @@
       /* Dropdown menus */
       #nav .dropdown-menu {
         width: 100%;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.98) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         border-radius: 8px;
         margin-top: 0.5rem !important;
+      }
+      
+      #nav .dropdown-item {
+        color: rgba(255, 255, 255, 0.85) !important;
+      }
+      
+      #nav .dropdown-item:hover {
+        background: rgba(59, 130, 246, 0.2) !important;
+        color: #60a5fa !important;
       }
       
       /* Plan badges in collapsed menu */
@@ -254,7 +312,7 @@
 </div>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-xl bg-white border-bottom sticky-top shadow-sm-sm">
+  <nav class="navbar navbar-expand-xl sticky-top shadow-sm-sm" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('index') }}">
         <i class="bi bi-graph-up-arrow"></i>

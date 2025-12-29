@@ -922,76 +922,90 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   /* Reports table dark theme */
-  .reports-table {
-    background-color: rgba(13,42,68,0.5);
-    color: #e6e9ef;
+  .table.reports-table {
+    background-color: rgba(13,42,68,0.8) !important;
+    color: #e6e9ef !important;
   }
   
-  .reports-table thead {
-    background-color: rgba(15, 23, 42, 0.8);
-    color: #e6e9ef;
-    border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+  .table.reports-table thead {
+    background-color: rgba(15, 23, 42, 0.95) !important;
+    color: #e6e9ef !important;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.4) !important;
   }
   
-  .reports-table thead th {
-    color: #e6e9ef;
+  .table.reports-table thead th {
+    color: #e6e9ef !important;
     font-weight: 600;
-    padding: 16px;
-    border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+    padding: 16px !important;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.4) !important;
+    background-color: rgba(15, 23, 42, 0.95) !important;
   }
   
-  .reports-table tbody {
-    background-color: rgba(13,42,68,0.5);
+  .table.reports-table tbody {
+    background-color: rgba(13,42,68,0.8) !important;
   }
   
-  .reports-table tbody tr {
-    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
-    color: #e6e9ef;
+  .table.reports-table tbody tr {
+    border-bottom: 1px solid rgba(102, 126, 234, 0.2) !important;
+    color: #e6e9ef !important;
+    background-color: rgba(13,42,68,0.8) !important;
   }
   
-  .reports-table tbody tr:hover {
-    background-color: rgba(102, 126, 234, 0.15);
+  .table.reports-table tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.25) !important;
     transition: background-color 0.2s ease;
   }
   
-  .reports-table tbody td {
-    padding: 14px 16px;
-    color: #e6e9ef;
+  .table.reports-table tbody td {
+    padding: 14px 16px !important;
+    color: #e6e9ef !important;
     vertical-align: middle;
+    background-color: transparent !important;
   }
   
-  .reports-table tbody td strong {
-    color: #ffffff;
+  .table.reports-table tbody td strong {
+    color: #ffffff !important;
     font-weight: 600;
   }
   
-  .reports-table tbody td small {
-    color: #cbd5e1;
+  .table.reports-table tbody td small {
+    color: #cbd5e1 !important;
   }
   
-  .reports-table .badge {
-    color: #ffffff;
+  .table.reports-table .badge {
+    color: #ffffff !important;
     font-weight: 500;
   }
   
   /* Improve form label visibility in modal */
   #compareModal .form-label {
-    color: #1e293b;
+    color: #1e293b !important;
     font-weight: 600;
   }
   
+  /* Modal body background */
+  #compareModal .modal-body {
+    background-color: #f8f9fa !important;
+  }
+  
   /* Improve select field visibility */
+  #compareModal .period-select {
+    background-color: rgba(13,42,68,0.9) !important;
+    color: #e6e9ef !important;
+    border-width: 2px !important;
+  }
+  
   #compareModal .period-select option {
-    background-color: #1e293b;
-    color: #e6e9ef;
+    background-color: #1e293b !important;
+    color: #e6e9ef !important;
   }
   
   /* Select focus state */
   #compareModal .period-select:focus {
-    background-color: rgba(13,42,68,0.7);
-    color: #ffffff;
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    background-color: rgba(13,42,68,0.95) !important;
+    color: #ffffff !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25) !important;
   }
 </style>
 {% endblock %}

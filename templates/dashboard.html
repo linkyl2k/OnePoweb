@@ -594,9 +594,9 @@
                 </div>
               </div>
               {% else %}
-              <div class="alert alert-warning mb-0" style="border-radius: 12px;">
+              <div class="alert alert-warning mb-0" style="border-radius: 12px; background-color: #fef3c7 !important; border: 1px solid #f59e0b !important; color: #92400e !important;">
                 <i class="bi bi-exclamation-triangle me-2"></i>
-                {% if current_lang == 'he' %}נדרשים לפחות 2 דוחות חודשיים להשוואה{% elif current_lang == 'en' %}At least 2 monthly reports required for comparison{% else %}Необходимо минимум 2 месячных отчета для сравнения{% endif %}
+                <span style="color: #92400e !important;">{% if current_lang == 'he' %}נדרשים לפחות 2 דוחות חודשיים להשוואה{% elif current_lang == 'en' %}At least 2 monthly reports required for comparison{% else %}Необходимо минимум 2 месячных отчета для сравнения{% endif %}</span>
               </div>
               {% endif %}
             </div>
@@ -727,9 +727,9 @@
             {% endif %}
           </div>
           
-          <div class="alert alert-info mt-4 mb-0" style="border-radius: 12px; background: rgba(46,160,255,0.1); border: none;">
-            <i class="bi bi-info-circle me-2"></i>
-            <small>{% if current_lang == 'he' %}מומלץ להשוות תקופות מאותו סוג לקבלת תוצאות מדויקות יותר{% elif current_lang == 'en' %}Recommended to compare periods of the same type for more accurate results{% else %}Рекомендуется сравнивать периоды одного типа для более точных результатов{% endif %}</small>
+          <div class="alert alert-info mt-4 mb-0" style="border-radius: 12px; background: rgba(59,130,246,0.1) !important; border: 1px solid rgba(59,130,246,0.3) !important; color: #1e40af !important;">
+            <i class="bi bi-info-circle me-2" style="color: #2563eb !important;"></i>
+            <small style="color: #1e40af !important; font-weight: 500;">{% if current_lang == 'he' %}מומלץ להשוות תקופות מאותו סוג לקבלת תוצאות מדויקות יותר{% elif current_lang == 'en' %}Recommended to compare periods of the same type for more accurate results{% else %}Рекомендуется сравнивать периоды одного типа для более точных результатов{% endif %}</small>
           </div>
         </div>
         <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 16px 24px;">
@@ -864,26 +864,33 @@ document.addEventListener('DOMContentLoaded', function() {
   /* Modal styles */
   #compareModal .modal-content {
     box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    background-color: #ffffff !important;
+  }
+  
+  #compareModal .modal-body {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
   }
   
   #compareModal .nav-pills .nav-link {
-    color: #6c757d;
-    border: none;
-    border-bottom: 3px solid transparent;
+    color: #6c757d !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
     margin-right: 8px;
     transition: all 0.3s ease;
+    background-color: transparent !important;
   }
   
   #compareModal .nav-pills .nav-link:hover {
-    color: #667eea;
-    background-color: rgba(102, 126, 234, 0.1);
-    border-bottom-color: rgba(102, 126, 234, 0.3);
+    color: #667eea !important;
+    background-color: rgba(102, 126, 234, 0.1) !important;
+    border-bottom-color: rgba(102, 126, 234, 0.3) !important;
   }
   
   #compareModal .nav-pills .nav-link.active {
-    color: #667eea;
-    background-color: rgba(102, 126, 234, 0.1);
-    border-bottom-color: #667eea;
+    color: #667eea !important;
+    background-color: rgba(102, 126, 234, 0.1) !important;
+    border-bottom-color: #667eea !important;
     font-weight: 600;
   }
   
@@ -985,7 +992,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   /* Modal body background */
   #compareModal .modal-body {
-    background-color: #f8f9fa !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+  }
+  
+  #compareModal .modal-body p {
+    color: #1e293b !important;
   }
   
   /* Improve select field visibility */

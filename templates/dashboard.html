@@ -770,8 +770,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Form validation - ensure selects from active tab are filled
+  // Handle form submission with AJAX
   form.addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent default form submission
     const activeTab = document.querySelector('#periodTypeTabs .nav-link.active');
     if (!activeTab) {
       e.preventDefault();
@@ -823,7 +824,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (!isValid) {
-      e.preventDefault();
       // Remove name attributes on validation failure
       if (report1Select) report1Select.removeAttribute('name');
       if (report2Select) report2Select.removeAttribute('name');
@@ -834,8 +834,150 @@ document.addEventListener('DOMContentLoaded', function() {
       {% else %}
       alert('Пожалуйста, выберите оба периода для сравнения');
       {% endif %}
+      return;
     }
+    
+    // Prevent default form submission
+    e.preventDefault();
+    
+    // Prepare form data
+    const formData = new FormData(form);
+    
+    // Show loading state
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>{% if current_lang == "he" %}משווה...{% elif current_lang == "en" %}Comparing...{% else %}Сравниваем...{% endif %}';
+    
+    // Send AJAX request
+    fetch('{{ url_for("dashboard_compare") }}', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalButtonText;
+      
+      // Check for errors
+      if (data.error) {
+        {% if current_lang == 'he' %}
+        alert('שגיאה: ' + data.error);
+        {% elif current_lang == 'en' %}
+        alert('Error: ' + data.error);
+        {% else %}
+        alert('Ошибка: ' + data.error);
+        {% endif %}
+        return;
+      }
+      
+      // Close modal
+      const modalElement = document.getElementById('compareModal');
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) modal.hide();
+      
+      // Check if data is identical (all changes are 0 or very close to 0)
+      const changes = data.changes || {};
+      const allChangesZero = Math.abs(changes.total_pct || 0) < 0.01 && 
+        Math.abs(changes.avg_daily_pct || 0) < 0.01 && 
+        Math.abs(changes.transactions_pct || 0) < 0.01 && 
+        (Math.abs(changes.avg_ticket_pct || 0) < 0.01 || changes.avg_ticket_pct === null);
+      
+      if (allChangesZero) {
+        // Show beautiful message for identical data
+        showIdenticalDataMessage(data);
+      } else {
+        // Reload page to show comparison results
+        window.location.reload();
+      }
+    })
+    .catch(error => {
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalButtonText;
+      console.error('Error:', error);
+      {% if current_lang == 'he' %}
+      alert('שגיאה בהשוואה. אנא נסה שוב.');
+      {% elif current_lang == 'en' %}
+      alert('Comparison error. Please try again.');
+      {% else %}
+      alert('Ошибка сравнения. Пожалуйста, попробуйте снова.');
+      {% endif %}
+    });
   });
+  
+  // Function to show identical data message
+  function showIdenticalDataMessage(data) {
+    // Remove existing comparison message if any
+    const existingMsg = document.getElementById('comparisonResultMessage');
+    if (existingMsg) existingMsg.remove();
+    
+    const total = data.period2 ? data.period2.total : (data.period1 ? data.period1.total : 0);
+    const days = data.period2 ? data.period2.days : (data.period1 ? data.period1.days : 0);
+    const currencySymbol = '{{ currency_symbol }}';
+    
+    // Create beautiful message card
+    const messageCard = document.createElement('div');
+    messageCard.id = 'comparisonResultMessage';
+    messageCard.className = 'card shadow-lg mb-4';
+    messageCard.style.cssText = 'border: none; border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); box-shadow: 0 10px 40px rgba(59,130,246,0.2);';
+    
+    messageCard.innerHTML = `
+      <div class="card-body text-center p-5">
+        <div style="width: 100px; height: 100px; margin: 0 auto 30px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(59,130,246,0.3);">
+          <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: white;"></i>
+        </div>
+        <h3 class="mb-3" style="color: #1e40af; font-weight: 700;">
+          {% if current_lang == 'he' %}
+          📊 הנתונים זהים לחלוטין
+          {% elif current_lang == 'en' %}
+          📊 Data is Identical
+          {% else %}
+          📊 Данные идентичны
+          {% endif %}
+        </h3>
+        <p class="lead mb-4" style="color: #1e3a8a; font-size: 1.2rem;">
+          {% if current_lang == 'he' %}
+          שני התקופות זהות לחלוטין - אין הבדל בכל המדדים.
+          {% elif current_lang == 'en' %}
+          Both periods are completely identical - no difference in any metrics.
+          {% else %}
+          Оба периода полностью идентичны - нет разницы ни по одному показателю.
+          {% endif %}
+        </p>
+        <div class="row g-4 mb-4" style="max-width: 700px; margin-left: auto; margin-right: auto;">
+          <div class="col-md-4">
+            <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.8); border: 2px solid rgba(59,130,246,0.2);">
+              <div class="small text-muted mb-2" style="font-weight: 500;">{% if current_lang == 'he' %}סה"כ מכירות{% elif current_lang == 'en' %}Total Sales{% else %}Общие продажи{% endif %}</div>
+              <div class="h4 mb-0" style="color: #1e40af; font-weight: 700;">${currencySymbol}${parseFloat(total).toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.8); border: 2px solid rgba(59,130,246,0.2);">
+              <div class="small text-muted mb-2" style="font-weight: 500;">{% if current_lang == 'he' %}שינוי כולל{% elif current_lang == 'en' %}Total Change{% else %}Общее изменение{% endif %}</div>
+              <div class="h4 mb-0" style="color: #64748b; font-weight: 700;">0%</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.8); border: 2px solid rgba(59,130,246,0.2);">
+              <div class="small text-muted mb-2" style="font-weight: 500;">{% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}Days{% else %}Дней{% endif %}</div>
+              <div class="h4 mb-0" style="color: #1e40af; font-weight: 700;">${days}</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg px-5 py-3" onclick="this.closest('#comparisonResultMessage').remove();" style="border-radius: 12px; font-weight: 600;">
+          <i class="bi bi-x-circle me-2"></i>
+          {% if current_lang == 'he' %}סגור{% elif current_lang == 'en' %}Close{% else %}Закрыть{% endif %}
+        </button>
+      </div>
+    `;
+    
+    // Insert message at the top of dashboard content
+    const dashboardContent = document.querySelector('.container.my-5');
+    if (dashboardContent) {
+      dashboardContent.insertBefore(messageCard, dashboardContent.firstChild);
+      messageCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
   
   // Visual feedback on select change
   document.querySelectorAll('.period-select').forEach(select => {

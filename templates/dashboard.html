@@ -49,21 +49,28 @@
   </div>
 
   {% if comparison %}
-  <!-- השוואת תקופות אוטומטית -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-      <h5 class="mb-0">📈 {% if current_lang == 'he' %}השוואה אוטומטית: {{ comparison.get('report2_name', 'אחרון') }} מול {{ comparison.get('report1_name', 'קודם') }}{% elif current_lang == 'en' %}Automatic Comparison: {{ comparison.get('report2_name', 'Latest') }} vs {{ comparison.get('report1_name', 'Previous') }}{% else %}Автоматическое сравнение: {{ comparison.get('report2_name', 'Последний') }} vs {{ comparison.get('report1_name', 'Предыдущий') }}{% endif %}</h5>
+  <!-- השוואת תקופות אוטומטית - Enhanced -->
+  <div class="card shadow-sm mb-4" style="border: none; border-radius: 16px; overflow: hidden;">
+    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">📈 {% if current_lang == 'he' %}השוואה אוטומטית: {{ comparison.get('report2_name', 'אחרון') }} מול {{ comparison.get('report1_name', 'קודם') }}{% elif current_lang == 'en' %}Automatic Comparison: {{ comparison.get('report2_name', 'Latest') }} vs {{ comparison.get('report1_name', 'Previous') }}{% else %}Автоматическое сравнение: {{ comparison.get('report2_name', 'Последний') }} vs {{ comparison.get('report1_name', 'Предыдущий') }}{% endif %}</h5>
+        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#detailedComparison">
+          <i class="bi bi-chevron-down"></i> {% if current_lang == 'he' %}פרטים{% elif current_lang == 'en' %}Details{% else %}Подробнее{% endif %}
+        </button>
+      </div>
     </div>
     <div class="card-body">
+      <!-- Main Comparison -->
       <div class="row g-4">
         <!-- תקופה קודמת -->
         <div class="col-md-5">
-          <div class="border rounded p-3 bg-light h-100">
+          <div class="border rounded-3 p-3 bg-light h-100">
             <h6 class="text-muted mb-2">{{ comparison.get('report1_name', ('תקופה קודמת' if current_lang == 'he' else 'Previous Period' if current_lang == 'en' else 'Предыдущий период')) }}</h6>
             <p class="h3 mb-1 text-primary">{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period1.total) }}</p>
-            <div class="d-flex gap-3 text-muted small">
+            <div class="d-flex flex-wrap gap-2 text-muted small">
               <span><i class="bi bi-calendar"></i> {{ comparison.period1.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
-              <span><i class="bi bi-receipt"></i> {{ comparison.period1.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}transactions{% else %}транзакций{% endif %}</span>
+              <span><i class="bi bi-receipt"></i> {{ comparison.period1.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}trans.{% else %}транз.{% endif %}</span>
+              <span><i class="bi bi-cart"></i> {{ currency_symbol }}{{ "{:,.0f}".format(comparison.period1.avg_ticket|default(0)) }} {% if current_lang == 'he' %}ממוצע{% elif current_lang == 'en' %}avg{% else %}средн.{% endif %}</span>
             </div>
           </div>
         </div>
@@ -72,30 +79,194 @@
         <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
           <i class="bi bi-arrow-left-right fs-3 text-muted mb-2"></i>
           {% if comparison.changes.total_pct > 0 %}
-            <span class="badge bg-success fs-5 px-3 py-2">↑ {{ comparison.changes.total_pct }}%</span>
+            <span class="badge bg-success fs-5 px-3 py-2" style="border-radius: 12px;">↑ {{ comparison.changes.total_pct }}%</span>
           {% elif comparison.changes.total_pct < 0 %}
-            <span class="badge bg-danger fs-5 px-3 py-2">↓ {{ comparison.changes.total_pct|abs }}%</span>
+            <span class="badge bg-danger fs-5 px-3 py-2" style="border-radius: 12px;">↓ {{ comparison.changes.total_pct|abs }}%</span>
           {% else %}
-            <span class="badge bg-secondary fs-5 px-3 py-2">= 0%</span>
+            <span class="badge bg-secondary fs-5 px-3 py-2" style="border-radius: 12px;">= 0%</span>
           {% endif %}
         </div>
         
         <!-- תקופה נוכחית -->
         <div class="col-md-5">
-          <div class="border rounded p-3 h-100" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+          <div class="border rounded-3 p-3 h-100" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
             <h6 class="text-dark mb-2" style="color: #2d5016 !important;">{{ comparison.get('report2_name', ('תקופה אחרונה' if current_lang == 'he' else 'Latest Period' if current_lang == 'en' else 'Последний период')) }}</h6>
             <p class="h3 mb-1" style="color: #1b5e20 !important; font-weight: 700;">{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period2.total) }}</p>
-            <div class="d-flex gap-3 small" style="color: #2d5016 !important;">
+            <div class="d-flex flex-wrap gap-2 small" style="color: #2d5016 !important;">
               <span><i class="bi bi-calendar"></i> {{ comparison.period2.days }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}</span>
-              <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}transactions{% else %}транзакций{% endif %}</span>
+              <span><i class="bi bi-receipt"></i> {{ comparison.period2.transactions }} {% if current_lang == 'he' %}עסקאות{% elif current_lang == 'en' %}trans.{% else %}транз.{% endif %}</span>
+              <span><i class="bi bi-cart"></i> {{ currency_symbol }}{{ "{:,.0f}".format(comparison.period2.avg_ticket|default(0)) }} {% if current_lang == 'he' %}ממוצע{% elif current_lang == 'en' %}avg{% else %}средн.{% endif %}</span>
             </div>
           </div>
         </div>
       </div>
       
       <!-- תובנה -->
-      <div class="alert alert-info mt-3 mb-0">
+      <div class="alert alert-info mt-3 mb-0" style="border-radius: 12px; border: none; background: rgba(46,160,255,0.1);">
         <i class="bi bi-lightbulb"></i> {{ comparison.insight }}
+      </div>
+      
+      <!-- Detailed Comparison (Collapsible) -->
+      <div class="collapse mt-4" id="detailedComparison">
+        
+        <!-- KPI Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background: rgba(16,185,129,0.08);">
+              <div class="small text-muted">{% if current_lang == 'he' %}שינוי יומי{% elif current_lang == 'en' %}Daily Change{% else %}Изм. в день{% endif %}</div>
+              <div class="h5 mb-0 {{ 'text-success' if comparison.changes.avg_daily_pct > 0 else 'text-danger' if comparison.changes.avg_daily_pct < 0 else '' }}">
+                {{ '+' if comparison.changes.avg_daily_pct > 0 else '' }}{{ comparison.changes.avg_daily_pct }}%
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background: rgba(46,160,255,0.08);">
+              <div class="small text-muted">{% if current_lang == 'he' %}שינוי בעסקאות{% elif current_lang == 'en' %}Transaction Change{% else %}Изм. транзакций{% endif %}</div>
+              <div class="h5 mb-0 {{ 'text-success' if comparison.changes.transactions_pct > 0 else 'text-danger' if comparison.changes.transactions_pct < 0 else '' }}">
+                {{ '+' if comparison.changes.transactions_pct > 0 else '' }}{{ comparison.changes.transactions_pct }}%
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background: rgba(251,191,36,0.08);">
+              <div class="small text-muted">{% if current_lang == 'he' %}שינוי בממוצע{% elif current_lang == 'en' %}Avg Ticket Change{% else %}Изм. ср. чека{% endif %}</div>
+              <div class="h5 mb-0 {{ 'text-success' if comparison.changes.avg_ticket_pct|default(0) > 0 else 'text-danger' if comparison.changes.avg_ticket_pct|default(0) < 0 else '' }}">
+                {{ '+' if comparison.changes.avg_ticket_pct|default(0) > 0 else '' }}{{ comparison.changes.avg_ticket_pct|default(0) }}%
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background: rgba(139,92,246,0.08);">
+              <div class="small text-muted">{% if current_lang == 'he' %}הפרש מוחלט{% elif current_lang == 'en' %}Absolute Diff{% else %}Абс. разница{% endif %}</div>
+              <div class="h5 mb-0 {{ 'text-success' if (comparison.period2.total - comparison.period1.total) > 0 else 'text-danger' }}">
+                {{ '+' if (comparison.period2.total - comparison.period1.total) > 0 else '' }}{{ currency_symbol }}{{ "{:,.0f}".format(comparison.period2.total - comparison.period1.total) }}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Weekday Comparison -->
+        {% if comparison.weekday_comparison %}
+        <div class="card mb-4" style="border: 1px solid rgba(102,126,234,0.2); border-radius: 12px;">
+          <div class="card-header bg-transparent" style="border-bottom: 1px solid rgba(102,126,234,0.1);">
+            <h6 class="mb-0"><i class="bi bi-calendar-week me-2"></i>{% if current_lang == 'he' %}השוואה לפי ימים{% elif current_lang == 'en' %}Comparison by Day{% else %}Сравнение по дням{% endif %}</h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-2">
+              {% for day, data in comparison.weekday_comparison.items() %}
+              <div class="col-6 col-md-3 col-lg">
+                <div class="text-center p-2 rounded-3" style="background: rgba(102,126,234,0.05); border: 1px solid rgba(102,126,234,0.1);">
+                  <div class="small fw-semibold mb-1">{{ day }}</div>
+                  <div class="small {{ 'text-success' if data.change_pct > 0 else 'text-danger' if data.change_pct < 0 else 'text-muted' }}">
+                    {% if data.change_pct > 0 %}↑{% elif data.change_pct < 0 %}↓{% else %}={% endif %} {{ data.change_pct|abs }}%
+                  </div>
+                  <div class="small text-muted">{{ currency_symbol }}{{ "{:,.0f}".format(data.period2) }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Best & Worst Days -->
+        {% if comparison.best_day or comparison.worst_day %}
+        <div class="row g-3 mb-4">
+          {% if comparison.best_day %}
+          <div class="col-md-6">
+            <div class="p-3 rounded-3" style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(34,197,94,0.05)); border: 1px solid rgba(16,185,129,0.2);">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width: 40px; height: 40px; background: rgba(16,185,129,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-trophy text-success"></i>
+                </div>
+                <div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}היום הכי טוב{% elif current_lang == 'en' %}Best Day{% else %}Лучший день{% endif %}</div>
+                  <div class="fw-bold">{{ comparison.best_day.name }} <span class="text-success">+{{ comparison.best_day.data.change_pct }}%</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          {% if comparison.worst_day %}
+          <div class="col-md-6">
+            <div class="p-3 rounded-3" style="background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(248,113,113,0.05)); border: 1px solid rgba(239,68,68,0.2);">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width: 40px; height: 40px; background: rgba(239,68,68,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-exclamation-triangle text-danger"></i>
+                </div>
+                <div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}היום הכי חלש{% elif current_lang == 'en' %}Weakest Day{% else %}Слабый день{% endif %}</div>
+                  <div class="fw-bold">{{ comparison.worst_day.name }} <span class="text-danger">{{ comparison.worst_day.data.change_pct }}%</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Peak Hours -->
+        {% if comparison.peak_hours and comparison.peak_hours.period2 %}
+        <div class="card mb-4" style="border: 1px solid rgba(251,191,36,0.2); border-radius: 12px;">
+          <div class="card-header bg-transparent" style="border-bottom: 1px solid rgba(251,191,36,0.1);">
+            <h6 class="mb-0"><i class="bi bi-clock me-2"></i>{% if current_lang == 'he' %}שעות שיא{% elif current_lang == 'en' %}Peak Hours{% else %}Пиковые часы{% endif %}</h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="small text-muted mb-2">{% if current_lang == 'he' %}תקופה קודמת{% elif current_lang == 'en' %}Previous Period{% else %}Прошлый период{% endif %}</div>
+                {% for ph in comparison.peak_hours.period1[:3] %}
+                <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(0,0,0,0.02);">
+                  <span><i class="bi bi-clock me-1"></i>{{ ph.hour }}</span>
+                  <span class="fw-semibold">{{ currency_symbol }}{{ "{:,.0f}".format(ph.total) }}</span>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <div class="small text-muted mb-2">{% if current_lang == 'he' %}תקופה נוכחית{% elif current_lang == 'en' %}Current Period{% else %}Текущий период{% endif %}</div>
+                {% for ph in comparison.peak_hours.period2[:3] %}
+                <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(16,185,129,0.05);">
+                  <span><i class="bi bi-clock me-1"></i>{{ ph.hour }}</span>
+                  <span class="fw-semibold text-success">{{ currency_symbol }}{{ "{:,.0f}".format(ph.total) }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Top Products Comparison -->
+        {% if comparison.top_products and comparison.top_products.period2 %}
+        <div class="card" style="border: 1px solid rgba(139,92,246,0.2); border-radius: 12px;">
+          <div class="card-header bg-transparent" style="border-bottom: 1px solid rgba(139,92,246,0.1);">
+            <h6 class="mb-0"><i class="bi bi-star me-2"></i>{% if current_lang == 'he' %}מוצרים מובילים{% elif current_lang == 'en' %}Top Products{% else %}Топ товаров{% endif %}</h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="small text-muted mb-2">{% if current_lang == 'he' %}תקופה קודמת{% elif current_lang == 'en' %}Previous Period{% else %}Прошлый период{% endif %}</div>
+                {% for prod in comparison.top_products.period1[:5] %}
+                <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(0,0,0,0.02);">
+                  <span class="text-truncate me-2" style="max-width: 150px;">{{ prod.name }}</span>
+                  <span class="fw-semibold">{{ currency_symbol }}{{ "{:,.0f}".format(prod.total) }}</span>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <div class="small text-muted mb-2">{% if current_lang == 'he' %}תקופה נוכחית{% elif current_lang == 'en' %}Current Period{% else %}Текущий период{% endif %}</div>
+                {% for prod in comparison.top_products.period2[:5] %}
+                <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(139,92,246,0.05);">
+                  <span class="text-truncate me-2" style="max-width: 150px;">{{ prod.name }}</span>
+                  <span class="fw-semibold" style="color: #8b5cf6;">{{ currency_symbol }}{{ "{:,.0f}".format(prod.total) }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
       </div>
     </div>
   </div>
@@ -196,8 +367,134 @@
     </div>
   </div>
 
+  <!-- Quick Actions & Insights -->
+  <div class="row g-4 mt-2 mb-4">
+    <!-- Trend Indicator -->
+    <div class="col-md-6">
+      <div class="card h-100" style="border: none; border-radius: 16px; background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(34,197,94,0.02));">
+        <div class="card-body">
+          <h6 class="mb-3">
+            <i class="bi bi-graph-up me-2" style="color: #10b981;"></i>
+            {% if current_lang == 'he' %}מגמת המכירות{% elif current_lang == 'en' %}Sales Trend{% else %}Тренд продаж{% endif %}
+          </h6>
+          
+          {% if reports|length >= 2 %}
+            {% set trend_pct = ((latest_summary.get('total_sales', 0) - (reports[1].summary_json | fromjson if reports[1].summary_json else {}).get('total_sales', 1)) / ((reports[1].summary_json | fromjson if reports[1].summary_json else {}).get('total_sales', 1) or 1) * 100)|round|int %}
+            <div class="d-flex align-items-center gap-3">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: {{ 'rgba(16,185,129,0.15)' if trend_pct >= 0 else 'rgba(239,68,68,0.15)' }}; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-{{ 'arrow-up-right' if trend_pct >= 0 else 'arrow-down-right' }}" style="font-size: 1.8rem; color: {{ '#10b981' if trend_pct >= 0 else '#ef4444' }};"></i>
+              </div>
+              <div>
+                <div class="h3 mb-0 {{ 'text-success' if trend_pct >= 0 else 'text-danger' }}">
+                  {{ '+' if trend_pct >= 0 else '' }}{{ trend_pct }}%
+                </div>
+                <div class="small text-muted">{% if current_lang == 'he' %}מהתקופה הקודמת{% elif current_lang == 'en' %}vs previous period{% else %}к пред. периоду{% endif %}</div>
+              </div>
+            </div>
+          {% else %}
+            <div class="text-center py-3 text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              {% if current_lang == 'he' %}העלה דוח נוסף לראות מגמות{% elif current_lang == 'en' %}Upload another report to see trends{% else %}Загрузите ещё отчет для трендов{% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="col-md-6">
+      <div class="card h-100" style="border: none; border-radius: 16px; background: linear-gradient(135deg, rgba(139,92,246,0.05), rgba(124,58,237,0.02));">
+        <div class="card-body">
+          <h6 class="mb-3">
+            <i class="bi bi-lightning-charge me-2" style="color: #8b5cf6;"></i>
+            {% if current_lang == 'he' %}תובנות מהירות{% elif current_lang == 'en' %}Quick Insights{% else %}Быстрые инсайты{% endif %}
+          </h6>
+          
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="p-2 rounded-3 text-center" style="background: rgba(139,92,246,0.08);">
+                <div class="small text-muted">{% if current_lang == 'he' %}דוחות החודש{% elif current_lang == 'en' %}Reports this month{% else %}Отчетов за месяц{% endif %}</div>
+                <div class="h5 mb-0" style="color: #8b5cf6;">{{ total_reports }}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded-3 text-center" style="background: rgba(46,160,255,0.08);">
+                <div class="small text-muted">{% if current_lang == 'he' %}ימים עם נתונים{% elif current_lang == 'en' %}Days with data{% else %}Дней с данными{% endif %}</div>
+                <div class="h5 mb-0" style="color: #2ea0ff;">{{ latest_summary.get('unique_days', latest_summary.get('days', '—')) }}</div>
+              </div>
+            </div>
+          </div>
+          
+          {% if latest_summary.get('peak_hour') or latest_summary.get('best_day') %}
+          <div class="mt-2 p-2 rounded-3" style="background: rgba(251,191,36,0.08);">
+            <div class="small">
+              {% if latest_summary.get('peak_hour') %}
+              <span class="me-3"><i class="bi bi-clock me-1" style="color: #fbbf24;"></i>{% if current_lang == 'he' %}שעת שיא:{% elif current_lang == 'en' %}Peak:{% else %}Пик:{% endif %} {{ latest_summary.get('peak_hour') }}</span>
+              {% endif %}
+              {% if latest_summary.get('best_day') %}
+              <span><i class="bi bi-calendar-check me-1" style="color: #fbbf24;"></i>{% if current_lang == 'he' %}יום הכי טוב:{% elif current_lang == 'en' %}Best:{% else %}Лучший:{% endif %} {{ latest_summary.get('best_day') }}</span>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Forecast & Recommendations -->
+  {% if total_sales > 0 %}
+  <div class="card mb-4" style="border: 2px solid rgba(46,160,255,0.2); border-radius: 16px; background: linear-gradient(135deg, rgba(46,160,255,0.03), transparent);">
+    <div class="card-header bg-transparent" style="border-bottom: 1px solid rgba(46,160,255,0.1);">
+      <h5 class="mb-0">
+        <i class="bi bi-bullseye me-2" style="color: #2ea0ff;"></i>
+        {% if current_lang == 'he' %}תחזית והמלצות{% elif current_lang == 'en' %}Forecast & Recommendations{% else %}Прогноз и рекомендации{% endif %}
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="text-center p-3 rounded-3" style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);">
+            <div class="small text-muted mb-1">{% if current_lang == 'he' %}תחזית לחודש הבא{% elif current_lang == 'en' %}Next Month Forecast{% else %}Прогноз на сл. месяц{% endif %}</div>
+            <div class="h4 mb-0" style="color: #10b981;">
+              {% if comparison and comparison.changes.total_pct %}
+                {% set forecast = latest_summary.get('total_sales', 0) * (1 + comparison.changes.total_pct / 100) %}
+                {{ currency_symbol }}{{ "{:,.0f}".format(forecast) }}
+              {% else %}
+                {{ currency_symbol }}{{ "{:,.0f}".format(latest_summary.get('total_sales', 0)) }}
+              {% endif %}
+            </div>
+            <div class="small text-muted">{% if current_lang == 'he' %}בהתבסס על המגמה{% elif current_lang == 'en' %}based on trend{% else %}по тренду{% endif %}</div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <h6 class="mb-2">{% if current_lang == 'he' %}המלצות לפעולה{% elif current_lang == 'en' %}Action Recommendations{% else %}Рекомендации к действию{% endif %}</h6>
+          <ul class="list-unstyled mb-0">
+            {% if comparison and comparison.worst_day %}
+            <li class="mb-2 d-flex align-items-start gap-2">
+              <i class="bi bi-arrow-right-circle" style="color: #ef4444; margin-top: 2px;"></i>
+              <span>{% if current_lang == 'he' %}שפר את המכירות ביום {{ comparison.worst_day.name }} – הוא היום החלש ביותר{% elif current_lang == 'en' %}Improve sales on {{ comparison.worst_day.name }} – it's the weakest day{% else %}Улучшите продажи в {{ comparison.worst_day.name }} – это самый слабый день{% endif %}</span>
+            </li>
+            {% endif %}
+            {% if comparison and comparison.changes.avg_ticket_pct|default(0) < 0 %}
+            <li class="mb-2 d-flex align-items-start gap-2">
+              <i class="bi bi-arrow-right-circle" style="color: #f59e0b; margin-top: 2px;"></i>
+              <span>{% if current_lang == 'he' %}הממוצע לעסקה ירד – נסה להציע חבילות או מוצרים משלימים{% elif current_lang == 'en' %}Average ticket decreased – try offering bundles or complementary products{% else %}Средний чек снизился – попробуйте предлагать комплекты{% endif %}</span>
+            </li>
+            {% endif %}
+            <li class="d-flex align-items-start gap-2">
+              <i class="bi bi-arrow-right-circle" style="color: #10b981; margin-top: 2px;"></i>
+              <span>{% if current_lang == 'he' %}העלה דוח חדש בכל שבוע כדי לעקוב אחר השינויים{% elif current_lang == 'en' %}Upload a new report weekly to track changes{% else %}Загружайте новый отчет каждую неделю для отслеживания{% endif %}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- טיפ לשימוש -->
-  <div class="alert alert-light border mt-4">
+  <div class="alert mb-4" style="border-radius: 12px; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2);">
     <div class="d-flex gap-3">
       <div class="fs-3">💡</div>
       <div>

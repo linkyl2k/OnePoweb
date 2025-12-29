@@ -2,7 +2,13 @@
 {% block content %}
 <div class="container my-4" {% if current_lang == 'he' %}dir="rtl" style="text-align:right"{% endif %}>
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">{% if current_lang == 'he' %}פוטנציאל שיפור (חודשי){% elif current_lang == 'en' %}Improvement Potential (Monthly){% else %}Потенциал улучшения (месячный){% endif %}</h3>
+    <div>
+      <h3 class="mb-1">
+        <i class="bi bi-rocket-takeoff me-2" style="color: #10b981;"></i>
+        {% if current_lang == 'he' %}פוטנציאל שיפור (חודשי){% elif current_lang == 'en' %}Improvement Potential (Monthly){% else %}Потенциал улучшения (месячный){% endif %}
+      </h3>
+      <p class="text-muted mb-0 small">{% if current_lang == 'he' %}ניתוח אישי על בסיס הנתונים שלך{% elif current_lang == 'en' %}Personal analysis based on your data{% else %}Персональный анализ на основе ваших данных{% endif %}</p>
+    </div>
     <div class="d-flex gap-2">
       <a class="btn btn-outline-secondary" href="{{ url_for('result') }}">{% if current_lang == 'he' %}חזרה לתוצאות{% elif current_lang == 'en' %}Back to Results{% else %}Вернуться к результатам{% endif %}</a>
       <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">{% if current_lang == 'he' %}הורדת PDF{% elif current_lang == 'en' %}Download PDF{% else %}Скачать PDF{% endif %}</a>
@@ -12,81 +18,372 @@
   {% if not has_any %}
     <div class="alert alert-warning">{% if current_lang == 'he' %}לא חושב פוטנציאל לדוח הזה. נסה לטעון דוח מחדש מהדף הראשי.{% elif current_lang == 'en' %}No potential calculated for this report. Try uploading a new report from the main page.{% else %}Потенциал для этого отчета не рассчитан. Попробуйте загрузить новый отчет с главной страницы.{% endif %}</div>
   {% else %}
+  
+    <!-- Quick Summary Cards -->
+    {% set _gain = roi.monthly_gain or 0 %}
+    {% set _roi  = roi.roi_percent or 0 %}
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="card h-100" style="border: none; background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(34,197,94,0.05)); border-radius: 16px;">
+          <div class="card-body text-center py-4">
+            <div style="width: 50px; height: 50px; margin: 0 auto 1rem; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-graph-up-arrow text-white" style="font-size: 1.3rem;"></i>
+            </div>
+            <div class="small text-muted mb-1">{% if current_lang == 'he' %}פוטנציאל חודשי{% elif current_lang == 'en' %}Monthly Potential{% else %}Месячный потенциал{% endif %}</div>
+            <div class="h4 mb-0" style="color: #10b981; font-weight: 700;">+{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card h-100" style="border: none; background: linear-gradient(135deg, rgba(46,160,255,0.1), rgba(59,130,246,0.05)); border-radius: 16px;">
+          <div class="card-body text-center py-4">
+            <div style="width: 50px; height: 50px; margin: 0 auto 1rem; background: linear-gradient(135deg, #2ea0ff, #3b82f6); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-percent text-white" style="font-size: 1.3rem;"></i>
+            </div>
+            <div class="small text-muted mb-1">{% if current_lang == 'he' %}תשואה תיאורטית{% elif current_lang == 'en' %}Theoretical ROI{% else %}Теор. ROI{% endif %}</div>
+            <div class="h4 mb-0" style="color: #2ea0ff; font-weight: 700;">{{ "{:,.0f}".format(_roi) }}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card h-100" style="border: none; background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05)); border-radius: 16px;">
+          <div class="card-body text-center py-4">
+            <div style="width: 50px; height: 50px; margin: 0 auto 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-calendar-check text-white" style="font-size: 1.3rem;"></i>
+            </div>
+            <div class="small text-muted mb-1">{% if current_lang == 'he' %}פוטנציאל שנתי{% elif current_lang == 'en' %}Yearly Potential{% else %}Годовой потенциал{% endif %}</div>
+            <div class="h4 mb-0" style="color: #f59e0b; font-weight: 700;">+{{ currency_symbol }}{{ "{:,.0f}".format(_gain * 12) }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card h-100" style="border: none; background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(124,58,237,0.05)); border-radius: 16px;">
+          <div class="card-body text-center py-4">
+            <div style="width: 50px; height: 50px; margin: 0 auto 1rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-lightning-charge text-white" style="font-size: 1.3rem;"></i>
+            </div>
+            <div class="small text-muted mb-1">{% if current_lang == 'he' %}החזר השקעה{% elif current_lang == 'en' %}Payback Time{% else %}Окупаемость{% endif %}</div>
+            <div class="h4 mb-0" style="color: #8b5cf6; font-weight: 700;">{% if _gain > 0 %}{{ "{:.0f}".format((roi.service_cost or 149) / _gain * 30) }} {% if current_lang == 'he' %}ימים{% elif current_lang == 'en' %}days{% else %}дней{% endif %}{% else %}—{% endif %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- What-If Calculator -->
+    <div class="card mb-4" style="border: 2px solid rgba(139,92,246,0.3); border-radius: 16px; background: linear-gradient(135deg, rgba(139,92,246,0.05), rgba(124,58,237,0.02));">
+      <div class="card-header bg-transparent" style="border-bottom: 1px solid rgba(139,92,246,0.2);">
+        <h5 class="mb-0">
+          <i class="bi bi-sliders me-2" style="color: #8b5cf6;"></i>
+          {% if current_lang == 'he' %}מחשבון "מה אם"{% elif current_lang == 'en' %}"What If" Calculator{% else %}Калькулятор "Что если"{% endif %}
+        </h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-3">{% if current_lang == 'he' %}התאם את הפרמטרים לראות איך שינויים קטנים משפיעים על ההכנסות{% elif current_lang == 'en' %}Adjust parameters to see how small changes affect revenue{% else %}Настройте параметры, чтобы увидеть, как небольшие изменения влияют на выручку{% endif %}</p>
+        
+        <div class="row g-4">
+          <div class="col-md-4">
+            <label class="form-label small">{% if current_lang == 'he' %}הגדלת עסקאות ביום החלש (%){% elif current_lang == 'en' %}Increase weak day transactions (%){% else %}Увеличение транзакций в слабый день (%){% endif %}</label>
+            <input type="range" class="form-range" id="weakDaySlider" min="0" max="50" value="10" oninput="updateWhatIf()">
+            <div class="d-flex justify-content-between small text-muted">
+              <span>0%</span>
+              <span id="weakDayValue" class="fw-bold" style="color: #8b5cf6;">10%</span>
+              <span>50%</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">{% if current_lang == 'he' %}הגדלת ממוצע לעסקה (%){% elif current_lang == 'en' %}Increase average ticket (%){% else %}Увеличение среднего чека (%){% endif %}</label>
+            <input type="range" class="form-range" id="avgTicketSlider" min="0" max="30" value="5" oninput="updateWhatIf()">
+            <div class="d-flex justify-content-between small text-muted">
+              <span>0%</span>
+              <span id="avgTicketValue" class="fw-bold" style="color: #8b5cf6;">5%</span>
+              <span>30%</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">{% if current_lang == 'he' %}הארכת שעות פעילות{% elif current_lang == 'en' %}Extended hours (revenue %){% else %}Расширение часов работы (% выручки){% endif %}</label>
+            <input type="range" class="form-range" id="extendedHoursSlider" min="0" max="20" value="5" oninput="updateWhatIf()">
+            <div class="d-flex justify-content-between small text-muted">
+              <span>0%</span>
+              <span id="extendedHoursValue" class="fw-bold" style="color: #8b5cf6;">5%</span>
+              <span>20%</span>
+            </div>
+          </div>
+        </div>
+        
+        <hr style="border-color: rgba(139,92,246,0.2);">
+        
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="p-3 rounded-3 text-center" style="background: rgba(139,92,246,0.1);">
+              <div class="small text-muted mb-1">{% if current_lang == 'he' %}פוטנציאל משוער חדש{% elif current_lang == 'en' %}New Estimated Potential{% else %}Новый расчётный потенциал{% endif %}</div>
+              <div class="h3 mb-0" id="whatIfResult" style="color: #8b5cf6; font-weight: 700;">+{{ currency_symbol }}{{ "{:,.0f}".format(_gain) }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 rounded-3 text-center" style="background: rgba(16,185,129,0.1);">
+              <div class="small text-muted mb-1">{% if current_lang == 'he' %}תוספת שנתית{% elif current_lang == 'en' %}Yearly Addition{% else %}Годовая добавка{% endif %}</div>
+              <div class="h3 mb-0" id="whatIfYearly" style="color: #10b981; font-weight: 700;">+{{ currency_symbol }}{{ "{:,.0f}".format(_gain * 12) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      const baseGain = {{ _gain }};
+      const currencySymbol = "{{ currency_symbol }}";
+      
+      function updateWhatIf() {
+        const weakDay = parseInt(document.getElementById('weakDaySlider').value);
+        const avgTicket = parseInt(document.getElementById('avgTicketSlider').value);
+        const extendedHours = parseInt(document.getElementById('extendedHoursSlider').value);
+        
+        document.getElementById('weakDayValue').textContent = weakDay + '%';
+        document.getElementById('avgTicketValue').textContent = avgTicket + '%';
+        document.getElementById('extendedHoursValue').textContent = extendedHours + '%';
+        
+        // Calculate new potential
+        const multiplier = 1 + (weakDay / 100) + (avgTicket / 100) + (extendedHours / 100);
+        const newGain = Math.round(baseGain * multiplier);
+        
+        document.getElementById('whatIfResult').textContent = '+' + currencySymbol + newGain.toLocaleString();
+        document.getElementById('whatIfYearly').textContent = '+' + currencySymbol + (newGain * 12).toLocaleString();
+      }
+    </script>
+    <!-- Goals Checklist -->
+    <div class="card mb-4" style="border: 2px solid rgba(16,185,129,0.3); border-radius: 16px; background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(34,197,94,0.02));">
+      <div class="card-header bg-transparent" style="border-bottom: 1px solid rgba(16,185,129,0.2);">
+        <h5 class="mb-0">
+          <i class="bi bi-check2-square me-2" style="color: #10b981;"></i>
+          {% if current_lang == 'he' %}רשימת יעדים להשגת הפוטנציאל{% elif current_lang == 'en' %}Goals Checklist to Achieve Potential{% else %}Чеклист целей для достижения потенциала{% endif %}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="goal-item p-3 rounded-3 mb-2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.2); cursor: pointer;" onclick="toggleGoal(this)">
+              <div class="d-flex align-items-center gap-3">
+                <div class="goal-checkbox" style="width: 24px; height: 24px; border: 2px solid #10b981; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-check text-success" style="display: none;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{% if current_lang == 'he' %}ניתוח יום חלש{% elif current_lang == 'en' %}Analyze weak day{% else %}Анализ слабого дня{% endif %}</div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}זיהוי הסיבות לירידה במכירות{% elif current_lang == 'en' %}Identify reasons for sales drop{% else %}Определить причины падения продаж{% endif %}</div>
+                </div>
+              </div>
+            </div>
+            <div class="goal-item p-3 rounded-3 mb-2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.2); cursor: pointer;" onclick="toggleGoal(this)">
+              <div class="d-flex align-items-center gap-3">
+                <div class="goal-checkbox" style="width: 24px; height: 24px; border: 2px solid #10b981; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-check text-success" style="display: none;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{% if current_lang == 'he' %}יצירת מבצע{% elif current_lang == 'en' %}Create promotion{% else %}Создать акцию{% endif %}</div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}הכנת מבצע ליום החלש{% elif current_lang == 'en' %}Prepare promotion for weak day{% else %}Подготовить акцию на слабый день{% endif %}</div>
+                </div>
+              </div>
+            </div>
+            <div class="goal-item p-3 rounded-3 mb-2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.2); cursor: pointer;" onclick="toggleGoal(this)">
+              <div class="d-flex align-items-center gap-3">
+                <div class="goal-checkbox" style="width: 24px; height: 24px; border: 2px solid #10b981; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-check text-success" style="display: none;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{% if current_lang == 'he' %}שיפור שעות ערב{% elif current_lang == 'en' %}Improve evening hours{% else %}Улучшить вечерние часы{% endif %}</div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}תפריט ערב מיוחד או הנחות{% elif current_lang == 'en' %}Special evening menu or discounts{% else %}Специальное вечернее меню или скидки{% endif %}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="goal-item p-3 rounded-3 mb-2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.2); cursor: pointer;" onclick="toggleGoal(this)">
+              <div class="d-flex align-items-center gap-3">
+                <div class="goal-checkbox" style="width: 24px; height: 24px; border: 2px solid #10b981; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-check text-success" style="display: none;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{% if current_lang == 'he' %}קידום מוצרים{% elif current_lang == 'en' %}Promote products{% else %}Продвижение товаров{% endif %}</div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}חבילות למוצרים עם מכירות נמוכות{% elif current_lang == 'en' %}Bundles for low-selling products{% else %}Пакеты для товаров с низкими продажами{% endif %}</div>
+                </div>
+              </div>
+            </div>
+            <div class="goal-item p-3 rounded-3 mb-2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.2); cursor: pointer;" onclick="toggleGoal(this)">
+              <div class="d-flex align-items-center gap-3">
+                <div class="goal-checkbox" style="width: 24px; height: 24px; border: 2px solid #10b981; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-check text-success" style="display: none;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{% if current_lang == 'he' %}העלאת דוח חדש{% elif current_lang == 'en' %}Upload new report{% else %}Загрузить новый отчет{% endif %}</div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}מעקב אחרי תוצאות השינויים{% elif current_lang == 'en' %}Track results of changes{% else %}Отслеживание результатов изменений{% endif %}</div>
+                </div>
+              </div>
+            </div>
+            <div class="goal-item p-3 rounded-3 mb-2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.2); cursor: pointer;" onclick="toggleGoal(this)">
+              <div class="d-flex align-items-center gap-3">
+                <div class="goal-checkbox" style="width: 24px; height: 24px; border: 2px solid #10b981; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                  <i class="bi bi-check text-success" style="display: none;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{% if current_lang == 'he' %}השוואת תקופות{% elif current_lang == 'en' %}Compare periods{% else %}Сравнить периоды{% endif %}</div>
+                  <div class="small text-muted">{% if current_lang == 'he' %}לראות אם יש שיפור{% elif current_lang == 'en' %}See if there's improvement{% else %}Проверить улучшения{% endif %}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-3 p-3 rounded-3" style="background: rgba(16,185,129,0.1);">
+          <div class="d-flex justify-content-between align-items-center">
+            <span>{% if current_lang == 'he' %}התקדמות{% elif current_lang == 'en' %}Progress{% else %}Прогресс{% endif %}</span>
+            <span id="goalProgress" class="fw-bold" style="color: #10b981;">0/6</span>
+          </div>
+          <div class="progress mt-2" style="height: 8px; border-radius: 4px;">
+            <div class="progress-bar" id="goalProgressBar" role="progressbar" style="width: 0%; background: linear-gradient(90deg, #10b981, #34d399);" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      function toggleGoal(element) {
+        const checkbox = element.querySelector('.goal-checkbox');
+        const icon = checkbox.querySelector('i');
+        const isChecked = icon.style.display !== 'none';
+        
+        if (isChecked) {
+          icon.style.display = 'none';
+          checkbox.style.background = 'transparent';
+          element.style.borderColor = 'rgba(16,185,129,0.2)';
+        } else {
+          icon.style.display = 'block';
+          checkbox.style.background = 'rgba(16,185,129,0.2)';
+          element.style.borderColor = '#10b981';
+        }
+        
+        updateGoalProgress();
+      }
+      
+      function updateGoalProgress() {
+        const total = document.querySelectorAll('.goal-item').length;
+        const checked = document.querySelectorAll('.goal-checkbox i[style*="display: block"]').length;
+        document.getElementById('goalProgress').textContent = checked + '/' + total;
+        document.getElementById('goalProgressBar').style.width = (checked / total * 100) + '%';
+      }
+    </script>
+    
     <!-- Disclaimer -->
-    <div class="alert alert-info mb-4" style="border-radius: 12px;">
-      <i class="bi bi-info-circle me-2"></i>
+    <div class="alert mb-4" style="border-radius: 12px; background: rgba(46,160,255,0.1); border: 1px solid rgba(46,160,255,0.2);">
+      <i class="bi bi-info-circle me-2" style="color: #2ea0ff;"></i>
       <strong>{% if current_lang == 'he' %}חשוב:{% elif current_lang == 'en' %}Important:{% else %}Важно:{% endif %}</strong> 
       {% if current_lang == 'he' %}
         הנתונים מציגים <u>פוטנציאל תיאורטי</u> על בסיס ניתוח הדוח. התוצאות בפועל תלויות בפעולות שתנקטו ובתנאי השוק. אנחנו מספקים תובנות — ההצלחה תלויה ביישום שלכם.
       {% elif current_lang == 'en' %}
         The data shows <u>theoretical potential</u> based on report analysis. Actual results depend on actions taken and market conditions. We provide insights — success depends on your implementation.
-  {% else %}
+      {% else %}
         Данные показывают <u>теоретический потенциал</u> на основе анализа отчета. Фактические результаты зависят от предпринятых действий и рыночных условий. Мы предоставляем инсайты — успех зависит от вашей реализации.
       {% endif %}
     </div>
 
-    <div class="card mb-4" style="border-color: rgba(16,185,129,0.3);">
-      <div class="card-body">
-        {% set _gain = roi.monthly_gain or 0 %}
-        {% set _roi  = roi.roi_percent or 0 %}
+    <div class="card mb-4" style="border: none; border-radius: 16px; background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(34,197,94,0.02));">
+      <div class="card-body p-4">
 
-        <h5 class="mb-3">
+        <h5 class="mb-4">
           <i class="bi bi-lightbulb me-2" style="color: #fbbf24;"></i>
           {% if current_lang == 'he' %}הזדמנויות שזיהינו בדוח שלך{% elif current_lang == 'en' %}Opportunities We Found in Your Report{% else %}Возможности, которые мы нашли в вашем отчете{% endif %}
         </h5>
 
         {% if roi.components %}
-          <div class="mb-4">
+          <div class="row g-3 mb-4">
               {% if roi.components.weak_day %}
                 {% set c = roi.components.weak_day %}
-              <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>{% if current_lang == 'he' %}יום '{{ c.day }}' חלש יחסית{% elif current_lang == 'en' %}Weak '{{ c.day }}' day{% else %}Слабый день '{{ c.day }}'{% endif %}</strong>
-                    <div class="small text-muted">
-                      {% if current_lang == 'he' %}אם תצליחו לסגור {{ c.achievable_percent or 30 }}% מהפער לימים רגילים{% elif current_lang == 'en' %}If you can close {{ c.achievable_percent or 30 }}% of the gap to regular days{% else %}Если вы сможете закрыть {{ c.achievable_percent or 30 }}% разрыва с обычными днями{% endif %}
+              <div class="col-md-4">
+                <div class="card h-100" style="border: 2px solid rgba(16,185,129,0.3); border-radius: 14px; background: linear-gradient(135deg, rgba(16,185,129,0.08), transparent);">
+                  <div class="card-body text-center">
+                    <div style="width: 56px; height: 56px; margin: 0 auto 1rem; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                      <i class="bi bi-calendar-x text-white" style="font-size: 1.5rem;"></i>
                     </div>
+                    <h6 class="mb-2">{% if current_lang == 'he' %}יום '{{ c.day }}' חלש{% elif current_lang == 'en' %}Weak '{{ c.day }}'{% else %}Слабый '{{ c.day }}'{% endif %}</h6>
+                    <div class="small text-muted mb-3">
+                      {% if current_lang == 'he' %}סגירת {{ c.achievable_percent or 30 }}% מהפער{% elif current_lang == 'en' %}Close {{ c.achievable_percent or 30 }}% gap{% else %}Закрыть {{ c.achievable_percent or 30 }}% разрыва{% endif %}
+                    </div>
+                    <div class="h4 mb-0" style="color: #10b981; font-weight: 700;">
+                      +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}
+                    </div>
+                    <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}/month{% else %}/месяц{% endif %}</div>
                   </div>
-                  <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399;">
-                    {% if current_lang == 'he' %}עד +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
-                  </span>
                 </div>
               </div>
               {% endif %}
             
               {% if roi.components.evening_hours %}
                 {% set c = roi.components.evening_hours %}
-              <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>{% if current_lang == 'he' %}שעות ערב חלשות{% elif current_lang == 'en' %}Weak Evening Hours{% else %}Слабые вечерние часы{% endif %}</strong>
-                    <div class="small text-muted">
-                      {% if current_lang == 'he' %}פוטנציאל אם תחזקו פעילות בשעות 17:00-20:00{% elif current_lang == 'en' %}Potential if you strengthen activity during 17:00-20:00{% else %}Потенциал, если усилите активность в 17:00-20:00{% endif %}
+              <div class="col-md-4">
+                <div class="card h-100" style="border: 2px solid rgba(46,160,255,0.3); border-radius: 14px; background: linear-gradient(135deg, rgba(46,160,255,0.08), transparent);">
+                  <div class="card-body text-center">
+                    <div style="width: 56px; height: 56px; margin: 0 auto 1rem; background: linear-gradient(135deg, #2ea0ff, #3b82f6); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                      <i class="bi bi-moon-stars text-white" style="font-size: 1.5rem;"></i>
                     </div>
+                    <h6 class="mb-2">{% if current_lang == 'he' %}שעות ערב{% elif current_lang == 'en' %}Evening Hours{% else %}Вечерние часы{% endif %}</h6>
+                    <div class="small text-muted mb-3">
+                      {% if current_lang == 'he' %}חיזוק 17:00-20:00{% elif current_lang == 'en' %}Strengthen 17:00-20:00{% else %}Усилить 17:00-20:00{% endif %}
+                    </div>
+                    <div class="h4 mb-0" style="color: #2ea0ff; font-weight: 700;">
+                      +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}
+                    </div>
+                    <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}/month{% else %}/месяц{% endif %}</div>
                   </div>
-                  <span class="badge" style="background: rgba(46,160,255,0.15); color: #34c3ff;">
-                    {% if current_lang == 'he' %}עד +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
-                  </span>
                 </div>
               </div>
               {% endif %}
             
               {% if roi.components.tail_products %}
                 {% set c = roi.components.tail_products %}
-              <div class="p-3 mb-2" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>{% if current_lang == 'he' %}מוצרים בעלי מכירות נמוכות{% elif current_lang == 'en' %}Products with Low Sales{% else %}Товары с низкими продажами{% endif %}</strong>
-                    <div class="small text-muted">
-                      {% if current_lang == 'he' %}קידום קל (+5%) של מוצרים בתחתית הסל{% elif current_lang == 'en' %}Easy promotion (+5%) of bottom products{% else %}Легкое продвижение (+5%) товаров внизу списка{% endif %}
+              <div class="col-md-4">
+                <div class="card h-100" style="border: 2px solid rgba(251,191,36,0.3); border-radius: 14px; background: linear-gradient(135deg, rgba(251,191,36,0.08), transparent);">
+                  <div class="card-body text-center">
+                    <div style="width: 56px; height: 56px; margin: 0 auto 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                      <i class="bi bi-box-seam text-white" style="font-size: 1.5rem;"></i>
                     </div>
+                    <h6 class="mb-2">{% if current_lang == 'he' %}מוצרים חלשים{% elif current_lang == 'en' %}Low Products{% else %}Слабые товары{% endif %}</h6>
+                    <div class="small text-muted mb-3">
+                      {% if current_lang == 'he' %}קידום +5%{% elif current_lang == 'en' %}Promote +5%{% else %}Продвижение +5%{% endif %}
+                    </div>
+                    <div class="h4 mb-0" style="color: #f59e0b; font-weight: 700;">
+                      +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}
+                    </div>
+                    <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}/month{% else %}/месяц{% endif %}</div>
                   </div>
-                  <span class="badge" style="background: rgba(251,191,36,0.15); color: #fbbf24;">
-                    {% if current_lang == 'he' %}עד +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/חודש{% elif current_lang == 'en' %}Up to +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/month{% else %}До +{{ currency_symbol }}{{ "{:,.0f}".format(c.monthly_gain or 0) }}/месяц{% endif %}
-                  </span>
                 </div>
+              </div>
+              {% endif %}
           </div>
-        {% endif %}
+          
+          <!-- Visual Breakdown -->
+          <div class="p-3 rounded-3 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+            <h6 class="mb-3">{% if current_lang == 'he' %}התפלגות הפוטנציאל{% elif current_lang == 'en' %}Potential Breakdown{% else %}Распределение потенциала{% endif %}</h6>
+            {% set total_pot = (roi.components.weak_day.monthly_gain or 0) + (roi.components.evening_hours.monthly_gain or 0) + (roi.components.tail_products.monthly_gain or 0) if roi.components else 1 %}
+            <div class="d-flex rounded-3 overflow-hidden" style="height: 24px;">
+              {% if roi.components.weak_day %}
+              <div style="width: {{ (roi.components.weak_day.monthly_gain or 0) / total_pot * 100 }}%; background: linear-gradient(90deg, #10b981, #34d399);" title="{% if current_lang == 'he' %}יום חלש{% elif current_lang == 'en' %}Weak Day{% else %}Слабый день{% endif %}"></div>
+              {% endif %}
+              {% if roi.components.evening_hours %}
+              <div style="width: {{ (roi.components.evening_hours.monthly_gain or 0) / total_pot * 100 }}%; background: linear-gradient(90deg, #2ea0ff, #3b82f6);" title="{% if current_lang == 'he' %}שעות ערב{% elif current_lang == 'en' %}Evening{% else %}Вечер{% endif %}"></div>
+              {% endif %}
+              {% if roi.components.tail_products %}
+              <div style="width: {{ (roi.components.tail_products.monthly_gain or 0) / total_pot * 100 }}%; background: linear-gradient(90deg, #fbbf24, #f59e0b);" title="{% if current_lang == 'he' %}מוצרים{% elif current_lang == 'en' %}Products{% else %}Товары{% endif %}"></div>
+              {% endif %}
+            </div>
+            <div class="d-flex justify-content-between mt-2 small">
+              {% if roi.components.weak_day %}
+              <span><span style="display: inline-block; width: 12px; height: 12px; background: #10b981; border-radius: 3px; margin-left: 4px;"></span> {% if current_lang == 'he' %}יום חלש{% elif current_lang == 'en' %}Weak Day{% else %}Слабый день{% endif %} ({{ ((roi.components.weak_day.monthly_gain or 0) / total_pot * 100)|round|int }}%)</span>
+              {% endif %}
+              {% if roi.components.evening_hours %}
+              <span><span style="display: inline-block; width: 12px; height: 12px; background: #2ea0ff; border-radius: 3px; margin-left: 4px;"></span> {% if current_lang == 'he' %}ערב{% elif current_lang == 'en' %}Evening{% else %}Вечер{% endif %} ({{ ((roi.components.evening_hours.monthly_gain or 0) / total_pot * 100)|round|int }}%)</span>
+              {% endif %}
+              {% if roi.components.tail_products %}
+              <span><span style="display: inline-block; width: 12px; height: 12px; background: #fbbf24; border-radius: 3px; margin-left: 4px;"></span> {% if current_lang == 'he' %}מוצרים{% elif current_lang == 'en' %}Products{% else %}Товары{% endif %} ({{ ((roi.components.tail_products.monthly_gain or 0) / total_pot * 100)|round|int }}%)</span>
+              {% endif %}
+            </div>
           </div>
         {% endif %}
 

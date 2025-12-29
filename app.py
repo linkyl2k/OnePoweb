@@ -3451,27 +3451,131 @@ def delete_report(report_id: int, user_id: int) -> bool:
 
 def compare_periods(df1: pd.DataFrame, df2: pd.DataFrame) -> dict:
     """
-    משווה בין שתי תקופות ומחזיר תובנות.
+    משווה בין שתי תקופות ומחזיר תובנות מפורטות.
+    Enhanced comparison with weekday analysis, hourly patterns, and top products.
     """
+    current_lang = get_language()
+    
     def calc_metrics(df):
+        total = float(pd.to_numeric(df[COL_SUM], errors='coerce').fillna(0).sum()) if COL_SUM in df.columns else 0
+        days = df[COL_DATE].nunique() if COL_DATE in df.columns else 0
+        transactions = len(df)
+        avg_ticket = total / transactions if transactions > 0 else 0
         return {
-            "total": float(pd.to_numeric(df[COL_SUM], errors='coerce').fillna(0).sum()) if COL_SUM in df.columns else 0,
-            "days": df[COL_DATE].nunique() if COL_DATE in df.columns else 0,
-            "avg_daily": 0,
-            "transactions": len(df),
+            "total": total,
+            "days": days,
+            "avg_daily": total / days if days > 0 else 0,
+            "transactions": transactions,
+            "avg_ticket": avg_ticket,
         }
+    
+    def calc_weekday_breakdown(df):
+        """Разбивка по дням недели"""
+        if COL_DATE not in df.columns or COL_SUM not in df.columns:
+            return {}
+        try:
+            df_temp = df.copy()
+            df_temp['_date'] = pd.to_datetime(df_temp[COL_DATE], errors='coerce')
+            df_temp['_weekday'] = df_temp['_date'].dt.dayofweek
+            df_temp['_sum'] = pd.to_numeric(df_temp[COL_SUM], errors='coerce').fillna(0)
+            
+            weekday_names = {
+                'he': ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'],
+                'en': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                'ru': ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
+            }
+            names = weekday_names.get(current_lang, weekday_names['en'])
+            
+            breakdown = {}
+            for wd in range(7):
+                day_data = df_temp[df_temp['_weekday'] == wd]
+                day_total = day_data['_sum'].sum()
+                day_count = len(day_data)
+                breakdown[names[wd]] = {
+                    "total": float(day_total),
+                    "count": day_count,
+                    "avg": float(day_total / day_count) if day_count > 0 else 0
+                }
+            return breakdown
+        except:
+            return {}
+    
+    def calc_hourly_breakdown(df):
+        """Разбивка по часам"""
+        if COL_TIME not in df.columns or COL_SUM not in df.columns:
+            return {}
+        try:
+            df_temp = df.copy()
+            df_temp['_hour'] = pd.to_datetime(df_temp[COL_TIME], format='%H:%M:%S', errors='coerce').dt.hour
+            df_temp['_sum'] = pd.to_numeric(df_temp[COL_SUM], errors='coerce').fillna(0)
+            
+            breakdown = {}
+            for hour in range(24):
+                hour_data = df_temp[df_temp['_hour'] == hour]
+                hour_total = hour_data['_sum'].sum()
+                hour_count = len(hour_data)
+                if hour_count > 0:
+                    breakdown[f"{hour:02d}:00"] = {
+                        "total": float(hour_total),
+                        "count": hour_count,
+                        "avg": float(hour_total / hour_count)
+                    }
+            return breakdown
+        except:
+            return {}
+    
+    def get_top_products(df, top_n=5):
+        """Топ продуктов по выручке"""
+        if COL_ITEM not in df.columns or COL_SUM not in df.columns:
+            return []
+        try:
+            df_temp = df.copy()
+            df_temp['_sum'] = pd.to_numeric(df_temp[COL_SUM], errors='coerce').fillna(0)
+            top = df_temp.groupby(COL_ITEM)['_sum'].sum().nlargest(top_n)
+            return [{"name": name, "total": float(val)} for name, val in top.items()]
+        except:
+            return []
     
     m1 = calc_metrics(df1)
     m2 = calc_metrics(df2)
     
-    m1["avg_daily"] = m1["total"] / m1["days"] if m1["days"] > 0 else 0
-    m2["avg_daily"] = m2["total"] / m2["days"] if m2["days"] > 0 else 0
-    
-    # חישוב שינויים באחוזים
+    # Расчёт изменений в процентах
     def pct_change(old, new):
         if old == 0:
             return 100 if new > 0 else 0
         return round((new - old) / old * 100, 1)
+    
+    # Расчёт разбивки по дням недели
+    weekday1 = calc_weekday_breakdown(df1)
+    weekday2 = calc_weekday_breakdown(df2)
+    
+    # Сравнение по дням недели
+    weekday_comparison = {}
+    for day in weekday2.keys():
+        old_val = weekday1.get(day, {}).get("total", 0)
+        new_val = weekday2.get(day, {}).get("total", 0)
+        weekday_comparison[day] = {
+            "period1": old_val,
+            "period2": new_val,
+            "change_pct": pct_change(old_val, new_val),
+            "change_abs": new_val - old_val
+        }
+    
+    # Расчёт по часам
+    hourly1 = calc_hourly_breakdown(df1)
+    hourly2 = calc_hourly_breakdown(df2)
+    
+    # Топ продукты
+    top_products1 = get_top_products(df1)
+    top_products2 = get_top_products(df2)
+    
+    # Определение лучшего и худшего дня
+    best_day = max(weekday_comparison.items(), key=lambda x: x[1]["change_pct"]) if weekday_comparison else None
+    worst_day = min(weekday_comparison.items(), key=lambda x: x[1]["change_pct"]) if weekday_comparison else None
+    
+    # Определение пиковых часов
+    peak_hours1 = sorted(hourly1.items(), key=lambda x: x[1]["total"], reverse=True)[:3] if hourly1 else []
+    peak_hours2 = sorted(hourly2.items(), key=lambda x: x[1]["total"], reverse=True)[:3] if hourly2 else []
     
     return {
         "period1": m1,
@@ -3480,24 +3584,69 @@ def compare_periods(df1: pd.DataFrame, df2: pd.DataFrame) -> dict:
             "total_pct": pct_change(m1["total"], m2["total"]),
             "avg_daily_pct": pct_change(m1["avg_daily"], m2["avg_daily"]),
             "transactions_pct": pct_change(m1["transactions"], m2["transactions"]),
+            "avg_ticket_pct": pct_change(m1["avg_ticket"], m2["avg_ticket"]),
         },
-        "insight": _generate_comparison_insight(m1, m2)
+        "weekday_comparison": weekday_comparison,
+        "best_day": {"name": best_day[0], "data": best_day[1]} if best_day else None,
+        "worst_day": {"name": worst_day[0], "data": worst_day[1]} if worst_day else None,
+        "peak_hours": {
+            "period1": [{"hour": h[0], "total": h[1]["total"]} for h in peak_hours1],
+            "period2": [{"hour": h[0], "total": h[1]["total"]} for h in peak_hours2],
+        },
+        "top_products": {
+            "period1": top_products1,
+            "period2": top_products2,
+        },
+        "insight": _generate_comparison_insight(m1, m2, best_day, worst_day, current_lang)
     }
 
 
-def _generate_comparison_insight(m1: dict, m2: dict) -> str:
-    """יצירת תובנה טקסטואלית להשוואה"""
-    total_change = m2["total"] - m1["total"]
+def _generate_comparison_insight(m1: dict, m2: dict, best_day=None, worst_day=None, lang='en') -> str:
+    """יצירת תובנה טקסטואלית להשוואה עם פרטים על ימים"""
     pct = ((m2["total"] - m1["total"]) / m1["total"] * 100) if m1["total"] > 0 else 0
     
+    insights = {
+        'he': {
+            'up_big': f"📈 עלייה משמעותית של {pct:.0f}% במכירות! המשך כך.",
+            'up_small': f"📊 עלייה קלה של {pct:.0f}% במכירות. יש מקום לשיפור.",
+            'down_small': f"📉 ירידה קלה של {abs(pct):.0f}% במכירות. כדאי לבדוק מה השתנה.",
+            'down_big': f"⚠️ ירידה משמעותית של {abs(pct):.0f}% במכירות! דורש תשומת לב.",
+        },
+        'en': {
+            'up_big': f"📈 Significant increase of {pct:.0f}% in sales! Keep it up.",
+            'up_small': f"📊 Slight increase of {pct:.0f}% in sales. Room for improvement.",
+            'down_small': f"📉 Slight decrease of {abs(pct):.0f}% in sales. Worth checking what changed.",
+            'down_big': f"⚠️ Significant decrease of {abs(pct):.0f}% in sales! Needs attention.",
+        },
+        'ru': {
+            'up_big': f"📈 Значительный рост на {pct:.0f}%! Так держать.",
+            'up_small': f"📊 Небольшой рост на {pct:.0f}%. Есть потенциал для улучшения.",
+            'down_small': f"📉 Небольшое снижение на {abs(pct):.0f}%. Стоит проверить, что изменилось.",
+            'down_big': f"⚠️ Значительное снижение на {abs(pct):.0f}%! Требует внимания.",
+        }
+    }
+    
+    msgs = insights.get(lang, insights['en'])
+    
     if pct > 10:
-        return f"📈 עלייה משמעותית של {pct:.0f}% במכירות! המשך כך."
+        base = msgs['up_big']
     elif pct > 0:
-        return f"📊 עלייה קלה של {pct:.0f}% במכירות. יש מקום לשיפור."
+        base = msgs['up_small']
     elif pct > -10:
-        return f"📉 ירידה קלה של {abs(pct):.0f}% במכירות. כדאי לבדוק מה השתנה."
+        base = msgs['down_small']
     else:
-        return f"⚠️ ירידה משמעותית של {abs(pct):.0f}% במכירות! דורש תשומת לב."
+        base = msgs['down_big']
+    
+    # Добавляем информацию о лучшем/худшем дне
+    if best_day and worst_day:
+        day_info = {
+            'he': f" היום הטוב ביותר: {best_day[0]} (+{best_day[1]['change_pct']:.0f}%)",
+            'en': f" Best day: {best_day[0]} (+{best_day[1]['change_pct']:.0f}%)",
+            'ru': f" Лучший день: {best_day[0]} (+{best_day[1]['change_pct']:.0f}%)"
+        }
+        base += day_info.get(lang, day_info['en'])
+    
+    return base
 
 
     # הוספת עמודות חדשות אם חסרות (SQLite סובלנית פה)

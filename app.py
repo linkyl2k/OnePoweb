@@ -3286,7 +3286,15 @@ def _read_report(file_storage_or_path):
     
     # Теперь безопасно преобразуем в числовой формат
     try:
-        df[COL_SUM] = pd.to_numeric(df[COL_SUM], errors="coerce").fillna(0)
+        # Заменяем запятые на точки для русских чисел (777,66 -> 777.66)
+        col_sum_str = df[COL_SUM].astype(str).str.replace(',', '.', regex=False)
+        # Удаляем пробелы и другие символы
+        col_sum_str = col_sum_str.str.replace(' ', '', regex=False)
+        col_sum_str = col_sum_str.str.replace('₽', '', regex=False)
+        col_sum_str = col_sum_str.str.replace('₪', '', regex=False)
+        col_sum_str = col_sum_str.str.replace('$', '', regex=False)
+        # Преобразуем в число
+        df[COL_SUM] = pd.to_numeric(col_sum_str, errors="coerce").fillna(0)
     except TypeError as e:
         # Если все еще ошибка, пробуем другой подход
         print(f"⚠️ TypeError при преобразовании COL_SUM: {e}")
@@ -3294,7 +3302,8 @@ def _read_report(file_storage_or_path):
         print(f"   Первые значения: {df[COL_SUM].head()}")
         # Пробуем преобразовать через astype
         try:
-            df[COL_SUM] = df[COL_SUM].astype(str).replace('', '0').astype(float).fillna(0)
+            col_sum_str = df[COL_SUM].astype(str).str.replace(',', '.', regex=False)
+            df[COL_SUM] = pd.to_numeric(col_sum_str, errors="coerce").fillna(0)
         except Exception as e2:
             raise ValueError(f"שגיאה בהמרת '{COL_SUM}' למספר: {e2}")
 
@@ -3305,18 +3314,38 @@ def _read_report(file_storage_or_path):
     # -------------------------------------------------------
     # 7) המרות תאריך + "שעה עגולה"
     # -------------------------------------------------------
-    df[COL_DATE] = pd.to_datetime(df[COL_DATE], errors="coerce").dt.date
+    # Парсинг дат с учетом формата день.месяц.год для русских дат
+    date_str = df[COL_DATE].astype(str).str.strip()
+    # Пробуем разные форматы
+    df[COL_DATE] = pd.to_datetime(date_str, format='%d.%m.%Y', errors='coerce', dayfirst=True)
+    # Если не получилось, пробуем без формата
+    if df[COL_DATE].isna().any():
+        df[COL_DATE] = pd.to_datetime(date_str, errors='coerce', dayfirst=True)
+    df[COL_DATE] = df[COL_DATE].dt.date
 
     # קבוע לשם העמודה אצלך (אם כבר מוגדר, נשתמש בו; אחרת ניצור)
     hour_col_name = globals().get("HOUR_COL", "שעה עגולה")
 
     # ---- פונקציה משופרת לחישוב 'שעה עגולה' ----
     def _ensure_hour_col(_df, time_col, out_col):
-        # ננסה להמיר לזמן ואז להוציא שעה
-        h_from_dt = pd.to_datetime(_df[time_col].astype(str), errors="coerce").dt.hour
+        # Пробуем разные форматы времени
+        time_str = _df[time_col].astype(str).str.strip()
+        
+        # Формат 1: HH:MM или HH:MM:SS
+        h_from_dt = pd.to_datetime(time_str, format='%H:%M', errors='coerce')
+        if h_from_dt.isna().any():
+            h_from_dt = pd.to_datetime(time_str, format='%H:%M:%S', errors='coerce')
+        if h_from_dt.isna().any():
+            # Пробуем без формата
+            h_from_dt = pd.to_datetime(time_str, errors='coerce')
+        
+        hours_from_dt = h_from_dt.dt.hour
+        
         # fallback: אם השדה הוא מספרי (7, 12, ...)
-        h_from_num = pd.to_numeric(_df[time_col], errors="coerce")
-        hours = h_from_dt.fillna(h_from_num)
+        h_from_num = pd.to_numeric(time_str, errors="coerce")
+        
+        # Объединяем результаты
+        hours = hours_from_dt.fillna(h_from_num)
         hours = pd.to_numeric(hours, errors="coerce").clip(0, 23).round().astype("Int64")
         _df[out_col] = hours
         return _df
@@ -3334,6 +3363,33 @@ def _read_report(file_storage_or_path):
         "Friday": "שישי", "Saturday": "שבת"
     }
     df["יום בשבוע"] = df["_weekday_eng"].map(heb)
+
+    # Финальная проверка данных
+    if df.empty:
+        raise ValueError("הקובץ ריק לאחר עיבוד - אין נתונים תקינים")
+    
+    # Проверка что COL_SUM содержит валидные данные
+    if COL_SUM in df.columns:
+        valid_sum = df[COL_SUM].notna() & (df[COL_SUM] != 0)
+        if valid_sum.sum() == 0:
+            print(f"⚠️ Warning: COL_SUM содержит только нули или NaN. Первые значения: {df[COL_SUM].head()}")
+        else:
+            print(f"✅ COL_SUM валиден: {valid_sum.sum()} строк с данными, сумма: {df[COL_SUM].sum():.2f}")
+    
+    # Проверка дат
+    if COL_DATE in df.columns:
+        valid_dates = df[COL_DATE].notna()
+        if valid_dates.sum() == 0:
+            raise ValueError("אין תאריכים תקינים בקובץ")
+        print(f"✅ Даты валидны: {valid_dates.sum()} строк")
+    
+    # Проверка времени
+    if COL_TIME_LOCAL in df.columns:
+        valid_times = df[COL_TIME_LOCAL].notna()
+        if valid_times.sum() == 0:
+            print(f"⚠️ Warning: Нет валидного времени")
+        else:
+            print(f"✅ Время валидно: {valid_times.sum()} строк")
 
     return df
 

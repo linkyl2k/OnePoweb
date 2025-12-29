@@ -3061,23 +3061,67 @@ def _read_report(file_storage_or_path):
         normalized_map[_normalize_col_name(key)] = val
 
     renamed = {}
+    # Сохраняем информацию о колонках, которые будут переименованы в COL_SUM
+    cols_to_sum = []
+    
     for col in df.columns:
         # ניסיון 1: התאמה מדויקת
         if col in COLUMN_MAP:
-            renamed[col] = COLUMN_MAP[col]
+            new_name = COLUMN_MAP[col]
+            renamed[col] = new_name
+            if new_name == COL_SUM:
+                cols_to_sum.append(col)
             continue
         # ניסיון 2: התאמה מנורמלת
         norm = _normalize_col_name(col)
         if norm in normalized_map:
-            renamed[col] = normalized_map[norm]
+            new_name = normalized_map[norm]
+            renamed[col] = new_name
+            if new_name == COL_SUM:
+                cols_to_sum.append(col)
             continue
         # ניסיון 3: חיפוש חלקי (אם שם העמודה מכיל מילת מפתח)
         for key, val in COLUMN_MAP.items():
             if key in col or col in key:
                 renamed[col] = val
+                if val == COL_SUM:
+                    cols_to_sum.append(col)
                 break
 
+    # Если несколько колонок маппятся в COL_SUM, выбираем приоритетную
+    if len(cols_to_sum) > 1:
+        # Приоритет: "Итого" > "Сумма_до_скидки" > остальные
+        priority_keywords = [("итого", 1), ("total", 1), ("סה\"כ", 1), ("סהכ", 1), 
+                            ("сумма_до_скидки", 2), ("сумма до скидки", 2)]
+        
+        selected_col = None
+        selected_priority = 999
+        
+        for orig_col in cols_to_sum:
+            orig_lower = str(orig_col).lower()
+            for keyword, priority in priority_keywords:
+                if keyword in orig_lower and priority < selected_priority:
+                    selected_col = orig_col
+                    selected_priority = priority
+                    break
+        
+        # Если нашли приоритетную, переименовываем остальные в другое имя
+        if selected_col:
+            for col in cols_to_sum:
+                if col != selected_col:
+                    # Переименовываем в временное имя, чтобы не создавать дубликат
+                    renamed[col] = f"{COL_SUM}_alt_{cols_to_sum.index(col)}"
+        else:
+            # Если не нашли приоритетную, используем первую
+            for col in cols_to_sum[1:]:
+                renamed[col] = f"{COL_SUM}_alt_{cols_to_sum.index(col)}"
+
     df.rename(columns=renamed, inplace=True)
+    
+    # Удаляем временные альтернативные колонки
+    alt_cols = [col for col in df.columns if col.startswith(f"{COL_SUM}_alt_")]
+    if alt_cols:
+        df.drop(columns=alt_cols, inplace=True)
 
     # DEBUG: הדפסת עמודות לאבחון
     print(f"📋 עמודות מקוריות: {list(df.columns)}")
@@ -3212,13 +3256,25 @@ def _read_report(file_storage_or_path):
     # Убеждаемся что это Series, а не что-то другое
     col_sum_data = df[COL_SUM]
     
+    # Если это DataFrame (несколько колонок с одинаковым именем), выбираем одну
+    if isinstance(col_sum_data, pd.DataFrame):
+        print(f"⚠️ Warning: COL_SUM is DataFrame (duplicate columns), selecting first column")
+        # Выбираем первую колонку (обычно это правильная)
+        col_sum_data = col_sum_data.iloc[:, 0]
+        # Удаляем дубликаты колонок, оставляя только одну
+        df = df.loc[:, ~df.columns.duplicated(keep='first')]
+        df[COL_SUM] = col_sum_data
     # Если это не Series, преобразуем
-    if not isinstance(col_sum_data, pd.Series):
+    elif not isinstance(col_sum_data, pd.Series):
         print(f"⚠️ Warning: COL_SUM is not Series, type: {type(col_sum_data)}")
         # Пробуем преобразовать в Series
         try:
             if hasattr(col_sum_data, 'values'):
-                col_sum_data = pd.Series(col_sum_data.values, index=df.index, name=COL_SUM)
+                # Если это массив, берем первый столбец если это 2D
+                if hasattr(col_sum_data.values, 'ndim') and col_sum_data.values.ndim > 1:
+                    col_sum_data = pd.Series(col_sum_data.values[:, 0], index=df.index, name=COL_SUM)
+                else:
+                    col_sum_data = pd.Series(col_sum_data.values, index=df.index, name=COL_SUM)
             elif hasattr(col_sum_data, '__iter__') and not isinstance(col_sum_data, str):
                 col_sum_data = pd.Series(list(col_sum_data), index=df.index, name=COL_SUM)
             else:

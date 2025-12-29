@@ -107,92 +107,138 @@
       color: #ef4444;
       animation: pulse-urgent 1s ease-in-out infinite;
     }
-    /* Mobile navbar tweaks - force vertical column layout like iPad */
-    @media (max-width: 767.98px) {
+    /* Tablet & Mobile navbar - cleaner vertical layout for iPad and smaller */
+    @media (max-width: 1199.98px) {
       .navbar {
-        padding-top: 0.35rem;
-        padding-bottom: 0.35rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
       }
-      .navbar-brand {
-        font-size: 1.05rem;
-      }
-      .navbar .plan-nav-badge,
-      .navbar .trial-countdown {
-        font-size: 0.6rem;
-      }
-      /* Force ALL nav items to be vertical column - no horizontal layout */
+      
+      /* Collapsed menu styling */
       #nav {
-        margin-top: 0.5rem;
+        margin-top: 0.75rem;
+        background: rgba(248, 250, 252, 0.98);
+        border-radius: 12px;
+        padding: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       }
+      
+      /* All nav items vertical */
       #nav .navbar-nav {
         flex-direction: column !important;
         width: 100% !important;
         margin: 0 !important;
+        gap: 0.25rem;
       }
+      
       #nav .navbar-nav.me-auto,
       #nav .navbar-nav.ms-auto {
         flex-direction: column !important;
         align-items: stretch !important;
         width: 100% !important;
       }
+      
       #nav .navbar-nav .nav-item {
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        display: block !important;
       }
+      
       #nav .navbar-nav .nav-link {
         display: block !important;
         width: 100% !important;
-        padding: 0.5rem 0.75rem !important;
+        padding: 0.65rem 1rem !important;
         text-align: left !important;
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease;
+        background: white;
+        margin-bottom: 0.25rem;
       }
-      #nav .navbar-nav .nav-link:last-child {
-        border-bottom: none !important;
+      
+      #nav .navbar-nav .nav-link:hover {
+        background: linear-gradient(90deg, rgba(16,185,129,0.1), rgba(46,160,255,0.08)) !important;
+        transform: translateX(4px);
       }
-      /* Separate left and right sections */
+      
+      /* Separator between menu sections */
       #nav .navbar-nav.ms-auto {
-        margin-top: 0.5rem !important;
-        border-top: 1px solid rgba(0,0,0,0.1) !important;
-        padding-top: 0.5rem !important;
+        margin-top: 0.75rem !important;
+        padding-top: 0.75rem !important;
+        border-top: 2px solid rgba(0,0,0,0.06) !important;
       }
-      /* Buttons should also be full width */
+      
+      /* Buttons full width and styled */
       #nav .navbar-nav .btn {
         width: 100% !important;
         margin: 0.25rem 0 !important;
         text-align: center !important;
+        padding: 0.65rem 1rem !important;
+        border-radius: 8px !important;
+      }
+      
+      /* Dropdown menus */
+      #nav .dropdown-menu {
+        width: 100%;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        margin-top: 0.5rem !important;
+      }
+      
+      /* Plan badges in collapsed menu */
+      .navbar .plan-nav-badge {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+      }
+      
+      .navbar .trial-countdown {
+        font-size: 0.65rem;
+        padding: 3px 8px;
       }
     }
     
-    /* iPhone / small phones - extra strict rules */
-    @media (max-width: 480px) {
+    /* iPhone / small phones - compact layout */
+    @media (max-width: 575.98px) {
       .navbar {
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
       }
+      
       .navbar-brand {
-        font-size: 0.95rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 60%;
+        font-size: 1rem;
       }
+      
       .navbar-toggler {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 1rem;
+        border-radius: 8px;
       }
+      
       /* Ensure no horizontal overflow */
       .navbar .container {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
       }
-      /* Smaller padding on very small screens */
+      
+      /* Compact collapsed menu */
+      #nav {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+      }
+      
       #nav .navbar-nav .nav-link {
-        padding: 0.4rem 0.6rem !important;
-        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.95rem;
+      }
+      
+      .navbar .plan-nav-badge {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+      }
+      
+      .navbar .trial-countdown {
+        font-size: 0.6rem;
+        padding: 2px 6px;
       }
     }
   </style>
@@ -208,7 +254,7 @@
 </div>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm-sm">
+  <nav class="navbar navbar-expand-xl bg-white border-bottom sticky-top shadow-sm-sm">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('index') }}">
         <i class="bi bi-graph-up-arrow"></i>

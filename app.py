@@ -7597,7 +7597,7 @@ def signup():
     except sqlite3.IntegrityError:
         current_lang = get_language()
         if current_lang == 'he':
-        flash("האימייל או שם המשתמש כבר קיימים", "danger")
+            flash("האימייל או שם המשתמש כבר קיימים", "danger")
         elif current_lang == 'en':
             flash("Email or username already exists", "danger")
         else:

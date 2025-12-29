@@ -7794,7 +7794,7 @@ def roi_page():
         
         # Если все еще нет данных, перенаправляем на result с сообщением
         if not has_any:
-    current_lang = get_language()
+            current_lang = get_language()
             if current_lang == "ru":
                 flash("Нет данных ROI для отображения. Пожалуйста, загрузите отчет сначала.", "warning")
             elif current_lang == "en":

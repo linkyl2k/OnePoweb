@@ -29,7 +29,7 @@ PAYPAL_API_URL = "https://api-m.sandbox.paypal.com" if PAYPAL_MODE == "sandbox" 
 # Prices in USD
 PLAN_PRICES = {
     "basic": {"usd": 9},
-    "pro": {"usd": 19}
+    "pro": {"usd": 20}
 }
 
 # Список доступных валют (упорядочены по популярности)
@@ -754,7 +754,7 @@ TRANSLATIONS = {
         "pricing_basic_features": "Все графики, без AI",
         "pricing_pro": "Pro",
         "pricing_pro_desc": "Графики + AI-инсайты",
-        "pricing_pro_price": "$19/месяц",
+        "pricing_pro_price": "$20/месяц",
         "pricing_pro_features": "Все графики + AI-рекомендации",
         "pricing_try_trial": "Попробуйте 7 дней бесплатно",
         "pricing_no_credit_card": "Без кредитной карты",
@@ -4920,7 +4920,7 @@ def index():
     # --- ROI אישי לחודש (על בסיס הדוח) ---
     try:
         roi_data = estimate_roi(df, ROIParams(
-            service_cost=149.0,
+            service_cost=20.0,
             month_days_assumption=30.0,
             evening_hours=(17, 20),
             midday_hours=(11, 14),
@@ -5131,7 +5131,7 @@ def demo_analysis():
     # --- ROI ---
     try:
         roi_data = estimate_roi(df, ROIParams(
-            service_cost=149.0,
+            service_cost=20.0,
             month_days_assumption=30,
             tail_share_cutoff=0.50
         ), current_lang)

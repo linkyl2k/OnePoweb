@@ -7556,7 +7556,7 @@ def signup():
     if not agree_terms:
         current_lang = get_language()
         if current_lang == 'he':
-        flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
+            flash("חובה לאשר את תנאי השימוש ומדיניות הפרטיות כדי להירשם.", "danger")
         elif current_lang == 'en':
             flash("You must agree to the Terms of Use and Privacy Policy to register.", "danger")
         else:
@@ -7567,7 +7567,7 @@ def signup():
     if password != confirm_password:
         current_lang = get_language()
         if current_lang == 'he':
-        flash("הסיסמאות אינן תואמות", "danger")
+            flash("הסיסמאות אינן תואמות", "danger")
         elif current_lang == 'en':
             flash("Passwords do not match", "danger")
         else:

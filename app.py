@@ -3008,6 +3008,19 @@ def _read_report(file_storage_or_path):
             with open(path, "rb") as f:
                 df = _read_csv_smart(f.read())
 
+    # Проверка что DataFrame создан и не пустой
+    if df is None:
+        raise ValueError("לא ניתן לקרוא את הקובץ - DataFrame הוא None")
+    
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError(f"הקובץ לא הוחזר כ-DataFrame. סוג: {type(df)}")
+    
+    if df.empty:
+        raise ValueError("הקובץ ריק - אין נתונים")
+    
+    if len(df.columns) == 0:
+        raise ValueError("הקובץ לא מכיל עמודות")
+
     # ניקוי רווחים בכותרות
     df.columns = df.columns.astype(str).str.strip()
 
@@ -3102,10 +3115,19 @@ def _read_report(file_storage_or_path):
         if COL_UNIT in df.columns and COL_QTY in df.columns:
             price = pd.to_numeric(df[COL_UNIT], errors="coerce").fillna(0)
             qty = pd.to_numeric(df[COL_QTY], errors="coerce").fillna(0)
-            df[COL_SUM] = (price * qty).round(2)
+            # Убеждаемся что результат - Series
+            result = (price * qty).round(2)
+            if isinstance(result, pd.Series):
+                df[COL_SUM] = result
+            else:
+                df[COL_SUM] = pd.Series(result, index=df.index)
         # אם יש רק מחיר (בלי כמות נפרדת) - נשתמש בו כסכום
         elif COL_UNIT in df.columns:
-            df[COL_SUM] = pd.to_numeric(df[COL_UNIT], errors="coerce").fillna(0)
+            result = pd.to_numeric(df[COL_UNIT], errors="coerce").fillna(0)
+            if isinstance(result, pd.Series):
+                df[COL_SUM] = result
+            else:
+                df[COL_SUM] = pd.Series(result, index=df.index)
 
     # -------------------------------------------------------
     # 4) וידוא עמודות חובה
@@ -3167,7 +3189,43 @@ def _read_report(file_storage_or_path):
     if COL_QTY in df.columns:
         df[COL_QTY] = pd.to_numeric(df[COL_QTY], errors="coerce").fillna(0)
 
-    df[COL_SUM] = pd.to_numeric(df[COL_SUM], errors="coerce").fillna(0)
+    # Проверка что COL_SUM существует и является Series
+    if COL_SUM not in df.columns:
+        available_cols = ', '.join(df.columns.tolist()[:10])
+        raise ValueError(f"עמודת '{COL_SUM}' לא נמצאה. עמודות זמינות: {available_cols}...")
+    
+    # Убеждаемся что это Series, а не что-то другое
+    col_sum_data = df[COL_SUM]
+    
+    # Если это не Series, преобразуем
+    if not isinstance(col_sum_data, pd.Series):
+        print(f"⚠️ Warning: COL_SUM is not Series, type: {type(col_sum_data)}")
+        # Пробуем преобразовать в Series
+        try:
+            if hasattr(col_sum_data, 'values'):
+                col_sum_data = pd.Series(col_sum_data.values, index=df.index, name=COL_SUM)
+            elif hasattr(col_sum_data, '__iter__') and not isinstance(col_sum_data, str):
+                col_sum_data = pd.Series(list(col_sum_data), index=df.index, name=COL_SUM)
+            else:
+                # Если это скаляр, создаем Series с одним значением для всех строк
+                col_sum_data = pd.Series([col_sum_data] * len(df), index=df.index, name=COL_SUM)
+            df[COL_SUM] = col_sum_data
+        except Exception as e:
+            raise ValueError(f"לא ניתן להמיר את '{COL_SUM}' ל-Series: {e}")
+    
+    # Теперь безопасно преобразуем в числовой формат
+    try:
+        df[COL_SUM] = pd.to_numeric(df[COL_SUM], errors="coerce").fillna(0)
+    except TypeError as e:
+        # Если все еще ошибка, пробуем другой подход
+        print(f"⚠️ TypeError при преобразовании COL_SUM: {e}")
+        print(f"   Тип данных: {type(df[COL_SUM])}")
+        print(f"   Первые значения: {df[COL_SUM].head()}")
+        # Пробуем преобразовать через astype
+        try:
+            df[COL_SUM] = df[COL_SUM].astype(str).replace('', '0').astype(float).fillna(0)
+        except Exception as e2:
+            raise ValueError(f"שגיאה בהמרת '{COL_SUM}' למספר: {e2}")
 
     # חישוב מחיר ליחידה אם חסר ויש כמות
     if COL_UNIT not in df.columns and COL_QTY in df.columns and (df[COL_QTY] > 0).any():

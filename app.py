@@ -2596,13 +2596,24 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
     currency_info = get_currency(lang)
     currency_symbol = currency_info["symbol"]
     
+    # Маппинг дней недели на разные языки
+    day_translation = {
+        "he": {"ראשון": "ראשון", "שני": "שני", "שלישי": "שלישי", "רביעי": "רביעי", 
+               "חמישי": "חמישי", "שישי": "שישי", "שבת": "שבת"},
+        "en": {"ראשון": "Sunday", "שני": "Monday", "שלישי": "Tuesday", "רביעי": "Wednesday",
+               "חמישי": "Thursday", "שישי": "Friday", "שבת": "Saturday"},
+        "ru": {"ראשון": "Воскресенье", "שני": "Понедельник", "שלישי": "Вторник", "רביעי": "Среда",
+               "חמישי": "Четверг", "שישי": "Пятница", "שבת": "Суббота"}
+    }
+    
     actions = []
     comps = roi_data.get("components", {})
     
     # 1. יום חלש - המלצה ספציפית
     if "weak_day" in comps:
         weak = comps["weak_day"]
-        day_name = weak.get("day", "")
+        day_name_he = weak.get("day", "")  # Исходное имя на иврите
+        day_name = day_translation.get(lang, day_translation["he"]).get(day_name_he, day_name_he)  # Переводим на нужный язык
         current = weak.get("current", 0)
         target = weak.get("target", 0)
         gap_pct = int((1 - current / max(1, target)) * 100) if target > 0 else 0
@@ -2672,8 +2683,8 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
         actions.append({
             "priority": 1,
             "category": category,
-            "title": title,
-            "action": day_actions.get(day_name, default_action),
+            "title": title.replace(day_name_he, day_name) if day_name != day_name_he else title,  # Заменяем иврит на переведенное имя в title
+            "action": day_actions.get(day_name_he, default_action).replace(day_name_he, day_name) if day_name != day_name_he else day_actions.get(day_name_he, default_action),  # Используем иврит для поиска, но заменяем на переведенное
             "impact": impact,
             "how_to": how_to
         })

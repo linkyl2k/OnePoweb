@@ -177,8 +177,9 @@
               <i class="bi bi-graph-up-arrow me-2" style="color: #10b981;"></i>
               {{ t('results_roi_potential') }}
             </h5>
-            <a href="{{ url_for('roi_page') }}" class="btn btn-sm" style="background: rgba(16,185,129,0.1); color: #34d399; border-radius: 8px;">
-              {% if current_lang == 'he' %}פרטים נוספים{% elif current_lang == 'en' %}More Details{% else %}Подробнее{% endif %} <i class="bi bi-arrow-left"></i>
+            <a href="{{ url_for('roi_page') }}" class="btn" style="background: linear-gradient(135deg, #10b981, #34d399); color: #fff; border: none; border-radius: 12px; padding: 10px 20px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(16,185,129,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(16,185,129,0.3)';">
+              {% if current_lang == 'he' %}פרטים נוספים{% elif current_lang == 'en' %}More Details{% else %}Подробнее{% endif %} 
+              <i class="bi bi-arrow-right" style="font-size: 1rem;"></i>
             </a>
           </div>
           

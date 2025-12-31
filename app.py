@@ -4366,13 +4366,26 @@ def index():
                 # --- AI ---
                 top_row = by_wd.sort_values(COL_SUM, ascending=False).iloc[0] if not by_wd.empty else None
                 weak_row = by_wd.sort_values(COL_SUM, ascending=True).iloc[0] if not by_wd.empty else None
+                
+                # Переводим дни недели для brief
+                best_day_he = str(top_row["יום בשבוע"]) if top_row is not None else None
+                weak_day_he = str(weak_row["יום בשבוע"]) if weak_row is not None else None
+                best_day_translated = day_mapping.get(current_lang, day_mapping["he"]).get(best_day_he, best_day_he) if best_day_he else None
+                weak_day_translated = day_mapping.get(current_lang, day_mapping["he"]).get(weak_day_he, weak_day_he) if weak_day_he else None
+                
+                # Переводим распределение по дням
+                dist_translated = {}
+                for k, v in zip(by_wd["יום בשבוע"], by_wd[COL_SUM]):
+                    k_translated = day_mapping.get(current_lang, day_mapping["he"]).get(str(k), str(k))
+                    dist_translated[k_translated] = float(v)
+                
                 brief = {
-                    "best_day": (str(top_row["יום בשבוע"]) if top_row is not None else None),
+                    "best_day": best_day_translated,
                     "best_day_sum": float(top_row[COL_SUM]) if top_row is not None else 0.0,
-                    "weak_day": (str(weak_row["יום בשבוע"]) if weak_row is not None else None),
+                    "weak_day": weak_day_translated,
                     "weak_day_sum": float(weak_row[COL_SUM]) if weak_row is not None else 0.0,
                     "avg_day": float(by_wd[COL_SUM].mean()) if not by_wd.empty else 0.0,
-                    "dist": {str(k): float(v) for k, v in zip(by_wd["יום בשבוע"], by_wd[COL_SUM])}
+                    "dist": dist_translated
                 }
                 chart_title_he = "מכירות לפי יום בשבוע"
                 chart_title = t("chart_sales_by_weekday")
@@ -4549,21 +4562,56 @@ def index():
                 pay = pay.groupby(pay_col, as_index=False)[COL_SUM].sum()
 
                 if not pay.empty:
-                    labels = [ _rtl(str(x)) for x in pay[pay_col].tolist() ]
+                    labels = [ str(x) for x in pay[pay_col].tolist() ]
                     values = pay[COL_SUM].tolist()
-
-                    fig, ax = plt.subplots(figsize=(6, 6))
-                    ax.pie(values, labels=labels, autopct="%1.0f%%", startangle=90)
+                    
+                    # Красивая цветовая палитра
+                    colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F']
+                    colors = colors[:len(values)]  # Обрезаем до нужного количества
+                    
+                    # Создаем фигуру с местом для легенды справа
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    
+                    # Круговая диаграмма БЕЗ меток - только проценты
+                    wedges, texts, autotexts = ax.pie(
+                        values, 
+                        autopct="%1.0f%%", 
+                        startangle=90,
+                        colors=colors,
+                        pctdistance=0.75,  # Расстояние процентов от центра
+                        textprops={'fontsize': 11, 'fontweight': 'bold', 'color': 'white'}
+                    )
+                    
+                    # Делаем проценты более читаемыми
+                    for autotext in autotexts:
+                        autotext.set_fontweight('bold')
+                    
+                    # Легенда справа с цветными метками
+                    ax.legend(
+                        wedges, 
+                        labels,
+                        title="",
+                        loc="center left",
+                        bbox_to_anchor=(1, 0, 0.5, 1),
+                        fontsize=11
+                    )
+                    
                     # Переводим заголовок
                     currency_info = get_currency(current_lang)
                     currency_symbol = currency_info["symbol"]
                     
                     if current_lang == "he":
-                        ax.set_title(_rtl(f"פילוח אמצעי תשלום ({currency_symbol})"))
+                        ax.set_title(_rtl(f"פילוח אמצעי תשלום ({currency_symbol})"), fontsize=14, fontweight='bold', pad=20)
                     elif current_lang == "en":
-                        ax.set_title(f"Payment Methods Breakdown ({currency_symbol})")
+                        ax.set_title(f"Payment Methods ({currency_symbol})", fontsize=14, fontweight='bold', pad=20)
                     else:  # ru
-                        ax.set_title(f"{t('chart_payment_methods')} ({currency_symbol})")
+                        ax.set_title(f"{t('chart_payment_methods')} ({currency_symbol})", fontsize=14, fontweight='bold', pad=20)
+                    
+                    # Обеспечиваем круглую форму диаграммы
+                    ax.axis('equal')
+                    
+                    # Подгоняем layout чтобы легенда не обрезалась
+                    plt.tight_layout()
 
                     fname = _save_fig(fig, "payments.png")
 
@@ -5423,10 +5471,17 @@ def demo_analysis():
 
             top = by_wd.sort_values(COL_SUM, ascending=False).iloc[0] if not by_wd.empty else None
             weak = by_wd.sort_values(COL_SUM, ascending=True).iloc[0] if not by_wd.empty else None
+            
+            # Переводим дни недели для brief
+            best_day_he = str(top["יום בשבוע"]) if top is not None else None
+            weak_day_he = str(weak["יום בשבוע"]) if weak is not None else None
+            best_day_translated = day_mapping.get(current_lang, day_mapping["he"]).get(best_day_he, best_day_he) if best_day_he else None
+            weak_day_translated = day_mapping.get(current_lang, day_mapping["he"]).get(weak_day_he, weak_day_he) if weak_day_he else None
+            
             brief = {
-                "best_day": (top["יום בשבוע"] if top is not None else None),
+                "best_day": best_day_translated,
                 "best_day_sum": float(top[COL_SUM]) if top is not None else 0.0,
-                "weak_day": (weak["יום בשבוע"] if weak is not None else None),
+                "weak_day": weak_day_translated,
                 "weak_day_sum": float(weak[COL_SUM]) if weak is not None else 0.0,
                 "avg_day": float(by_wd[COL_SUM].mean()) if not by_wd.empty else 0.0,
             }
@@ -5547,18 +5602,52 @@ def demo_analysis():
     if opt_payments and COL_PAY in df.columns:
         try:
             pay = df.groupby(COL_PAY)[COL_SUM].sum().reset_index()
-            fig = plt.figure(figsize=(6, 6))
-            plt.pie(pay[COL_SUM], labels=pay[COL_PAY], autopct="%1.0f%%", startangle=90)
+            labels = [str(x) for x in pay[COL_PAY].tolist()]
+            values = pay[COL_SUM].tolist()
+            
+            # Красивая цветовая палитра
+            colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F']
+            colors = colors[:len(values)]
+            
+            # Создаем фигуру с местом для легенды справа
+            fig, ax = plt.subplots(figsize=(10, 6))
+            
+            # Круговая диаграмма БЕЗ меток - только проценты
+            wedges, texts, autotexts = ax.pie(
+                values, 
+                autopct="%1.0f%%", 
+                startangle=90,
+                colors=colors,
+                pctdistance=0.75,
+                textprops={'fontsize': 11, 'fontweight': 'bold', 'color': 'white'}
+            )
+            
+            for autotext in autotexts:
+                autotext.set_fontweight('bold')
+            
+            # Легенда справа с цветными метками
+            ax.legend(
+                wedges, 
+                labels,
+                title="",
+                loc="center left",
+                bbox_to_anchor=(1, 0, 0.5, 1),
+                fontsize=11
+            )
+            
             # Переводим заголовок
             currency_info = get_currency(current_lang)
             currency_symbol = currency_info["symbol"]
             
             if current_lang == "he":
-                plt.title(f"פילוח אמצעי תשלום ({currency_symbol})")
+                ax.set_title(f"פילוח אמצעי תשלום ({currency_symbol})", fontsize=14, fontweight='bold', pad=20)
             elif current_lang == "en":
-                plt.title(f"Payment Methods Breakdown ({currency_symbol})")
+                ax.set_title(f"Payment Methods ({currency_symbol})", fontsize=14, fontweight='bold', pad=20)
             else:  # ru
-                plt.title(f"{t('chart_payment_methods')} ({currency_symbol})")
+                ax.set_title(f"{t('chart_payment_methods')} ({currency_symbol})", fontsize=14, fontweight='bold', pad=20)
+            
+            ax.axis('equal')
+            plt.tight_layout()
             fname = _save_fig(fig, "payments.png")
 
             total = float(pay[COL_SUM].sum()) or 1.0

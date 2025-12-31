@@ -6393,11 +6393,7 @@ def export_pdf():
 
 
 
-# ---------------- דפים סטטיים: אודות / צור קשר / תודה ----------------
-@app.route("/about")
-def about():
-    return render_template("about.html", active="about", title="אודות")
-
+# ---------------- דפים סטטיים: צור קשר / תודה ----------------
 @app.route("/pricing")
 def pricing():
     """Pricing page with plan comparison"""

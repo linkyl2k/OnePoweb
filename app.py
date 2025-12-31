@@ -3270,7 +3270,27 @@ def _read_report(file_storage_or_path):
     # -------------------------------------------------------
     # 4) וידוא עמודות חובה
     # -------------------------------------------------------
-    needed = [COL_DATE, COL_TIME, COL_SUM]
+    # אם אין עמודת 'שעה', ננסה ליצור אותה מעמודת 'תאריך' או נשים זמן ברירת מחדל
+    if COL_TIME not in df.columns:
+        print(f"⚠️ עמודת 'שעה' לא נמצאה, מנסה לחלץ מעמודת 'תאריך'...")
+        # בודק אם עמודת התאריך מכילה גם שעה (למשל: "2024-01-01 12:30:00")
+        if COL_DATE in df.columns:
+            date_str = df[COL_DATE].astype(str).str.strip()
+            # מנסה לזהות פורמט עם שעה (כולל תאריכים עם רווח ושעה)
+            has_time = date_str.str.contains(r'\d{1,2}:\d{2}', na=False, regex=True)
+            if has_time.any():
+                # מחלץ את החלק של השעה
+                time_part = date_str.str.extract(r'(\d{1,2}:\d{2}(?::\d{2})?)', expand=False)
+                df[COL_TIME] = time_part.fillna("12:00")  # ברירת מחדל אם לא נמצא
+            else:
+                # אם אין שעה בתאריך, נשים שעה ברירת מחדל
+                df[COL_TIME] = "12:00"
+        else:
+            # אם אין אפילו תאריך, נשים שעה ברירת מחדל
+            df[COL_TIME] = "12:00"
+        print(f"✅ עמודת 'שעה' נוצרה")
+    
+    needed = [COL_DATE, COL_SUM]  # COL_TIME כעת לא חובה כי אנחנו יוצרים אותה
     missing = [c for c in needed if c not in df.columns]
     if missing:
         # הודעת שגיאה מפורטת יותר

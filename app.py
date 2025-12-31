@@ -5607,7 +5607,11 @@ def export_pdf():
             report_name = report_row['name']
             created_at = report_row['created_at']
             summary_json = json.loads(report_row['summary_json'] or '{}')
-            report_currency = report_row.get('currency', 'USD')
+            # sqlite3.Row doesn't have .get(), use direct access with try/except
+            try:
+                report_currency = report_row['currency'] or 'USD'
+            except (KeyError, IndexError):
+                report_currency = 'USD'
             
             # Определяем язык из валюты отчета или используем текущий
             if report_currency == 'ILS':

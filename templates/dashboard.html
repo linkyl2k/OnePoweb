@@ -4,11 +4,11 @@
   <!-- כותרת -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="mb-1" style="text-decoration: none !important;">📊 {{ t('dashboard_title') }}</h2>
-      <p class="text-muted mb-0">{{ t('dashboard_subtitle') }}</p>
+      <h2 class="mb-1" style="text-decoration: none !important;">📊 {% if current_lang == 'he' %}לוח בקרה{% elif current_lang == 'en' %}Dashboard{% else %}Панель управления{% endif %}</h2>
+      <p class="text-muted mb-0">{% if current_lang == 'he' %}השוואת תקופות וניתוח מגמות{% elif current_lang == 'en' %}Period comparison and trend analysis{% else %}Сравнение периодов и анализ трендов{% endif %}</p>
     </div>
     <a class="btn btn-primary" href="{{ url_for('index') }}">
-      <i class="bi bi-plus-lg"></i> {{ t('dashboard_upload_new') }}
+      <i class="bi bi-plus-lg"></i> {% if current_lang == 'he' %}העלה דוח חדש{% elif current_lang == 'en' %}Upload New Report{% else %}Загрузить новый отчет{% endif %}
     </a>
   </div>
 
@@ -17,7 +17,7 @@
     <div class="col-md-3">
       <div class="card bg-primary text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{{ t('dashboard_total_sales') }}</h6>
+          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{% if current_lang == 'he' %}סה"כ מכירות{% elif current_lang == 'en' %}Total Sales{% else %}Общие продажи{% endif %}</h6>
           <h2 class="card-title mb-0" style="text-decoration: none !important;">{{ total_sales_currency_symbol if total_sales_currency_symbol else currency_symbol }}{{ "{:,.0f}".format(total_sales) }}</h2>
         </div>
       </div>
@@ -25,7 +25,7 @@
     <div class="col-md-3">
       <div class="card bg-success text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{{ t('dashboard_saved_reports') }}</h6>
+          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{% if current_lang == 'he' %}דוחות שמורים{% elif current_lang == 'en' %}Saved Reports{% else %}Сохраненные отчеты{% endif %}</h6>
           <h2 class="card-title mb-0" style="text-decoration: none !important;">{{ total_reports }}</h2>
         </div>
       </div>
@@ -33,7 +33,7 @@
     <div class="col-md-3">
       <div class="card bg-info text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{{ t('dashboard_avg_daily') }}</h6>
+          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{% if current_lang == 'he' %}ממוצע יומי{% elif current_lang == 'en' %}Daily Average{% else %}Средний дневной{% endif %}</h6>
           <h2 class="card-title mb-0" style="text-decoration: none !important;">{{ currency_symbol }}{{ "{:,.0f}".format(latest_summary.get('avg_daily', 0)) }}</h2>
         </div>
       </div>
@@ -41,7 +41,7 @@
     <div class="col-md-3">
       <div class="card shadow h-100" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); border: none;">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75" style="color: rgba(255,255,255,0.9); text-decoration: none;">{{ t('dashboard_plan') }}</h6>
+          <h6 class="card-subtitle mb-2 opacity-75" style="color: rgba(255,255,255,0.9); text-decoration: none;">{% if current_lang == 'he' %}תוכנית{% elif current_lang == 'en' %}Plan{% else %}План{% endif %}</h6>
           {% if user.plan|upper == 'PRO' %}
           <div class="d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2 rounded-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
             <i class="bi bi-rocket-takeoff" style="font-size: 1.2rem; color: #fff;"></i>

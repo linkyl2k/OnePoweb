@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5" style="max-width: 900px;">
+  
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <a href="{{ url_for('profile') }}" class="text-muted text-decoration-none d-inline-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-arrow-{{ 'right' if current_lang == 'he' else 'left' }}"></i>
+      {% if current_lang == 'he' %}חזרה לפרופיל{% elif current_lang == 'en' %}Back to Profile{% else %}Назад в профиль{% endif %}
+    </a>
+    <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(52,211,153,0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+      <i class="bi bi-file-earmark-text" style="font-size: 1.75rem; color: #34d399;"></i>
+    </div>
+    <h2 style="color: #fff; margin-bottom: 0.5rem;">{% if current_lang == 'he' %}דוחות שמורים{% elif current_lang == 'en' %}Saved Reports{% else %}Сохраненные отчеты{% endif %}</h2>
+    <p class="text-muted">{% if current_lang == 'he' %}צפה וטען את הדוחות שלך{% elif current_lang == 'en' %}View and load your reports{% else %}Просматривайте и загружайте ваши отчеты{% endif %}</p>
+  </div>
+
+  {% if reports %}
+    <div class="row g-3">
+      {% for report in reports %}
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100" style="transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;" 
+             onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.3)';"
+             onmouseout="this.style.transform=''; this.style.boxShadow='';"
+             onclick="window.location.href='{{ url_for('load_report', report_id=report['id']) }}'">
+          <div class="card-body p-4">
+            <!-- Report Icon -->
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-file-text" style="font-size: 1.25rem; color: #fff;"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-0" style="color: #fff;">{{ report['name'] }}</h6>
+                <small class="text-muted">
+                  {% if report['period_type'] == 'month' %}
+                    {% if current_lang == 'he' %}חודש{% elif current_lang == 'en' %}Month{% else %}Месяц{% endif %}
+                  {% elif report['period_type'] == 'week' %}
+                    {% if current_lang == 'he' %}שבוע{% elif current_lang == 'en' %}Week{% else %}Неделя{% endif %}
+                  {% elif report['period_type'] == 'day' %}
+                    {% if current_lang == 'he' %}יום{% elif current_lang == 'en' %}Day{% else %}День{% endif %}
+                  {% else %}
+                    {% if current_lang == 'he' %}מותאם אישית{% elif current_lang == 'en' %}Custom{% else %}Произвольный{% endif %}
+                  {% endif %}
+                </small>
+              </div>
+            </div>
+            
+            <!-- Date -->
+            <div class="d-flex align-items-center gap-2 text-muted small">
+              <i class="bi bi-calendar"></i>
+              {{ report['created_at'][:10] }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+      <div style="width: 120px; height: 120px; border-radius: 24px; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="bi bi-inbox" style="font-size: 3rem; color: var(--muted);"></i>
+      </div>
+      <h4 class="mb-3" style="color: var(--text);">{% if current_lang == 'he' %}אין דוחות שמורים{% elif current_lang == 'en' %}No Saved Reports{% else %}Нет сохраненных отчетов{% endif %}</h4>
+      <p class="text-muted mb-4">{% if current_lang == 'he' %}התחל לנתח דוחות כדי לשמור אותם כאן{% elif current_lang == 'en' %}Start analyzing reports to save them here{% else %}Начните анализировать отчеты, чтобы сохранить их здесь{% endif %}</p>
+      <a href="{{ url_for('index') }}" class="btn" style="background: linear-gradient(90deg, #10b981, #34d399); color: #fff; border: none; border-radius: 10px; padding: 12px 24px; font-weight: 600;">
+        <i class="bi bi-plus-lg me-2"></i>
+        {% if current_lang == 'he' %}צור דוח חדש{% elif current_lang == 'en' %}Create New Report{% else %}Создать новый отчет{% endif %}
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+

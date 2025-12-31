@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5" style="max-width: 600px;">
+  
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <a href="{{ url_for('profile') }}" class="text-muted text-decoration-none d-inline-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-arrow-{{ 'right' if current_lang == 'he' else 'left' }}"></i>
+      {% if current_lang == 'he' %}חזרה לפרופיל{% elif current_lang == 'en' %}Back to Profile{% else %}Назад в профиль{% endif %}
+    </a>
+    <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(248,113,113,0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+      <i class="bi bi-exclamation-triangle" style="font-size: 1.75rem; color: #f87171;"></i>
+    </div>
+    <h2 style="color: #f87171; margin-bottom: 0.5rem;">{% if current_lang == 'he' %}מחיקת חשבון{% elif current_lang == 'en' %}Delete Account{% else %}Удалить аккаунт{% endif %}</h2>
+    <p class="text-muted">{% if current_lang == 'he' %}פעולה זו בלתי הפיכה{% elif current_lang == 'en' %}This action is irreversible{% else %}Это действие необратимо{% endif %}</p>
+  </div>
+
+  <!-- Warning Alert -->
+  <div class="alert" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; color: #f87171; margin-bottom: 1.5rem;">
+    <div class="d-flex gap-3 align-items-start">
+      <i class="bi bi-exclamation-circle" style="font-size: 1.5rem;"></i>
+      <div>
+        <strong>{% if current_lang == 'he' %}אזהרה!{% elif current_lang == 'en' %}Warning!{% else %}Внимание!{% endif %}</strong>
+        <p class="mb-0 mt-1">
+          {% if current_lang == 'he' %}
+            מחיקת החשבון תמחק לצמיתות את כל הנתונים שלך, כולל דוחות שמורים והיסטוריה. לא ניתן לשחזר פעולה זו.
+          {% elif current_lang == 'en' %}
+            Deleting your account will permanently erase all your data, including saved reports and history. This action cannot be undone.
+          {% else %}
+            Удаление аккаунта навсегда удалит все ваши данные, включая сохраненные отчеты и историю. Это действие нельзя отменить.
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Form -->
+  <div class="card" style="border: 1px solid rgba(239,68,68,0.2);">
+    <div class="card-body p-4">
+      <form method="POST">
+        
+        <!-- Confirmation Text -->
+        <div class="mb-3">
+          <label class="form-label">
+            {% if current_lang == 'he' %}
+              הקלד <strong>מחק</strong> כדי לאשר
+            {% elif current_lang == 'en' %}
+              Type <strong>DELETE</strong> to confirm
+            {% else %}
+              Введите <strong>УДАЛИТЬ</strong> для подтверждения
+            {% endif %}
+          </label>
+          <input type="text" name="confirm_text" class="form-control" required style="border-radius: 10px; padding: 12px;" placeholder="{% if current_lang == 'he' %}מחק{% elif current_lang == 'en' %}DELETE{% else %}УДАЛИТЬ{% endif %}">
+        </div>
+
+        <!-- Password Confirmation -->
+        <div class="mb-4">
+          <label class="form-label">{% if current_lang == 'he' %}אמת עם סיסמה{% elif current_lang == 'en' %}Confirm with Password{% else %}Подтвердите паролем{% endif %}</label>
+          <input type="password" name="password" class="form-control" required style="border-radius: 10px; padding: 12px;">
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn flex-fill" style="background: linear-gradient(90deg, #ef4444, #f87171); color: #fff; font-weight: 600; border-radius: 10px; padding: 12px;">
+            <i class="bi bi-trash me-2"></i>
+            {% if current_lang == 'he' %}מחק חשבון לצמיתות{% elif current_lang == 'en' %}Delete Account Permanently{% else %}Удалить аккаунт навсегда{% endif %}
+          </button>
+          <a href="{{ url_for('profile') }}" class="btn flex-fill" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px;">
+            {% if current_lang == 'he' %}ביטול{% elif current_lang == 'en' %}Cancel{% else %}Отмена{% endif %}
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+

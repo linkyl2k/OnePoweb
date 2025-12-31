@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5" style="max-width: 600px;">
+  
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <a href="{{ url_for('profile') }}" class="text-muted text-decoration-none d-inline-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-arrow-{{ 'right' if current_lang == 'he' else 'left' }}"></i>
+      {% if current_lang == 'he' %}חזרה לפרופיל{% elif current_lang == 'en' %}Back to Profile{% else %}Назад в профиль{% endif %}
+    </a>
+    <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(96,165,250,0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+      <i class="bi bi-envelope" style="font-size: 1.75rem; color: #60a5fa;"></i>
+    </div>
+    <h2 style="color: #fff; margin-bottom: 0.5rem;">{% if current_lang == 'he' %}שינוי אימייל{% elif current_lang == 'en' %}Change Email{% else %}Изменить Email{% endif %}</h2>
+    <p class="text-muted">{% if current_lang == 'he' %}עדכן את כתובת האימייל שלך{% elif current_lang == 'en' %}Update your email address{% else %}Обновите ваш email адрес{% endif %}</p>
+  </div>
+
+  <!-- Current Email Info -->
+  <div class="alert" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: 12px; color: #60a5fa; margin-bottom: 1.5rem;">
+    <i class="bi bi-info-circle me-2"></i>
+    {% if current_lang == 'he' %}אימייל נוכחי:{% elif current_lang == 'en' %}Current email:{% else %}Текущий email:{% endif %}
+    <strong>{{ user.email }}</strong>
+  </div>
+
+  <!-- Change Email Form -->
+  <div class="card">
+    <div class="card-body p-4">
+      <form method="POST">
+        
+        <!-- New Email -->
+        <div class="mb-3">
+          <label class="form-label">{% if current_lang == 'he' %}אימייל חדש{% elif current_lang == 'en' %}New Email{% else %}Новый Email{% endif %}</label>
+          <input type="email" name="email" class="form-control" required style="border-radius: 10px; padding: 12px;" placeholder="example@email.com">
+        </div>
+
+        <!-- Confirm with Password -->
+        <div class="mb-4">
+          <label class="form-label">{% if current_lang == 'he' %}אמת עם סיסמה{% elif current_lang == 'en' %}Confirm with Password{% else %}Подтвердите паролем{% endif %}</label>
+          <input type="password" name="password" class="form-control" required style="border-radius: 10px; padding: 12px;">
+          <small class="text-muted">{% if current_lang == 'he' %}הזן את הסיסמה הנוכחית שלך{% elif current_lang == 'en' %}Enter your current password{% else %}Введите ваш текущий пароль{% endif %}</small>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn flex-fill" style="background: linear-gradient(90deg, #3b82f6, #60a5fa); color: #fff; font-weight: 600; border-radius: 10px; padding: 12px;">
+            {% if current_lang == 'he' %}שמור שינויים{% elif current_lang == 'en' %}Save Changes{% else %}Сохранить изменения{% endif %}
+          </button>
+          <a href="{{ url_for('profile') }}" class="btn flex-fill" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px;">
+            {% if current_lang == 'he' %}ביטול{% elif current_lang == 'en' %}Cancel{% else %}Отмена{% endif %}
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+

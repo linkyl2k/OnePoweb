@@ -787,6 +787,26 @@ TRANSLATIONS = {
         "profile_no_saved_reports": "Нет сохраненных отчетов",
         "profile_load_report": "Загрузить отчет",
         
+        # Account settings
+        "change_password_title": "Изменить пароль",
+        "change_email_title": "Изменить email",
+        "saved_reports_title": "Сохраненные отчеты",
+        "delete_account_title": "Удалить аккаунт",
+        "current_password": "Текущий пароль",
+        "new_password": "Новый пароль",
+        "confirm_password": "Подтвердите пароль",
+        "current_password_incorrect": "Неверный текущий пароль",
+        "passwords_dont_match": "Пароли не совпадают",
+        "password_changed_success": "Пароль успешно изменен",
+        "password_incorrect": "Неверный пароль",
+        "invalid_email": "Неверный формат email",
+        "email_already_exists": "Этот email уже используется",
+        "email_changed_success": "Email успешно изменен",
+        "confirmation_text_incorrect": "Неверный текст подтверждения",
+        "account_deleted_success": "Аккаунт успешно удален",
+        "save_changes": "Сохранить изменения",
+        "cancel": "Отмена",
+        
         # Contact
         "contact_title": "Свяжитесь с нами",
         "contact_subtitle": "Мы здесь, чтобы помочь",
@@ -7567,6 +7587,134 @@ def dashboard_delete_report(report_id):
 def profile():
     u = current_user()
     return render_template("profile.html", user=u, active="profile", title="הפרופיל שלי")
+
+@app.route("/change_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    u = current_user()
+    lang = get_language()
+    
+    if request.method == "GET":
+        return render_template("change_password.html", user=u, active="profile", title=t("change_password_title", lang))
+    
+    current_password = request.form.get("current_password", "")
+    new_password = request.form.get("new_password", "")
+    confirm_password = request.form.get("confirm_password", "")
+    
+    # Verify current password
+    import hashlib
+    if hashlib.sha256(current_password.encode()).hexdigest() != u["password"]:
+        flash(t("current_password_incorrect", lang), "danger")
+        return render_template("change_password.html", user=u, active="profile", title=t("change_password_title", lang))
+    
+    # Validate new password
+    if new_password != confirm_password:
+        flash(t("passwords_dont_match", lang), "danger")
+        return render_template("change_password.html", user=u, active="profile", title=t("change_password_title", lang))
+    
+    is_valid, error_msg = validate_password(new_password, lang)
+    if not is_valid:
+        flash(error_msg, "danger")
+        return render_template("change_password.html", user=u, active="profile", title=t("change_password_title", lang))
+    
+    # Update password
+    hashed = hashlib.sha256(new_password.encode()).hexdigest()
+    get_db().execute("UPDATE users SET password=? WHERE id=?", (hashed, u["id"]))
+    get_db().commit()
+    
+    flash(t("password_changed_success", lang), "success")
+    return redirect(url_for("profile"))
+
+@app.route("/change_email", methods=["GET", "POST"])
+@login_required
+def change_email():
+    u = current_user()
+    lang = get_language()
+    
+    if request.method == "GET":
+        return render_template("change_email.html", user=u, active="profile", title=t("change_email_title", lang))
+    
+    new_email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
+    
+    # Verify password
+    import hashlib
+    if hashlib.sha256(password.encode()).hexdigest() != u["password"]:
+        flash(t("password_incorrect", lang), "danger")
+        return render_template("change_email.html", user=u, active="profile", title=t("change_email_title", lang))
+    
+    # Validate email
+    import re
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', new_email):
+        flash(t("invalid_email", lang), "danger")
+        return render_template("change_email.html", user=u, active="profile", title=t("change_email_title", lang))
+    
+    # Check if email already exists
+    existing = get_db().execute("SELECT id FROM users WHERE email=? AND id!=?", (new_email, u["id"])).fetchone()
+    if existing:
+        flash(t("email_already_exists", lang), "danger")
+        return render_template("change_email.html", user=u, active="profile", title=t("change_email_title", lang))
+    
+    # Update email
+    get_db().execute("UPDATE users SET email=? WHERE id=?", (new_email, u["id"]))
+    get_db().commit()
+    
+    flash(t("email_changed_success", lang), "success")
+    return redirect(url_for("profile"))
+
+@app.route("/saved_reports")
+@login_required
+def saved_reports():
+    u = current_user()
+    lang = get_language()
+    
+    # Get user's saved reports
+    db = get_db()
+    reports = db.execute("""
+        SELECT id, name, period_type, created_at 
+        FROM reports 
+        WHERE user_id=? 
+        ORDER BY created_at DESC
+    """, (u["id"],)).fetchall()
+    
+    return render_template("saved_reports.html", user=u, reports=reports, active="profile", title=t("saved_reports_title", lang))
+
+@app.route("/delete_account", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    u = current_user()
+    lang = get_language()
+    
+    if request.method == "GET":
+        return render_template("delete_account.html", user=u, active="profile", title=t("delete_account_title", lang))
+    
+    password = request.form.get("password", "")
+    confirm_text = request.form.get("confirm_text", "").strip()
+    
+    # Verify password
+    import hashlib
+    if hashlib.sha256(password.encode()).hexdigest() != u["password"]:
+        flash(t("password_incorrect", lang), "danger")
+        return render_template("delete_account.html", user=u, active="profile", title=t("delete_account_title", lang))
+    
+    # Verify confirmation text
+    expected = "DELETE" if lang == "en" else "УДАЛИТЬ" if lang == "ru" else "מחק"
+    if confirm_text.upper() != expected:
+        flash(t("confirmation_text_incorrect", lang), "danger")
+        return render_template("delete_account.html", user=u, active="profile", title=t("delete_account_title", lang))
+    
+    # Delete user data
+    db = get_db()
+    db.execute("DELETE FROM reports WHERE user_id=?", (u["id"],))
+    db.execute("DELETE FROM users WHERE id=?", (u["id"],))
+    db.commit()
+    
+    # Logout
+    session.clear()
+    
+    flash(t("account_deleted_success", lang), "success")
+    return redirect(url_for("index"))
+
 
 @app.route("/profile/edit", methods=["GET", "POST"])
 @login_required

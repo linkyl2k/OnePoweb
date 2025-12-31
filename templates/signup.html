@@ -12,7 +12,7 @@
             <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(46,160,255,0.15)); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
               <i class="bi bi-person-plus" style="font-size: 1.5rem; color: #1abc9c;"></i>
             </div>
-            <h3 class="mb-1">{{ t('signup_title') }}</h3>
+            <h3 class="mb-1">{% if current_lang == 'he' %}הרשמה{% elif current_lang == 'en' %}Sign Up{% else %}Регистрация{% endif %}</h3>
             <p class="text-muted small mb-0">{% if current_lang == 'he' %}הצטרף ל-OnePoweb בחינם{% elif current_lang == 'en' %}Join OnePoweb for free{% else %}Присоединяйтесь к OnePoweb бесплатно{% endif %}</p>
           </div>
 
@@ -32,7 +32,7 @@
             
             <!-- Email -->
           <div>
-              <label class="form-label">{{ t('signup_email') }}</label>
+              <label class="form-label">{% if current_lang == 'he' %}אימייל{% elif current_lang == 'en' %}Email{% else %}Email{% endif %}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                 <input name="email" type="email" class="form-control" value="{{ email or '' }}" required placeholder="your@email.com">
@@ -42,7 +42,7 @@
             
             <!-- Username -->
           <div>
-              <label class="form-label">{{ t('signup_username') }}</label>
+              <label class="form-label">{% if current_lang == 'he' %}שם משתמש{% elif current_lang == 'en' %}Username{% else %}Имя пользователя{% endif %}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-at"></i></span>
                 <input name="username" type="text" class="form-control" value="{{ username or '' }}" placeholder="myusername" pattern="^[A-Za-z0-9]{4,20}$" minlength="4" maxlength="20" required>
@@ -52,29 +52,29 @@
             
             <!-- Password -->
           <div>
-              <label class="form-label">{{ t('signup_password') }}</label>
+              <label class="form-label">{% if current_lang == 'he' %}סיסמה{% elif current_lang == 'en' %}Password{% else %}Пароль{% endif %}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
                 <input name="password" type="password" class="form-control" id="password" minlength="8" maxlength="32" pattern="^(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9]{8,32}$" required placeholder="{% if current_lang == 'he' %}סיסמה חזקה{% elif current_lang == 'en' %}Strong password{% else %}Надежный пароль{% endif %}">
               </div>
               <!-- Password Requirements -->
               <div class="mt-2 p-2" style="background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                <div class="small text-muted mb-1">{{ t('password_requirements') }}</div>
+                <div class="small text-muted mb-1">{% if current_lang == 'he' %}דרישות סיסמה{% elif current_lang == 'en' %}Password Requirements{% else %}Требования к паролю{% endif %}</div>
                 <div class="d-flex flex-wrap gap-2">
-                  <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_length') }}</span>
-                  <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_english') }}</span>
-                  <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_upper') }}</span>
-                  <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('password_digit') }}</span>
+                  <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{% if current_lang == 'he' %}8-32 תווים{% elif current_lang == 'en' %}8-32 characters{% else %}8-32 символов{% endif %}</span>
+                  <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{% if current_lang == 'he' %}אנגלית בלבד{% elif current_lang == 'en' %}English only{% else %}Только английские{% endif %}</span>
+                  <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{% if current_lang == 'he' %}אות גדולה{% elif current_lang == 'en' %}Uppercase{% else %}Заглавная буква{% endif %}</span>
+                  <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{% if current_lang == 'he' %}ספרה{% elif current_lang == 'en' %}Digit{% else %}Цифра{% endif %}</span>
                 </div>
               </div>
           </div>
             
             <!-- Confirm Password -->
           <div>
-              <label class="form-label">{{ t('signup_confirm') }}</label>
+              <label class="form-label">{% if current_lang == 'he' %}אימות סיסמה{% elif current_lang == 'en' %}Confirm Password{% else %}Подтвердите пароль{% endif %}</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                <input name="confirm_password" type="password" class="form-control" id="confirm_password" minlength="8" maxlength="32" required placeholder="{{ t('signup_confirm') }}">
+                <input name="confirm_password" type="password" class="form-control" id="confirm_password" minlength="8" maxlength="32" required placeholder="{% if current_lang == 'he' %}אימות סיסמה{% elif current_lang == 'en' %}Confirm Password{% else %}Подтвердите пароль{% endif %}">
           </div>
               <div id="password-match" class="small mt-1" style="display: none;"></div>
           </div>
@@ -95,7 +95,7 @@
             
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary w-100 py-2 mt-2" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); border: none; border-radius: 12px; font-weight: 600;">
-              <i class="bi bi-person-check me-2"></i>{{ t('signup_button') }}
+              <i class="bi bi-person-check me-2"></i>{% if current_lang == 'he' %}הרשמה{% elif current_lang == 'en' %}Sign Up{% else %}Зарегистрироваться{% endif %}
             </button>
         </form>
 
@@ -103,13 +103,13 @@
           <div class="text-center my-4" style="position: relative;">
             <hr style="border-color: var(--border);">
             <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-soft); padding: 0 1rem; color: var(--muted); font-size: 0.85rem;">
-              {{ t('signup_have_account') }}
+              {% if current_lang == 'he' %}כבר יש לך חשבון?{% elif current_lang == 'en' %}Already have an account?{% else %}Уже есть аккаунт?{% endif %}
             </span>
           </div>
           
           <!-- Login Link -->
           <a href="{{ url_for('login') }}" class="btn w-100" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
-            <i class="bi bi-box-arrow-in-left me-2"></i>{{ t('nav_login') }}
+            <i class="bi bi-box-arrow-in-left me-2"></i>{% if current_lang == 'he' %}התחברות{% elif current_lang == 'en' %}Login{% else %}Войти{% endif %}
           </a>
           
         </div>
@@ -119,13 +119,13 @@
       <div class="text-center mt-4">
         <div class="d-flex justify-content-center gap-4 flex-wrap">
           <div class="small text-muted">
-            <i class="bi bi-check-circle text-success me-1"></i>{{ t('benefits_trial') }}
+            <i class="bi bi-check-circle text-success me-1"></i>{% if current_lang == 'he' %}7 ימי ניסיון חינם{% elif current_lang == 'en' %}7-day free trial{% else %}7 дней бесплатного пробного периода{% endif %}
           </div>
           <div class="small text-muted">
-            <i class="bi bi-check-circle text-success me-1"></i>{{ t('benefits_no_card') }}
+            <i class="bi bi-check-circle text-success me-1"></i>{% if current_lang == 'he' %}ללא כרטיס אשראי{% elif current_lang == 'en' %}No credit card required{% else %}Без кредитной карты{% endif %}
           </div>
           <div class="small text-muted">
-            <i class="bi bi-check-circle text-success me-1"></i>{{ t('benefits_cancel') }}
+            <i class="bi bi-check-circle text-success me-1"></i>{% if current_lang == 'he' %}ביטול בכל עת{% elif current_lang == 'en' %}Cancel anytime{% else %}Отмена в любое время{% endif %}
       </div>
         </div>
       </div>

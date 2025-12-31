@@ -2034,6 +2034,10 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
     - קידום מוצרים חלשים (זנב)
     מחזיר פירוט סכומים חודשיים + ROI%.
     """
+    # Получаем валюту из текущей сессии
+    currency_info = get_currency(lang)
+    currency_symbol = currency_info["symbol"]
+    
     out = {"components": {}, "monthly_gain": 0.0, "service_cost": params.service_cost, "roi_percent": 0.0}
 
     # ננרמל סכומים
@@ -2152,42 +2156,48 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
     parts = []
     if "weak_day" in out["components"]:
         c = out["components"]["weak_day"]
-        parts.append(
-            f"יום חלש (‘{c['day']}’) יעלה לרמת הימים הרגילים: +{c['monthly_gain']:,.0f} ₪/חודש."
-        )
+        if lang == "he":
+            parts.append(f"יום חלש ('{c['day']}') יעלה לרמת הימים הרגילים: +{c['monthly_gain']:,.0f} {currency_symbol}/חודש.")
+        elif lang == "en":
+            parts.append(f"Weak day ('{c['day']}') raised to regular days level: +{currency_symbol}{c['monthly_gain']:,.0f}/month.")
+        else:  # ru
+            parts.append(f"Слабый день ('{c['day']}') поднят до уровня обычных дней: +{currency_symbol}{c['monthly_gain']:,.0f}/месяц.")
     if "evening_hours" in out["components"]:
         c = out["components"]["evening_hours"]
         if lang == "he":
-            parts.append(f"שעות ערב חלשות → יעד חדש: +{c['uplift_per_day']:,.0f} ₪ ליום × {int(c['days_in_month_factor']):d} ימים ≈ +{c['monthly_gain']:,.0f} ₪/חודש.")
+            parts.append(f"שעות ערב חלשות → יעד חדש: +{c['uplift_per_day']:,.0f} {currency_symbol} ליום × {int(c['days_in_month_factor']):d} ימים ≈ +{c['monthly_gain']:,.0f} {currency_symbol}/חודש.")
         elif lang == "en":
-            parts.append(f"Weak evening hours → new target: +${c['uplift_per_day']:,.0f} per day × {int(c['days_in_month_factor']):d} days ≈ +${c['monthly_gain']:,.0f}/month.")
+            parts.append(f"Weak evening hours → new target: +{currency_symbol}{c['uplift_per_day']:,.0f} per day × {int(c['days_in_month_factor']):d} days ≈ +{currency_symbol}{c['monthly_gain']:,.0f}/month.")
         else:  # ru
-            parts.append(f"Слабые вечерние часы → новая цель: +${c['uplift_per_day']:,.0f} в день × {int(c['days_in_month_factor']):d} дней ≈ +${c['monthly_gain']:,.0f}/месяц.")
+            parts.append(f"Слабые вечерние часы → новая цель: +{currency_symbol}{c['uplift_per_day']:,.0f} в день × {int(c['days_in_month_factor']):d} дней ≈ +{currency_symbol}{c['monthly_gain']:,.0f}/месяц.")
     if "tail_products" in out["components"]:
         c = out["components"]["tail_products"]
-        parts.append(
-            f"קידום ‘זנב מוצרים’ (≈{int(params.tail_share_cutoff*100)}% מההכנסות) ב+{int(params.tail_boost_ratio*100)}% → +{c['monthly_gain']:,.0f} ₪/חודש."
-        )
+        if lang == "he":
+            parts.append(f"קידום 'זנב מוצרים' (≈{int(params.tail_share_cutoff*100)}% מההכנסות) ב+{int(params.tail_boost_ratio*100)}% → +{c['monthly_gain']:,.0f} {currency_symbol}/חודש.")
+        elif lang == "en":
+            parts.append(f"Promoting 'tail products' (≈{int(params.tail_share_cutoff*100)}% of revenue) by +{int(params.tail_boost_ratio*100)}% → +{currency_symbol}{c['monthly_gain']:,.0f}/month.")
+        else:  # ru
+            parts.append(f"Продвижение 'хвоста продуктов' (≈{int(params.tail_share_cutoff*100)}% от выручки) на +{int(params.tail_boost_ratio*100)}% → +{currency_symbol}{c['monthly_gain']:,.0f}/месяц.")
 
     # Текстовый итог ROI по языкам
     if lang == "he":
         summary_text = (
-            f"פוטנציאל שיפור חודשי (בתנאי שפועלים על התובנות): ~{total_gain:,.0f} ₪. "
-            f"עלות השירות: {params.service_cost:,.0f} ₪. "
+            f"פוטנציאל שיפור חודשי (בתנאי שפועלים על התובנות): ~{total_gain:,.0f} {currency_symbol}. "
+            f"עלות השירות: {params.service_cost:,.0f} {currency_symbol}. "
             f"ROI תיאורטי: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ הערכה זו מבוססת על ניתוח הנתונים בלבד. התוצאות בפועל תלויות בפעולות שתנקטו."
     elif lang == "en":
         summary_text = (
-            f"Monthly improvement potential (if you act on insights): ~${total_gain:,.0f}. "
-            f"Service cost: ${params.service_cost:,.0f}. "
+            f"Monthly improvement potential (if you act on insights): ~{currency_symbol}{total_gain:,.0f}. "
+            f"Service cost: {currency_symbol}{params.service_cost:,.0f}. "
             f"Theoretical ROI: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ This estimate is based on data analysis only. Actual results depend on actions taken."
     else:  # ru
         summary_text = (
-            f"Потенциал улучшения в месяц (при условии действий на основе инсайтов): ~${total_gain:,.0f}. "
-            f"Стоимость услуги: ${params.service_cost:,.0f}. "
+            f"Потенциал улучшения в месяц (при условии действий на основе инсайтов): ~{currency_symbol}{total_gain:,.0f}. "
+            f"Стоимость услуги: {currency_symbol}{params.service_cost:,.0f}. "
             f"Теоретический ROI: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ Эта оценка основана только на анализе данных. Фактические результаты зависят от предпринятых действий."
@@ -2420,7 +2430,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
         if lang == "he":
             plan = {
                 "category": f"יום {day_name}",
-                "goal": f"העלאת מכירות ביום {day_name} ב-{int((target_revenue - current_revenue) * 0.3)} ₪",
+                "goal": f"העלאת מכירות ביום {day_name} ב-{int((target_revenue - current_revenue) * 0.3)} {currency_symbol}",
                 "days": [
                     {"day": 1, "action": f"פרסם בפייסבוק/אינסטגרם על מבצע מיוחד ביום {day_name}", "measure": "מספר צפיות/לייקים", "check": "יום 2"},
                     {"day": 2, "action": "הכן חומרי פרסום (פוסטר, סטורי)", "measure": "חומרים מוכנים", "check": "יום 3"},
@@ -2431,7 +2441,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
                     {"day": 7, "action": "סיכום: השווה הכנסה ליום {day_name} לפני ואחרי", "measure": "הכנסה שבועית", "check": "יום 8"}
                 ],
                 "metrics": {
-                    "daily_revenue": f"מעקב יומי: {current_revenue:,.0f} → יעד: {target_revenue * 0.3 + current_revenue:,.0f} ₪",
+                    "daily_revenue": f"מעקב יומי: {current_revenue:,.0f} → יעד: {target_revenue * 0.3 + current_revenue:,.0f} {currency_symbol}",
                     "transactions": "מספר עסקאות ביום",
                     "avg_check": "ממוצע לעסקה"
                 }
@@ -2439,7 +2449,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
         elif lang == "en":
             plan = {
                 "category": f"{day_name} Day",
-                "goal": f"Increase {day_name} sales by ${int((target_revenue - current_revenue) * 0.3):,.0f}",
+                "goal": f"Increase {day_name} sales by {currency_symbol}{int((target_revenue - current_revenue) * 0.3):,.0f}",
                 "days": [
                     {"day": 1, "action": f"Post on Facebook/Instagram about special promotion on {day_name}", "measure": "Views/likes count", "check": "Day 2"},
                     {"day": 2, "action": "Prepare marketing materials (poster, story)", "measure": "Materials ready", "check": "Day 3"},
@@ -2450,7 +2460,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
                     {"day": 7, "action": f"Summary: Compare {day_name} revenue before and after", "measure": "Weekly revenue", "check": "Day 8"}
                 ],
                 "metrics": {
-                    "daily_revenue": f"Daily tracking: ${current_revenue:,.0f} → target: ${target_revenue * 0.3 + current_revenue:,.0f}",
+                    "daily_revenue": f"Daily tracking: {currency_symbol}{current_revenue:,.0f} → target: {currency_symbol}{target_revenue * 0.3 + current_revenue:,.0f}",
                     "transactions": "Transaction count per day",
                     "avg_check": "Average per transaction"
                 }
@@ -2458,7 +2468,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
         else:  # ru
             plan = {
                 "category": f"День {day_name}",
-                "goal": f"Увеличить продажи в {day_name} на {int((target_revenue - current_revenue) * 0.3):,.0f} ₽",
+                "goal": f"Увеличить продажи в {day_name} на {currency_symbol}{int((target_revenue - current_revenue) * 0.3):,.0f}",
                 "days": [
                     {"day": 1, "action": f"Опубликуйте в Facebook/Instagram о специальной акции в {day_name}", "measure": "Количество просмотров/лайков", "check": "День 2"},
                     {"day": 2, "action": "Подготовьте рекламные материалы (постер, сторис)", "measure": "Материалы готовы", "check": "День 3"},
@@ -2469,7 +2479,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
                     {"day": 7, "action": f"Итог: Сравните выручку {day_name} до и после", "measure": "Недельная выручка", "check": "День 8"}
                 ],
                 "metrics": {
-                    "daily_revenue": f"Ежедневный отслеживание: {current_revenue:,.0f} → цель: {target_revenue * 0.3 + current_revenue:,.0f} ₽",
+                    "daily_revenue": f"Ежедневное отслеживание: {currency_symbol}{current_revenue:,.0f} → цель: {currency_symbol}{target_revenue * 0.3 + current_revenue:,.0f}",
                     "transactions": "Количество транзакций в день",
                     "avg_check": "Средний чек"
                 }
@@ -2484,7 +2494,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
         if lang == "he":
             plan = {
                 "category": "שעות ערב (17:00-20:00)",
-                "goal": f"הגברת פעילות ערב ב-{uplift_per_day:,.0f} ₪ ליום",
+                "goal": f"הגברת פעילות ערב ב-{uplift_per_day:,.0f} {currency_symbol} ליום",
                 "days": [
                     {"day": 1, "action": "הכרז על Happy Hour 17:00-19:00 (הנחה 20% על משקאות)", "measure": "מספר לקוחות בערב", "check": "יום 2"},
                     {"day": 2, "action": "פרסם בסטורי אינסטגרם על מבצע הערב", "measure": "צפיות בסטורי", "check": "יום 3"},
@@ -2495,7 +2505,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
                     {"day": 7, "action": "סיכום: השווה הכנסה ערב לפני ואחרי", "measure": "הכנסה שבועית ערב", "check": "יום 8"}
                 ],
                 "metrics": {
-                    "daily_revenue": f"מעקב יומי ערב: יעד +{uplift_per_day:,.0f} ₪",
+                    "daily_revenue": f"מעקב יומי ערב: יעד +{uplift_per_day:,.0f} {currency_symbol}",
                     "transactions": "מספר עסקאות בשעות 17-20",
                     "avg_check": "ממוצע לעסקה בערב"
                 }
@@ -2522,7 +2532,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
         else:  # ru
             plan = {
                 "category": "Вечерние часы (17:00-20:00)",
-                "goal": f"Увеличить вечернюю активность на {uplift_per_day:,.0f} ₽ в день",
+                "goal": f"Увеличить вечернюю активность на {currency_symbol}{uplift_per_day:,.0f} в день",
                 "days": [
                     {"day": 1, "action": "Объявите Happy Hour 17:00-19:00 (скидка 20% на напитки)", "measure": "Количество клиентов вечером", "check": "День 2"},
                     {"day": 2, "action": "Опубликуйте Instagram story о вечерней акции", "measure": "Просмотры сторис", "check": "День 3"},
@@ -2533,7 +2543,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
                     {"day": 7, "action": "Итог: Сравните вечернюю выручку до и после", "measure": "Недельная вечерняя выручка", "check": "День 8"}
                 ],
                 "metrics": {
-                    "daily_revenue": f"Ежедневное отслеживание вечера: цель +{uplift_per_day:,.0f} ₽",
+                    "daily_revenue": f"Ежедневное отслеживание вечера: цель +{currency_symbol}{uplift_per_day:,.0f}",
                     "transactions": "Количество транзакций в 17-20",
                     "avg_check": "Средний чек (вечер)"
                 }
@@ -2548,7 +2558,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
         if lang == "he":
             plan = {
                 "category": "מוצרים חלשים",
-                "goal": f"הגברת מכירות מוצרים חלשים ב-{monthly_gain:,.0f} ₪ לחודש",
+                "goal": f"הגברת מכירות מוצרים חלשים ב-{monthly_gain:,.0f} {currency_symbol} לחודש",
                 "days": [
                     {"day": 1, "action": "זהה 5-10 מוצרים עם מכירות נמוכות", "measure": "רשימת מוצרים", "check": "יום 2"},
                     {"day": 2, "action": "צור חבילות: מוצר חזק + מוצר חלש במחיר מיוחד", "measure": "מספר חבילות", "check": "יום 3"},
@@ -2586,7 +2596,7 @@ def generate_7day_action_plan(df, roi_data: dict, lang: str = "he") -> Dict[str,
         else:  # ru
             plan = {
                 "category": "Слабые товары",
-                "goal": f"Увеличить продажи слабых товаров на {monthly_gain:,.0f} ₽ в месяц",
+                "goal": f"Увеличить продажи слабых товаров на {currency_symbol}{monthly_gain:,.0f} в месяц",
                 "days": [
                     {"day": 1, "action": "Определите 5-10 товаров с низкими продажами", "measure": "Список товаров", "check": "День 2"},
                     {"day": 2, "action": "Создайте пакеты: сильный товар + слабый товар по специальной цене", "measure": "Количество пакетов", "check": "День 3"},
@@ -2842,8 +2852,8 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             if lang == "he":
                 category = "💰 הגדלת סל"
                 title = f"הגדל עסקה ממוצעת ב-15%"
-                action = f"יעד: מ-₪{avg_transaction:.0f} ל-₪{avg_transaction + target_increase:.0f}"
-                impact = f"פוטנציאל: +₪{target_increase * 30:.0f}/חודש (30 עסקאות/יום)"
+                action = f"יעד: מ-{currency_symbol}{avg_transaction:.0f} ל-{currency_symbol}{avg_transaction + target_increase:.0f}"
+                impact = f"פוטנציאל: +{currency_symbol}{target_increase * 30:.0f}/חודש (30 עסקאות/יום)"
                 how_to = [
                     "הצע תוספות: 'רוצה להוסיף X?'",
                     "Upsell: 'במעט יותר תקבל גרסה גדולה'",
@@ -2853,8 +2863,8 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             elif lang == "en":
                 category = "💰 Basket Increase"
                 title = f"Increase average transaction by 15%"
-                action = f"Target: from ₪{avg_transaction:.0f} to ₪{avg_transaction + target_increase:.0f}"
-                impact = f"Potential: +₪{target_increase * 30:.0f}/month (30 transactions/day)"
+                action = f"Target: from {currency_symbol}{avg_transaction:.0f} to {currency_symbol}{avg_transaction + target_increase:.0f}"
+                impact = f"Potential: +{currency_symbol}{target_increase * 30:.0f}/month (30 transactions/day)"
                 how_to = [
                     "Suggest add-ons: 'Would you like to add X?'",
                     "Upsell: 'For a bit more you get a large size'",
@@ -2864,8 +2874,8 @@ def generate_action_items(df, roi_data: dict, lang: str = "he") -> list:
             else:  # ru
                 category = "💰 Увеличение корзины"
                 title = f"Увеличьте среднюю транзакцию на 15%"
-                action = f"Цель: с ₪{avg_transaction:.0f} до ₪{avg_transaction + target_increase:.0f}"
-                impact = f"Потенциал: +₪{target_increase * 30:.0f}/месяц (30 транзакций/день)"
+                action = f"Цель: с {currency_symbol}{avg_transaction:.0f} до {currency_symbol}{avg_transaction + target_increase:.0f}"
+                impact = f"Потенциал: +{currency_symbol}{target_increase * 30:.0f}/месяц (30 транзакций/день)"
                 how_to = [
                     "Предлагайте дополнения: 'Хотите добавить X?'",
                     "Апселл: 'За немного больше получите большой размер'",

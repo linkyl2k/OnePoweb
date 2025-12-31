@@ -1515,17 +1515,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Include Onboarding Modal for new users -->
-{% set u = current_user() %}
-{% if u and not u['onboarding_completed'] %}
-  {% include 'onboarding_modal.html' %}
-  <script>
-    // Show onboarding modal automatically for new users
-    document.addEventListener('DOMContentLoaded', function() {
-      const onboardingModal = new bootstrap.Modal(document.getElementById('onboardingModal'));
-      onboardingModal.show();
-    });
-  </script>
-{% endif %}
-
 {% endblock %}

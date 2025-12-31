@@ -4179,7 +4179,28 @@ def set_currency(currency_code):
     return_url = request.args.get("return_url") or request.referrer or url_for("index")
     return redirect(return_url)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
+def landing():
+    """Landing page - redirect based on login status"""
+    u = current_user()
+    if u:
+        # Logged in users go to upload page
+        return redirect(url_for('index'))
+    else:
+        # Guests go to about page
+        return redirect(url_for('about'))
+
+@app.route("/about")
+def about():
+    """About page for guests"""
+    return render_template("about.html", active="about", title="About OnePoweb")
+
+@app.route("/get-started")
+def get_started():
+    """Onboarding questions for new users"""
+    return render_template("get_started.html", active="get_started", title="Get Started")
+
+@app.route("/upload", methods=["GET", "POST"])
 def index():
     messages, plots = [], []
     current_lang = get_language()  # Получаем текущий язык

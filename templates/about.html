@@ -2,547 +2,181 @@
 {% block content %}
 
 <!-- Hero Section -->
-<section class="about-hero mb-5">
-  <div class="text-center">
-    <div class="about-icon mb-3">
-      <i class="bi bi-graph-up-arrow"></i>
-    </div>
-    <h1 class="about-title mb-3">
-      {% if current_lang == 'he' %}
-        אודות OnePoweb
-      {% elif current_lang == 'en' %}
-        About OnePoweb
-      {% else %}
-        О OnePoweb
-      {% endif %}
-    </h1>
-    <p class="about-subtitle">
-      {% if current_lang == 'he' %}
-        הופכים נתוני מכירות לתובנות עסקיות — פשוט, מהיר וחכם
-      {% elif current_lang == 'en' %}
-        Turning your sales data into clear business insights — simple, fast and smart.
-      {% else %}
-        Превращаем ваши данные о продажах в понятные бизнес‑инсайты — просто, быстро и умно.
-      {% endif %}
-    </p>
-  </div>
-</section>
-
-<!-- Mission Section -->
-<section class="about-section mb-5">
-  <div class="row g-4 align-items-center">
-    <div class="col-12 col-lg-6">
-      <span class="section-label">
-        {% if current_lang == 'he' %}המשימה שלנו{% elif current_lang == 'en' %}Our Mission{% else %}Наша миссия{% endif %}
-      </span>
-      <h2 class="mb-3">
-        {% if current_lang == 'he' %}להנגיש BI לכל עסק{% elif current_lang == 'en' %}Make data‑driven decisions accessible to every business{% else %}Сделать аналитики и решения на основе данных доступными каждому бизнесу{% endif %}
-      </h2>
-      <p class="text-content">
-        {% if current_lang == 'he' %}
-          עסקים גדולים משקיעים אלפי שקלים בכלי ניתוח מתקדמים. אנחנו מאמינים שגם בעלי עסקים קטנים ובינוניים מגיע להם לקבל החלטות מבוססות נתונים — בלי להיות מומחי אקסל, ובלי לשבור את הכיס.
-        {% elif current_lang == 'en' %}
-          Large companies invest thousands in complex BI tools. We believe that small and medium businesses also deserve data‑driven decisions — without being Excel experts and without huge budgets.
-        {% else %}
-          Крупные компании тратят тысячи на сложные BI‑системы. Мы считаем, что и малый/средний бизнес заслуживает принимать решения на основе данных — без экспертизы в Excel и без огромных бюджетов.
-        {% endif %}
-      </p>
-      <p class="text-content">
-        {% if current_lang == 'he' %}
-          <strong>OnePoweb</strong> נולד מתוך הצורך הזה: כלי פשוט שכל אחד יכול להשתמש בו, שמפיק תובנות אמיתיות תוך שניות.
-        {% elif current_lang == 'en' %}
-          <strong>OnePoweb</strong> was created exactly for this: a simple tool anyone can use that turns raw reports into real insights in seconds.
-        {% else %}
-          <strong>OnePoweb</strong> появился именно из этой потребности: простой инструмент, которым может пользоваться каждый, получая реальные инсайты из отчётов за секунды.
-        {% endif %}
-      </p>
-    </div>
-    <div class="col-12 col-lg-6">
-      <div class="mission-card">
-        <div class="mission-item">
-          <div class="mission-icon"><i class="bi bi-lightning-charge-fill"></i></div>
-          <div>
-            <strong>{% if current_lang == 'he' %}מהיר{% elif current_lang == 'en' %}Fast{% else %}Быстро{% endif %}</strong>
-            <p>{% if current_lang == 'he' %}ניתוח תוך 30 שניות, לא שעות{% elif current_lang == 'en' %}Analysis in 30 seconds, not hours{% else %}Анализ за 30 секунд, а не за часы{% endif %}</p>
-          </div>
-        </div>
-        <div class="mission-item">
-          <div class="mission-icon"><i class="bi bi-hand-thumbs-up-fill"></i></div>
-          <div>
-            <strong>{% if current_lang == 'he' %}פשוט{% elif current_lang == 'en' %}Simple{% else %}Просто{% endif %}</strong>
-            <p>{% if current_lang == 'he' %}בלי ידע טכני, בלי הדרכה{% elif current_lang == 'en' %}Without technical knowledge, without guidance{% else %}Без технических знаний, без обучения{% endif %}</p>
-          </div>
-        </div>
-        <div class="mission-item">
-          <div class="mission-icon"><i class="bi bi-shield-check"></i></div>
-          <div>
-            <strong>{% if current_lang == 'he' %}מאובטח{% elif current_lang == 'en' %}Secure{% else %}Безопасно{% endif %}</strong>
-            <p>{% if current_lang == 'he' %}הנתונים שלך נשארים שלך{% elif current_lang == 'en' %}Your data remains yours{% else %}Ваши данные остаются вашими{% endif %}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- What We Do Section -->
-<section class="about-section mb-5">
-    <div class="text-center mb-4">
-      <span class="section-label">
-        {% if current_lang == 'he' %}מה אנחנו עושים{% elif current_lang == 'en' %}What we do{% else %}Чем мы занимаемся{% endif %}
-      </span>
-      <h2>
-        {% if current_lang == 'he' %}הופכים דוחות למעשים{% elif current_lang == 'en' %}Turning reports into action{% else %}Превращаем отчёты в конкретные действия{% endif %}
-      </h2>
-    </div>
+<div style="min-height: 90vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f1419 0%, #1a1f36 100%); position: relative; overflow: hidden;">
   
-  <div class="row g-4">
-    <div class="col-12 col-md-6 col-lg-3">
-      <div class="feature-box">
-        <div class="feature-num">01</div>
-        <h4>
-          {% if current_lang == 'he' %}ניתוח אוטומטי{% elif current_lang == 'en' %}Automatic analysis{% else %}Автоматический анализ{% endif %}
-        </h4>
-        <p>
-          {% if current_lang == 'he' %}העלה קובץ CSV או Excel — המערכת עושה את השאר{% elif current_lang == 'en' %}Upload a CSV or Excel file — the system does the rest{% else %}Загрузите файл CSV или Excel — система сделает всё остальное{% endif %}
-        </p>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-3">
-      <div class="feature-box">
-        <div class="feature-num">02</div>
-        <h4>
-          {% if current_lang == 'he' %}גרפים חכמים{% elif current_lang == 'en' %}Smart charts{% else %}Умные графики{% endif %}
-        </h4>
-        <p>
-          {% if current_lang == 'he' %}מכירות לפי שעה, יום, מוצר ואמצעי תשלום{% elif current_lang == 'en' %}Sales by hour, day, product and payment method{% else %}Продажи по часам, дням, товарам и способам оплаты{% endif %}
-        </p>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-3">
-      <div class="feature-box">
-        <div class="feature-num">03</div>
-        <h4>
-          {% if current_lang == 'he' %}תובנות AI{% elif current_lang == 'en' %}AI insights{% else %}Инсайты от ИИ{% endif %}
-        </h4>
-        <p>
-          {% if current_lang == 'he' %}בינה מלאכותית שמסבירה את הנתונים בשפה פשוטה{% elif current_lang == 'en' %}AI that explains your data in simple, practical language{% else %}Искусственный интеллект, который простым языком объясняет, что происходит в цифрах{% endif %}
-        </p>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-3">
-      <div class="feature-box">
-        <div class="feature-num">04</div>
-        <h4>
-          {% if current_lang == 'he' %}דוחות PDF{% elif current_lang == 'en' %}PDF reports{% else %}PDF‑отчёты{% endif %}
-        </h4>
-        <p>
-          {% if current_lang == 'he' %}ייצוא מקצועי לשיתוף עם צוות או שותפים{% elif current_lang == 'en' %}Professional PDF export to share with your team or partners{% else %}Профессиональные PDF‑отчёты для команды, партнёров или бухгалтера{% endif %}
-        </p>
-      </div>
-    </div>
+  <!-- Animated Background -->
+  <div style="position: absolute; width: 100%; height: 100%; opacity: 0.1;">
+    <div style="position: absolute; width: 500px; height: 500px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); border-radius: 50%; filter: blur(100px); top: -200px; right: -100px;"></div>
+    <div style="position: absolute; width: 400px; height: 400px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 50%; filter: blur(100px); bottom: -150px; left: -100px;"></div>
   </div>
-</section>
 
-<!-- For Who Section -->
-<section class="about-section mb-5">
-  <div class="for-who-card">
-    <div class="row g-4 align-items-center">
-      <div class="col-12 col-lg-5">
-        <span class="section-label">
-          {% if current_lang == 'he' %}למי זה מתאים?{% elif current_lang == 'en' %}Who is it for?{% else %}Кому подойдёт OnePoweb?{% endif %}
-        </span>
-        <h2 class="mb-3">
-          {% if current_lang == 'he' %}בנינו את זה בשבילך{% elif current_lang == 'en' %}We built it for you{% else %}Мы сделали это специально для вас{% endif %}
-        </h2>
-        <p class="text-content">
-          {% if current_lang == 'he' %}
-            OnePoweb נבנה במיוחד עבור בעלי עסקים שרוצים להבין את הנתונים שלהם בלי להתעסק עם טכנולוגיה מסובכת.
-          {% elif current_lang == 'en' %}
-            OnePoweb is made for business owners who want to understand their numbers without dealing with complex technology.
-          {% else %}
-            OnePoweb создан для владельцев бизнеса, которые хотят понимать свои цифры, не погружаясь в сложные технологии и отчёты.
-          {% endif %}
+  <div class="container" style="position: relative; z-index: 1;">
+    <div class="row align-items-center">
+      
+      <!-- Left Side - Text Content -->
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <div class="mb-4">
+          <span class="badge" style="background: linear-gradient(135deg, rgba(46,160,255,0.2), rgba(52,195,255,0.2)); border: 1px solid rgba(46,160,255,0.3); color: #34c3ff; padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 600;">
+            ✨ AI-Powered Analytics
+          </span>
+        </div>
+        
+        <h1 class="display-3 fw-bold text-white mb-4" style="line-height: 1.2;">
+          Transform Your Business Data Into 
+          <span style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Actionable Insights</span>
+        </h1>
+        
+        <p class="lead text-muted mb-5" style="font-size: 1.25rem; line-height: 1.8;">
+          OnePoweb analyzes your sales data in seconds and provides AI-driven recommendations to boost revenue, optimize operations, and understand your customers better.
         </p>
-      </div>
-      <div class="col-12 col-lg-7">
-        <div class="who-grid">
-          <div class="who-item">
-            <i class="bi bi-cup-hot"></i>
-            <span>{% if current_lang == 'he' %}בתי קפה{% elif current_lang == 'en' %}Cafés{% else %}Кафе{% endif %}</span>
+        
+        <div class="d-flex gap-3 mb-5">
+          <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(46,160,255,0.4); transition: all 0.3s;">
+            Get Started Free <i class="bi bi-arrow-right ms-2"></i>
+          </a>
+          <a href="#features" class="btn btn-lg btn-outline-light" style="padding: 1rem 2rem; border-radius: 16px; border: 2px solid rgba(255,255,255,0.2);">
+            Learn More
+          </a>
+        </div>
+        
+        <div class="d-flex gap-4 text-muted">
+          <div>
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            <span>No credit card required</span>
           </div>
-          <div class="who-item">
-            <i class="bi bi-shop"></i>
-            <span>{% if current_lang == 'he' %}חנויות{% elif current_lang == 'en' %}Shops{% else %}Магазины{% endif %}</span>
-          </div>
-          <div class="who-item">
-            <i class="bi bi-egg-fried"></i>
-            <span>{% if current_lang == 'he' %}מסעדות{% elif current_lang == 'en' %}Restaurants{% else %}Рестораны{% endif %}</span>
-          </div>
-          <div class="who-item">
-            <i class="bi bi-basket"></i>
-            <span>{% if current_lang == 'he' %}מכולות{% elif current_lang == 'en' %}Grocery stores{% else %}Мини‑маркеты и продуктовые{% endif %}</span>
-          </div>
-          <div class="who-item">
-            <i class="bi bi-scissors"></i>
-            <span>{% if current_lang == 'he' %}מספרות{% elif current_lang == 'en' %}Barbers & salons{% else %}Салоны и барбершопы{% endif %}</span>
-          </div>
-          <div class="who-item">
-            <i class="bi bi-box-seam"></i>
-            <span>{% if current_lang == 'he' %}קמעונאות{% elif current_lang == 'en' %}Retail{% else %}Ритейл{% endif %}</span>
+          <div>
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            <span>7-day free trial</span>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- Values Section -->
-<section class="about-section mb-5">
-  <div class="text-center mb-4">
-    <span class="section-label">
-      {% if current_lang == 'he' %}הערכים שלנו{% elif current_lang == 'en' %}Our values{% else %}Наши ценности{% endif %}
-    </span>
-    <h2>
-      {% if current_lang == 'he' %}מה מנחה אותנו{% elif current_lang == 'en' %}What guides us{% else %}Что нас направляет{% endif %}
-    </h2>
-  </div>
-  
-  <div class="row g-4">
-    <div class="col-12 col-md-4">
-      <div class="value-card">
-        <div class="value-icon">🎯</div>
-        <h4>{% if current_lang == 'he' %}פשטות{% elif current_lang == 'en' %}Simplicity{% else %}Простота{% endif %}</h4>
-        <p>
-          {% if current_lang == 'he' %}
-            אם צריך הסבר ארוך — אנחנו לא עשינו את העבודה שלנו
-          {% elif current_lang == 'en' %}
-            If it needs a long explanation, we didn’t design it well enough.
-          {% else %}
-            Если нужно долго объяснять, значит инструмент сделан недостаточно просто.
-          {% endif %}
-        </p>
+      
+      <!-- Right Side - Visual/Screenshot -->
+      <div class="col-lg-6">
+        <div style="position: relative;">
+          <div style="background: linear-gradient(135deg, rgba(46,160,255,0.1), rgba(16,185,129,0.1)); border: 1px solid rgba(46,160,255,0.2); border-radius: 24px; padding: 2rem; backdrop-filter: blur(10px);">
+            <div class="text-center mb-4">
+              <i class="bi bi-graph-up-arrow" style="font-size: 5rem; color: #2ea0ff;"></i>
+            </div>
+            <div class="row g-3 text-center">
+              <div class="col-4">
+                <div style="background: rgba(46,160,255,0.1); border-radius: 16px; padding: 1.5rem;">
+                  <div class="h2 fw-bold text-white mb-2">📊</div>
+                  <div class="small text-muted">Smart Analytics</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div style="background: rgba(16,185,129,0.1); border-radius: 16px; padding: 1.5rem;">
+                  <div class="h2 fw-bold text-white mb-2">🤖</div>
+                  <div class="small text-muted">AI Insights</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div style="background: rgba(245,158,11,0.1); border-radius: 16px; padding: 1.5rem;">
+                  <div class="h2 fw-bold text-white mb-2">📈</div>
+                  <div class="small text-muted">ROI Boost</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+      
     </div>
-    <div class="col-12 col-md-4">
-      <div class="value-card">
-        <div class="value-icon">💡</div>
-        <h4>{% if current_lang == 'he' %}שקיפות{% elif current_lang == 'en' %}Transparency{% else %}Прозрачность{% endif %}</h4>
-        <p>
-          {% if current_lang == 'he' %}
-            מחירים ברורים, בלי הפתעות, בלי אותיות קטנות
-          {% elif current_lang == 'en' %}
-            Clear pricing, no surprises and no small print.
-          {% else %}
-            Понятные цены, никаких скрытых условий и мелкого шрифта.
-          {% endif %}
-        </p>
-      </div>
-    </div>
-    <div class="col-12 col-md-4">
-      <div class="value-card">
-        <div class="value-icon">🚀</div>
-        <h4>{% if current_lang == 'he' %}שיפור מתמיד{% elif current_lang == 'en' %}Continuous improvement{% else %}Постоянное улучшение{% endif %}</h4>
-        <p>
-          {% if current_lang == 'he' %}
-            מקשיבים למשוב ומשתפרים כל הזמן
-          {% elif current_lang == 'en' %}
-            We listen to feedback and keep improving the product.
-          {% else %}
-            Мы внимательно слушаем обратную связь и постоянно улучшаем сервис.
-          {% endif %}
-    </p>
   </div>
 </div>
+
+<!-- Features Section -->
+<div id="features" class="py-5" style="background: #0f1419;">
+  <div class="container py-5">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-white mb-3">Why Choose OnePoweb?</h2>
+      <p class="lead text-muted">Everything you need to make data-driven decisions</p>
+    </div>
+    
+    <div class="row g-4">
+      
+      <div class="col-md-4">
+        <div class="h-100 p-4" style="background: linear-gradient(135deg, rgba(46,160,255,0.05), rgba(52,195,255,0.05)); border: 1px solid rgba(46,160,255,0.2); border-radius: 20px; transition: transform 0.3s;">
+          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <i class="bi bi-lightning-charge" style="font-size: 2rem; color: white;"></i>
+          </div>
+          <h4 class="text-white mb-3">Instant Analysis</h4>
+          <p class="text-muted mb-0">Upload your sales data and get comprehensive insights in seconds. No manual work required.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="h-100 p-4" style="background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(52,211,153,0.05)); border: 1px solid rgba(16,185,129,0.2); border-radius: 20px; transition: transform 0.3s;">
+          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <i class="bi bi-robot" style="font-size: 2rem; color: white;"></i>
+          </div>
+          <h4 class="text-white mb-3">AI-Powered Recommendations</h4>
+          <p class="text-muted mb-0">Get personalized action plans based on your business patterns and industry best practices.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="h-100 p-4" style="background: linear-gradient(135deg, rgba(245,158,11,0.05), rgba(251,191,36,0.05)); border: 1px solid rgba(245,158,11,0.2); border-radius: 20px; transition: transform 0.3s;">
+          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <i class="bi bi-graph-up" style="font-size: 2rem; color: white;"></i>
+          </div>
+          <h4 class="text-white mb-3">ROI Calculator</h4>
+          <p class="text-muted mb-0">Discover hidden opportunities to increase revenue by 20-30% with our advanced ROI analysis.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="h-100 p-4" style="background: linear-gradient(135deg, rgba(139,92,246,0.05), rgba(167,139,250,0.05)); border: 1px solid rgba(139,92,246,0.2); border-radius: 20px;">
+          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <i class="bi bi-file-earmark-pdf" style="font-size: 2rem; color: white;"></i>
+          </div>
+          <h4 class="text-white mb-3">Professional Reports</h4>
+          <p class="text-muted mb-0">Export beautiful PDF reports with charts and insights to share with your team.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="h-100 p-4" style="background: linear-gradient(135deg, rgba(236,72,153,0.05), rgba(251,113,133,0.05)); border: 1px solid rgba(236,72,153,0.2); border-radius: 20px;">
+          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ec4899, #fb7185); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <i class="bi bi-shield-check" style="font-size: 2rem; color: white;"></i>
+          </div>
+          <h4 class="text-white mb-3">Secure & Private</h4>
+          <p class="text-muted mb-0">Your data is encrypted and stored securely. We never share your information with third parties.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="h-100 p-4" style="background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(96,165,250,0.05)); border: 1px solid rgba(59,130,246,0.2); border-radius: 20px;">
+          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #3b82f6, #60a5fa); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <i class="bi bi-globe" style="font-size: 2rem; color: white;"></i>
+          </div>
+          <h4 class="text-white mb-3">Multi-Language Support</h4>
+          <p class="text-muted mb-0">Available in Hebrew, English, and Russian with multi-currency support.</p>
+        </div>
+      </div>
+      
+    </div>
   </div>
-</section>
+</div>
 
 <!-- CTA Section -->
-<section class="about-cta">
-  <div class="cta-inner text-center">
-    <h2 class="mb-3">
-      {% if current_lang == 'he' %}מוכנים לנסות?{% elif current_lang == 'en' %}Ready to try it?{% else %}Готовы попробовать?{% endif %}
-    </h2>
-    <p class="mb-4">
-      {% if current_lang == 'he' %}
-        התחילו בחינם — בלי כרטיס אשראי, בלי התחייבות
-      {% elif current_lang == 'en' %}
-        Start for free — no credit card, no commitment.
-      {% else %}
-        Начните бесплатно — без карты и без обязательств.
-      {% endif %}
-    </p>
-    <div class="d-flex flex-wrap justify-content-center gap-3">
-      <a href="{{ url_for('index') }}" class="btn btn-cta-primary btn-lg">
-        <i class="bi bi-upload me-2"></i>
-        {% if current_lang == 'he' %}העלה דוח עכשיו{% elif current_lang == 'en' %}Upload a report now{% else %}Загрузить отчёт сейчас{% endif %}
-      </a>
-      <a href="{{ url_for('contact') }}" class="btn btn-cta-secondary btn-lg">
-        <i class="bi bi-envelope me-2"></i>
-        {% if current_lang == 'he' %}צור קשר{% elif current_lang == 'en' %}Contact us{% else %}Связаться с нами{% endif %}
+<div class="py-5" style="background: linear-gradient(135deg, #1a1f36 0%, #0f1419 100%);">
+  <div class="container py-5">
+    <div class="text-center">
+      <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Business?</h2>
+      <p class="lead text-muted mb-5">Join thousands of businesses making smarter decisions with OnePoweb</p>
+      <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1.25rem 4rem; border-radius: 16px; color: white; font-weight: 600; font-size: 1.25rem; box-shadow: 0 10px 40px rgba(46,160,255,0.4);">
+        Get Started - It's Free <i class="bi bi-arrow-right ms-2"></i>
       </a>
     </div>
   </div>
-</section>
+</div>
 
 <style>
-/* ===== About Page Styles ===== */
-
-/* Hero */
-.about-hero {
-  padding: 3rem 0;
-}
-
-.about-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto;
-  background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(46,160,255,0.15));
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: #1abc9c;
-}
-
-.about-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-}
-
-.about-subtitle {
-  font-size: 1.2rem;
-  color: var(--muted);
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-/* Sections */
-.about-section {
-  padding: 2rem 0;
-}
-
-.section-label {
-  display: inline-block;
-  background: linear-gradient(90deg, rgba(26,188,156,0.15), rgba(46,160,255,0.1));
-  color: #1abc9c;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 1rem;
-}
-
-.text-content {
-  color: var(--text);
-  font-size: 1.05rem;
-  line-height: 1.8;
-}
-
-/* Mission Card */
-.mission-card {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
-.mission-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.mission-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.mission-item:first-child {
-  padding-top: 0;
-}
-
-.mission-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(46,160,255,0.15));
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #1abc9c;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.mission-item strong {
-  display: block;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.mission-item p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-/* Feature Boxes */
-.feature-box {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.5rem;
-  height: 100%;
-  transition: all 0.3s ease;
-}
-
-.feature-box:hover {
-  border-color: rgba(26,188,156,0.3);
-  transform: translateY(-3px);
-}
-
-.feature-num {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #1abc9c, #2ea0ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  margin-bottom: 0.5rem;
-}
-
-.feature-box h4 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.feature-box p {
-  color: var(--muted);
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-/* For Who Card */
-.for-who-card {
-  background: linear-gradient(135deg, rgba(26,188,156,0.08), rgba(46,160,255,0.05));
-  border: 1px solid rgba(26,188,156,0.2);
-  border-radius: 20px;
-  padding: 2.5rem;
-}
-
-.who-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
-
-.who-item {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.who-item:hover {
-  border-color: rgba(26,188,156,0.4);
-  background: rgba(26,188,156,0.05);
-}
-
-.who-item i {
-  font-size: 1.5rem;
-  color: #1abc9c;
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.who-item span {
-  font-size: 0.9rem;
-  color: var(--text);
-}
-
-/* Value Cards */
-.value-card {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem;
-  text-align: center;
-  height: 100%;
-}
-
-.value-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.value-card h4 {
-  margin-bottom: 0.5rem;
-}
-
-.value-card p {
-  color: var(--muted);
-  font-size: 0.95rem;
-  margin: 0;
-}
-
-/* CTA */
-.about-cta {
-  background: linear-gradient(135deg, rgba(26,188,156,0.1), rgba(46,160,255,0.08));
-  border: 1px solid rgba(26,188,156,0.25);
-  border-radius: 20px;
-  padding: 3rem 2rem;
-  margin-top: 2rem;
-}
-
-.btn-cta-primary {
-  background: linear-gradient(90deg, #1abc9c, #16e0bd);
-  color: #000;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 12px;
-  font-weight: 600;
-}
-
-.btn-cta-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(26,188,156,0.35);
-  color: #000;
-}
-
-.btn-cta-secondary {
-  background: rgba(255,255,255,0.05);
-  color: var(--text);
-  border: 1px solid rgba(255,255,255,0.15);
-  padding: 14px 28px;
-  border-radius: 12px;
-  font-weight: 600;
-}
-
-.btn-cta-secondary:hover {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .about-title {
-    font-size: 1.75rem;
+  .col-md-4 > div:hover {
+    transform: translateY(-5px);
   }
-  .who-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .for-who-card {
-    padding: 1.5rem;
-  }
-}
 </style>
 
 {% endblock %}

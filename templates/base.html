@@ -323,17 +323,19 @@
       </button>
       <div id="nav" class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto">
+          {% if session.uid %}
+            <li class="nav-item">
+              <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('index') }}">{{ t('nav_home') }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if active=='dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+            </li>
+          {% endif %}
           <li class="nav-item">
-            <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('index') }}">{{ t('nav_home') }}</a>
+            <a class="nav-link {% if active=='about' %}active{% endif %}" href="{{ url_for('about') }}">About</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if active=='about' %}active{% endif %}" href="{{ url_for('about') }}">{{ t('nav_about') }}</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if active=='contact' %}active{% endif %}" href="{{ url_for('contact') }}">{{ t('nav_contact') }}</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if active=='landing' %}active{% endif %}" href="{{ url_for('landing') }}">{{ t('nav_about') }}</a>
+            <a class="nav-link {% if active=='contact' %}active{% endif %}" href="{{ url_for('contact') }}">Contact</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {% if active=='pricing' %}active{% endif %}" href="{{ url_for('pricing') }}" style="background: linear-gradient(90deg, rgba(16,185,129,0.15), rgba(46,160,255,0.1)); color: #10b981 !important; border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 6px 12px !important; font-weight: 600;">
@@ -354,6 +356,14 @@
 
         <!-- חלק ימין -->
         <ul class="navbar-nav ms-auto align-items-center">
+          {% if not session.uid %}
+            <!-- Get Started button for guests -->
+            <li class="nav-item me-2">
+              <a href="{{ url_for('get_started') }}" class="btn" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 0.75rem 2rem; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(46,160,255,0.4); transition: all 0.3s;">
+                Get Started <i class="bi bi-arrow-right ms-2"></i>
+              </a>
+            </li>
+          {% endif %}
           {% if session.uid %}
             {% set u = current_user() %}
             {% set effective = get_effective_plan(u) if u else 'free' %}

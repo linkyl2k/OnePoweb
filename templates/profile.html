@@ -188,15 +188,13 @@
             </a>
 
             <!-- Delete Account -->
-            <a href="#" onclick="confirmDelete(); return false;" class="d-flex align-items-center p-3 text-decoration-none" style="background: rgba(239,68,68,0.05); border-radius: 12px; border: 1px solid rgba(239,68,68,0.15); transition: all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.1)'; this.style.borderColor='rgba(239,68,68,0.3)';" onmouseout="this.style.background='rgba(239,68,68,0.05)'; this.style.borderColor='rgba(239,68,68,0.15)';">
-              <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(239,68,68,0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                <i class="bi bi-trash" style="font-size: 1.1rem; color: #f87171;"></i>
+            <a href="#" onclick="confirmDelete(); return false;" class="d-flex align-items-center p-2 text-decoration-none mt-2" style="background: transparent; border: none; transition: opacity 0.2s; opacity: 0.5;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='0.5';">
+              <div style="width: 24px; height: 24px; border-radius: 6px; background: transparent; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                <i class="bi bi-trash" style="font-size: 0.75rem; color: var(--muted);"></i>
               </div>
               <div class="flex-grow-1">
-                <div style="color: #f87171; font-weight: 500;">{% if current_lang == 'he' %}מחיקת חשבון{% elif current_lang == 'en' %}Delete Account{% else %}Удалить аккаунт{% endif %}</div>
-                <small style="color: rgba(248,113,113,0.7);">{% if current_lang == 'he' %}פעולה בלתי הפיכה{% elif current_lang == 'en' %}Irreversible action{% else %}Необратимое действие{% endif %}</small>
+                <small style="color: var(--muted); font-size: 0.75rem; font-weight: 400;">{% if current_lang == 'he' %}מחיקת חשבון{% elif current_lang == 'en' %}Delete Account{% else %}Удалить аккаунт{% endif %}</small>
               </div>
-              <i class="bi bi-chevron-{{ 'left' if current_lang == 'he' else 'right' }}" style="color: #f87171;"></i>
             </a>
           </div>
         </div>

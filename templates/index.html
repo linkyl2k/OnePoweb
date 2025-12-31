@@ -1516,7 +1516,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- Include Onboarding Modal for new users -->
-{% if current_user and not current_user['onboarding_completed'] %}
+{% set u = current_user() %}
+{% if u and not u['onboarding_completed'] %}
   {% include 'onboarding_modal.html' %}
   <script>
     // Show onboarding modal automatically for new users

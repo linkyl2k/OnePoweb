@@ -4184,13 +4184,11 @@ def index():
     messages, plots = [], []
     current_lang = get_language()  # Получаем текущий язык
     print(f"🌐 index(): current_lang = {current_lang}")
-    u = current_user()  # Get current user for onboarding check
 
     def _render():
         return render_template("index.html",
                                messages=messages, plots=plots,
-                               active="home", title="ניתוח דוח",
-                               current_user=u)
+                               active="home", title="ניתוח דוח")
 
     # GET – מסך העלאה
     if request.method == "GET":

@@ -11,7 +11,7 @@
     </div>
     <div class="d-flex gap-2">
       <a class="btn btn-outline-secondary" href="{{ url_for('result') }}">{% if current_lang == 'he' %}חזרה לתוצאות{% elif current_lang == 'en' %}Back to Results{% else %}Вернуться к результатам{% endif %}</a>
-      <a class="btn btn-primary" href="{{ url_for('export_pdf') }}">{% if current_lang == 'he' %}הורדת PDF{% elif current_lang == 'en' %}Download PDF{% else %}Скачать PDF{% endif %}</a>
+      <a class="btn btn-primary" href="{{ url_for('export_pdf', report_id=saved_report_id) if saved_report_id else url_for('export_pdf') }}">{% if current_lang == 'he' %}הורדת PDF{% elif current_lang == 'en' %}Download PDF{% else %}Скачать PDF{% endif %}</a>
     </div>
   </div>
 

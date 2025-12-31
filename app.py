@@ -5558,12 +5558,12 @@ def export_pdf():
     """
     יצוא PDF באמצעות WeasyPrint (ללא דפדפן) עם RTL תקין.
     כולל בלוק ROI מעוצב בדף הראשון + עמוד ROI מסכם (אם קיים ROI).
+    Поддерживает загрузку из сохраненного отчета через параметр report_id.
     """
     import os, io, textwrap
     from datetime import datetime as _dt
 
     # ---------- 1) שליפת snapshot ----------
-    # תמיד לקחת מ-LAST_EXPORT (הכי עדכני)
     u = current_user()
     plan = get_effective_plan(u) if u else "free"
     
@@ -5576,57 +5576,124 @@ def export_pdf():
                                feature="הורדת PDF עם המלצות",
                                title="שדרוג נדרש"), 403
     
-    # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
-    session_data = session.get("last_export", {})
-    print(f"📄 PDF Export: session_data has {len(session_data.get('plots', []))} plots")
+    # Проверяем, есть ли report_id в параметрах (для экспорта сохраненного отчета)
+    report_id = request.args.get("report_id", type=int)
     
-    if session_data:
-        # Данные из сессии
-        generated_at_str = session_data.get("generated_at", "")
-        if generated_at_str:
-            try:
-                from datetime import datetime
-                dt = datetime.fromisoformat(generated_at_str)
-                generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
-            except:
-                generated_at_str = ""
-        current_lang = get_language()
-        raw_summary = session_data.get("summary", "")
-
-        # summary может быть dict с языками или строкой
-        if isinstance(raw_summary, dict):
-            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
-        else:
-            summary_for_lang = raw_summary
-
-        snap = {
-            "generated_at": generated_at_str,
-            "lang": session_data.get("lang") or get_language(),
-            "summary": summary_for_lang,
-            "summary_ai": session_data.get("summary_ai", ""),
-            "roi": session_data.get("roi", {}),
-            "plots": session_data.get("plots", []),
-        }
-        print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
+    if report_id:
+        # Загружаем данные из сохраненного отчета
+        print(f"📄 PDF Export: Loading from saved report {report_id}")
+        try:
+            df = load_report(report_id, u["id"])
+            if df is None:
+                current_lang = get_language()
+                if current_lang == 'he':
+                    return "דוח לא נמצא או אין הרשאה", 404
+                elif current_lang == 'ru':
+                    return "Отчет не найден или нет доступа", 404
+                else:
+                    return "Report not found or access denied", 404
+            
+            # Генерируем отчет заново из DataFrame
+            # Получаем информацию о отчете из базы данных
+            db = get_db()
+            report_row = db.execute(
+                "SELECT name, created_at, summary_json, currency FROM reports WHERE id = ? AND user_id = ?",
+                (report_id, u["id"])
+            ).fetchone()
+            
+            if not report_row:
+                return "Report not found", 404
+            
+            report_name = report_row['name']
+            created_at = report_row['created_at']
+            summary_json = json.loads(report_row['summary_json'] or '{}')
+            report_currency = report_row.get('currency', 'USD')
+            
+            # Определяем язык из валюты отчета или используем текущий
+            if report_currency == 'ILS':
+                report_lang = 'he'
+            elif report_currency == 'RUB':
+                report_lang = 'ru'
+            else:
+                report_lang = get_language()
+            
+            # Создаем snapshot из данных отчета
+            snap = {
+                "generated_at": created_at,
+                "lang": report_lang,
+                "summary": f"Report: {report_name}",
+                "summary_ai": "",
+                "roi": {},
+                "plots": []
+            }
+            
+            # TODO: Здесь можно регенерировать графики из DataFrame
+            # Пока используем только summary данные
+            print(f"📄 PDF: Loaded from saved report {report_id}, name={report_name}")
+            
+        except Exception as e:
+            print(f"❌ Error loading report {report_id}: {e}")
+            import traceback
+            traceback.print_exc()
+            current_lang = get_language()
+            if current_lang == 'he':
+                return f"שגיאה בטעינת דוח: {str(e)}", 500
+            elif current_lang == 'ru':
+                return f"Ошибка загрузки отчета: {str(e)}", 500
+            else:
+                return f"Error loading report: {str(e)}", 500
     else:
-        # Fallback на LAST_EXPORT
-        current_lang = get_language()
-        raw_summary = LAST_EXPORT.get("summary", "")
-        if isinstance(raw_summary, dict):
-            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
-        else:
-            summary_for_lang = raw_summary
+        # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
+        session_data = session.get("last_export", {})
+        print(f"📄 PDF Export: session_data has {len(session_data.get('plots', []))} plots")
+        
+        if session_data:
+            # Данные из сессии
+            generated_at_str = session_data.get("generated_at", "")
+            if generated_at_str:
+                try:
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(generated_at_str)
+                    generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
+                except:
+                    generated_at_str = ""
+            current_lang = get_language()
+            raw_summary = session_data.get("summary", "")
 
-        snap = {
-            "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
-                             if LAST_EXPORT.get("generated_at") else ""),
-            "lang": LAST_EXPORT.get("lang") or get_language(),
-            "summary": summary_for_lang,
-            "summary_ai": LAST_EXPORT.get("summary_ai", ""),
-            "roi": LAST_EXPORT.get("roi", {}),
-            "plots": LAST_EXPORT.get("plots", []),
-        }
-        print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
+            # summary может быть dict с языками или строкой
+            if isinstance(raw_summary, dict):
+                summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+            else:
+                summary_for_lang = raw_summary
+
+            snap = {
+                "generated_at": generated_at_str,
+                "lang": session_data.get("lang") or get_language(),
+                "summary": summary_for_lang,
+                "summary_ai": session_data.get("summary_ai", ""),
+                "roi": session_data.get("roi", {}),
+                "plots": session_data.get("plots", []),
+            }
+            print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
+        else:
+            # Fallback на LAST_EXPORT
+            current_lang = get_language()
+            raw_summary = LAST_EXPORT.get("summary", "")
+            if isinstance(raw_summary, dict):
+                summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+            else:
+                summary_for_lang = raw_summary
+
+            snap = {
+                "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
+                                 if LAST_EXPORT.get("generated_at") else ""),
+                "lang": LAST_EXPORT.get("lang") or get_language(),
+                "summary": summary_for_lang,
+                "summary_ai": LAST_EXPORT.get("summary_ai", ""),
+                "roi": LAST_EXPORT.get("roi", {}),
+                "plots": LAST_EXPORT.get("plots", []),
+            }
+            print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
     
     print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}, lang={snap.get('lang')}")
     print(f"📄 PDF Snap plots detail: {[p.get('filename') for p in snap.get('plots', [])]}")
@@ -7767,9 +7834,11 @@ def roi_page():
     export_data = {}
     
     # 1. Сначала пробуем LAST_EXPORT (глобальная переменная - самый быстрый)
+    saved_report_id = None
     if LAST_EXPORT.get("roi"):
         roi = LAST_EXPORT.get("roi", {})
         export_data = LAST_EXPORT
+        saved_report_id = LAST_EXPORT.get("saved_report_id")
         print(f"📊 ROI Page: Loaded from LAST_EXPORT")
     else:
         # 2. Fallback на session (для multi-worker на Render)
@@ -7777,6 +7846,7 @@ def roi_page():
         if session_data:
             roi = session_data.get("roi", {})
             export_data = session_data
+            saved_report_id = session_data.get("saved_report_id")
             print(f"📊 ROI Page: Loaded from session")
     
     # Если данных все еще нет, пробуем загрузить из последнего сохраненного отчета
@@ -7885,6 +7955,7 @@ def roi_page():
         has_any=has_any,
         diagnosis=diagnosis,
         action_plan=action_plan,
+        saved_report_id=saved_report_id,
         title="ROI משוער",
         active="roi",
     )
@@ -7905,6 +7976,7 @@ def result():
     
     # Сначала пробуем LAST_EXPORT (глобальная переменная - работает мгновенно)
     plots_from_export = LAST_EXPORT.get("plots", [])
+    saved_report_id = None
     print(f"🔍 /result: Checking LAST_EXPORT - has_data={bool(LAST_EXPORT)}, plots_count={len(plots_from_export)}")
     
     if plots_from_export and len(plots_from_export) > 0:
@@ -7918,7 +7990,8 @@ def result():
         summary_ai = LAST_EXPORT.get("summary_ai", "")
         roi = LAST_EXPORT.get("roi", {})
         action_items = LAST_EXPORT.get("action_items", [])
-        print(f"✅ Loaded from LAST_EXPORT: {len(plots)} plots")
+        saved_report_id = LAST_EXPORT.get("saved_report_id")
+        print(f"✅ Loaded from LAST_EXPORT: {len(plots)} plots, saved_report_id={saved_report_id}")
         if plots:
             print(f"✅ First plot sample: filename={plots[0].get('filename', 'N/A')}, title={plots[0].get('title', 'N/A')}")
     else:
@@ -7939,7 +8012,8 @@ def result():
                 summary_ai = session_data.get("summary_ai", "")
                 roi = session_data.get("roi", {})
                 action_items = session_data.get("action_items", [])
-                print(f"✅ Loaded from session: {len(plots)} plots")
+                saved_report_id = session_data.get("saved_report_id")
+                print(f"✅ Loaded from session: {len(plots)} plots, saved_report_id={saved_report_id}")
                 if plots:
                     print(f"✅ First plot sample: filename={plots[0].get('filename', 'N/A')}, title={plots[0].get('title', 'N/A')}")
             else:
@@ -8054,6 +8128,7 @@ def result():
         action_items=action_items,
         messages=messages,
         user_plan=user_plan,
+        saved_report_id=saved_report_id,
         title="תוצאות הניתוח",
         active="result",
     )

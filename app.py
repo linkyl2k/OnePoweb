@@ -8279,11 +8279,25 @@ from flask import render_template
 
 @app.errorhandler(404)
 def not_found(e):
-    return render_template("error.html", code=404, msg="העמוד לא נמצא"), 404
+    lang = session.get("lang", "he")
+    if lang == "en":
+        msg = "Page not found"
+    elif lang == "ru":
+        msg = "Страница не найдена"
+    else:
+        msg = "העמוד לא נמצא"
+    return render_template("error.html", code=404, msg=msg), 404
 
 @app.errorhandler(500)
 def server_error(e):
-    return render_template("error.html", code=500, msg="שגיאה בשרת"), 500
+    lang = session.get("lang", "he")
+    if lang == "en":
+        msg = "Server error"
+    elif lang == "ru":
+        msg = "Ошибка сервера"
+    else:
+        msg = "שגיאה בשרת"
+    return render_template("error.html", code=500, msg=msg), 500
 
 @app.route("/landing")
 def landing():

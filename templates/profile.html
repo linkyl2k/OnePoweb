@@ -139,75 +139,8 @@
       </div>
     </div>
 
-    <!-- Referral Card -->
-    <div class="col-12 col-lg-6">
-      <div class="card h-100">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-3 mb-4">
-            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(26,188,156,0.2), rgba(16,185,129,0.15)); display: flex; align-items: center; justify-content: center;">
-              <i class="bi bi-gift" style="font-size: 1.25rem; color: #1abc9c;"></i>
-            </div>
-            <div>
-              <h5 class="mb-0">{% if current_lang == 'he' %}הזמן חברים{% elif current_lang == 'en' %}Invite Friends{% else %}Пригласить друзей{% endif %}</h5>
-              <span class="text-muted small">{% if current_lang == 'he' %}קבל 50% הנחה על החודש הבא{% elif current_lang == 'en' %}Get 50% discount on next month{% else %}Получите 50% скидку на следующий месяц{% endif %}</span>
-            </div>
-          </div>
-
-          <!-- Stats Row -->
-          <div class="row g-3 mb-4">
-            <div class="col-6">
-              <div class="text-center p-3" style="background: rgba(16,185,129,0.08); border-radius: 12px; border: 1px solid rgba(16,185,129,0.15);">
-                <div style="font-size: 2rem; font-weight: bold; color: #34d399;">
-                  {% if user.referral_discount and user.referral_discount > 0 %}{{ user.referral_discount }}%{% else %}0%{% endif %}
-                </div>
-                <div class="text-muted small">{{ t('profile_referral_pending') }}</div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="text-center p-3" style="background: rgba(46,160,255,0.08); border-radius: 12px; border: 1px solid rgba(46,160,255,0.15);">
-                <div style="font-size: 2rem; font-weight: bold; color: #34c3ff;">
-                  {{ user.referred_count or 0 }}
-                </div>
-                <div class="text-muted small">{% if current_lang == 'he' %}חברים הצטרפו{% elif current_lang == 'en' %}Friends Joined{% else %}Друзей присоединилось{% endif %}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Referral Link -->
-          <label class="form-label small text-muted mb-2">{% if current_lang == 'he' %}הלינק האישי שלך:{% elif current_lang == 'en' %}Your Personal Link:{% else %}Ваша персональная ссылка:{% endif %}</label>
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" readonly value="{{ url_for('signup', ref=user.ref_code, _external=True) }}" style="font-size: 0.85rem; border-radius: 10px 0 0 10px;">
-            <button class="btn" type="button" onclick="copyLink(this)" style="background: linear-gradient(90deg, #1abc9c, #16e0bd); color: #fff; border: none; border-radius: 0 10px 10px 0; padding: 0 20px;">
-              <i class="bi bi-clipboard"></i> {% if current_lang == 'he' %}העתק{% elif current_lang == 'en' %}Copy{% else %}Копировать{% endif %}
-            </button>
-          </div>
-
-          <p class="small text-muted mb-3" style="line-height: 1.6;">
-            <i class="bi bi-info-circle me-1"></i>
-            {% if current_lang == 'he' %}שתף/י את הלינק — כל חבר/ה שמצטרף/ת ומשלם/ת מזכה אותך ב־<strong>50% הנחה</strong> על החודש הבא. ההנחה חד-פעמית ותחול אוטומטית בחיוב הבא.{% elif current_lang == 'en' %}Share the link — every friend who joins and pays earns you a <strong>50% discount</strong> on next month. The discount is one-time and will apply automatically on the next charge.{% else %}Поделитесь ссылкой — каждый друг, который присоединится и оплатит, даст вам <strong>50% скидку</strong> на следующий месяц. Скидка одноразовая и будет применена автоматически при следующем платеже.{% endif %}
-          </p>
-
-          <a class="btn w-100" href="{{ url_for('referrals') }}" style="background: rgba(26,188,156,0.12); color: #1abc9c; border: 1px solid rgba(26,188,156,0.25); border-radius: 10px; padding: 10px;">
-            <i class="bi bi-bar-chart me-2"></i> {% if current_lang == 'he' %}פרטים נוספים{% elif current_lang == 'en' %}More Details{% else %}Подробнее{% endif %}
-          </a>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <script>
-function copyLink(btn) {
-  const input = btn.parentElement.querySelector('input');
-  navigator.clipboard.writeText(input.value);
-  const originalHtml = btn.innerHTML;
-  btn.innerHTML = '<i class="bi bi-check2"></i> {% if current_lang == 'he' %}הועתק!{% elif current_lang == 'en' %}Copied!{% else %}Скопировано!{% endif %}';
-  btn.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
-  setTimeout(() => {
-    btn.innerHTML = originalHtml;
-    btn.style.background = 'linear-gradient(90deg, #1abc9c, #16e0bd)';
-  }, 2000);
-}
-</script>
 {% endblock %}

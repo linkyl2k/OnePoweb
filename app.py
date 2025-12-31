@@ -5569,6 +5569,7 @@ def export_pdf():
     
     # DEBUG
     print(f"📄 PDF Export: plan={plan}, LAST_EXPORT plots count={len(LAST_EXPORT.get('plots', []))}")
+    print(f"📄 PDF Export: Session has last_export: {bool(session.get('last_export'))}")
     
     if plan not in ("pro", "premium", "admin"):
         return render_template("upgrade_required.html", 
@@ -5577,6 +5578,7 @@ def export_pdf():
     
     # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
     session_data = session.get("last_export", {})
+    print(f"📄 PDF Export: session_data has {len(session_data.get('plots', []))} plots")
     
     if session_data:
         # Данные из сессии
@@ -5627,6 +5629,18 @@ def export_pdf():
         print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
     
     print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}, lang={snap.get('lang')}")
+    print(f"📄 PDF Snap plots detail: {[p.get('filename') for p in snap.get('plots', [])]}")
+
+    # Проверка, есть ли данные для экспорта
+    if not snap.get('plots') and not snap.get('summary') and not snap.get('roi'):
+        current_lang = get_language()
+        if current_lang == 'he':
+            error_msg = "לא נמצאו נתונים לייצוא. אנא העלה דוח תחילה."
+        elif current_lang == 'ru':
+            error_msg = "Нет данных для экспорта. Пожалуйста, сначала загрузите отчет."
+        else:
+            error_msg = "No data found for export. Please upload a report first."
+        return f"<h1>Error</h1><p>{error_msg}</p><p><a href='/'>Go back</a></p>", 404
 
     # Язык PDF берём из snapshot (язык анализа), а не из текущей сессии
     pdf_lang_code = snap.get("lang") or get_language()

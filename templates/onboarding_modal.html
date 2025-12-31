@@ -1,0 +1,319 @@
+<!-- Onboarding Modal -->
+<div class="modal fade" id="onboardingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius: 24px; border: none; background: linear-gradient(135deg, #1a1f36 0%, #0f1419 100%); box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+      
+      <!-- Progress Bar -->
+      <div style="padding: 0 2rem; padding-top: 2rem;">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-white small fw-bold">Getting to know you...</span>
+          <span class="text-white small"><span id="currentStep">1</span>/3</span>
+        </div>
+        <div class="progress" style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+          <div class="progress-bar" id="progressBar" role="progressbar" style="width: 33%; background: linear-gradient(90deg, #2ea0ff, #34c3ff); border-radius: 10px; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <div class="modal-body p-5">
+        <form id="onboardingForm">
+          
+          <!-- Question 1: Business Locations -->
+          <div class="onboarding-question" id="question1">
+            <div class="text-center mb-4">
+              <div style="width: 80px; height: 80px; margin: 0 auto 1rem; border-radius: 20px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(46,160,255,0.3);">
+                <i class="bi bi-shop" style="font-size: 2.5rem; color: white;"></i>
+              </div>
+              <h3 class="text-white mb-2 fw-bold">How many locations does your business have?</h3>
+              <p class="text-muted mb-4">This helps us tailor insights specifically for your business scale</p>
+            </div>
+            
+            <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <input type="radio" class="btn-check" name="locations" id="loc1" value="1" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4" for="loc1" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏪</div>
+                  <div class="fw-bold">Single</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="radio" class="btn-check" name="locations" id="loc2" value="2-5" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4" for="loc2" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏬</div>
+                  <div class="fw-bold">2-5</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="radio" class="btn-check" name="locations" id="loc3" value="6-20" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4" for="loc3" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏢</div>
+                  <div class="fw-bold">6-20</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="radio" class="btn-check" name="locations" id="loc4" value="20+" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4" for="loc4" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌐</div>
+                  <div class="fw-bold">20+</div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question 2: Industry -->
+          <div class="onboarding-question" id="question2" style="display: none;">
+            <div class="text-center mb-4">
+              <div style="width: 80px; height: 80px; margin: 0 auto 1rem; border-radius: 20px; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(16,185,129,0.3);">
+                <i class="bi bi-briefcase" style="font-size: 2.5rem; color: white;"></i>
+              </div>
+              <h3 class="text-white mb-2 fw-bold">What industry are you in?</h3>
+              <p class="text-muted mb-4">We'll provide industry-specific recommendations</p>
+            </div>
+            
+            <div class="row g-3">
+              <div class="col-6 col-md-4">
+                <input type="radio" class="btn-check" name="industry" id="ind1" value="Restaurant/Cafe" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-3" for="ind1" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🍽️</div>
+                  <div class="small fw-bold">Restaurant/Cafe</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-4">
+                <input type="radio" class="btn-check" name="industry" id="ind2" value="Retail" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-3" for="ind2" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛍️</div>
+                  <div class="small fw-bold">Retail</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-4">
+                <input type="radio" class="btn-check" name="industry" id="ind3" value="Services" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-3" for="ind3" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">💼</div>
+                  <div class="small fw-bold">Services</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-4">
+                <input type="radio" class="btn-check" name="industry" id="ind4" value="E-commerce" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-3" for="ind4" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛒</div>
+                  <div class="small fw-bold">E-commerce</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-4">
+                <input type="radio" class="btn-check" name="industry" id="ind5" value="Healthcare" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-3" for="ind5" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏥</div>
+                  <div class="small fw-bold">Healthcare</div>
+                </label>
+              </div>
+              <div class="col-6 col-md-4">
+                <input type="radio" class="btn-check" name="industry" id="ind6" value="Other" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-3" for="ind6" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                  <div class="small fw-bold">Other</div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question 3: Primary Goal -->
+          <div class="onboarding-question" id="question3" style="display: none;">
+            <div class="text-center mb-4">
+              <div style="width: 80px; height: 80px; margin: 0 auto 1rem; border-radius: 20px; background: linear-gradient(135deg, #f59e0b, #fbbf24); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(245,158,11,0.3);">
+                <i class="bi bi-bullseye" style="font-size: 2.5rem; color: white;"></i>
+              </div>
+              <h3 class="text-white mb-2 fw-bold">What's your primary goal?</h3>
+              <p class="text-muted mb-4">Let's focus on what matters most to you</p>
+            </div>
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <input type="radio" class="btn-check" name="goal" id="goal1" value="Increase Revenue" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4 text-start" for="goal1" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div class="d-flex align-items-center">
+                    <div style="font-size: 2rem; margin-right: 1rem;">📈</div>
+                    <div>
+                      <div class="fw-bold">Increase Revenue</div>
+                      <div class="small text-muted">Boost your sales and income</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <div class="col-md-6">
+                <input type="radio" class="btn-check" name="goal" id="goal2" value="Optimize Operations" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4 text-start" for="goal2" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div class="d-flex align-items-center">
+                    <div style="font-size: 2rem; margin-right: 1rem;">⚙️</div>
+                    <div>
+                      <div class="fw-bold">Optimize Operations</div>
+                      <div class="small text-muted">Improve efficiency and reduce costs</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <div class="col-md-6">
+                <input type="radio" class="btn-check" name="goal" id="goal3" value="Understand Customers" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4 text-start" for="goal3" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div class="d-flex align-items-center">
+                    <div style="font-size: 2rem; margin-right: 1rem;">👥</div>
+                    <div>
+                      <div class="fw-bold">Understand Customers</div>
+                      <div class="small text-muted">Gain insights into buyer behavior</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <div class="col-md-6">
+                <input type="radio" class="btn-check" name="goal" id="goal4" value="Track Performance" autocomplete="off">
+                <label class="btn btn-outline-light w-100 py-4 text-start" for="goal4" style="border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                  <div class="d-flex align-items-center">
+                    <div style="font-size: 2rem; margin-right: 1rem;">📊</div>
+                    <div>
+                      <div class="fw-bold">Track Performance</div>
+                      <div class="small text-muted">Monitor KPIs and metrics</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer border-0 px-5 pb-4 pt-0">
+        <div class="w-100 d-flex justify-content-between align-items-center">
+          <button type="button" class="btn btn-link text-muted" id="skipBtn" style="text-decoration: none;">
+            Skip for now
+          </button>
+          <div>
+            <button type="button" class="btn btn-outline-light me-2" id="backBtn" style="display: none; border-radius: 12px; padding: 0.75rem 1.5rem;">
+              <i class="bi bi-arrow-left me-1"></i> Back
+            </button>
+            <button type="button" class="btn btn-primary" id="nextBtn" style="border-radius: 12px; padding: 0.75rem 2rem; background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; box-shadow: 0 4px 15px rgba(46,160,255,0.4);">
+              Next <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+            <button type="button" class="btn btn-success" id="finishBtn" style="display: none; border-radius: 12px; padding: 0.75rem 2rem; background: linear-gradient(135deg, #10b981, #34d399); border: none; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
+              Get Started <i class="bi bi-check-lg ms-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Button hover effects */
+  .btn-check:checked + .btn-outline-light {
+    background: linear-gradient(135deg, #2ea0ff, #34c3ff) !important;
+    border-color: #2ea0ff !important;
+    color: white !important;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(46,160,255,0.4);
+  }
+  
+  .btn-outline-light:hover {
+    background: rgba(255,255,255,0.05) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    transform: translateY(-2px);
+  }
+  
+  #skipBtn:hover {
+    color: white !important;
+  }
+</style>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 3;
+  
+  const questions = ['question1', 'question2', 'question3'];
+  const answers = {
+    locations: null,
+    industry: null,
+    goal: null
+  };
+  
+  function updateProgress() {
+    const percentage = (currentStep / totalSteps) * 100;
+    document.getElementById('progressBar').style.width = percentage + '%';
+    document.getElementById('currentStep').textContent = currentStep;
+  }
+  
+  function showQuestion(step) {
+    questions.forEach((q, idx) => {
+      document.getElementById(q).style.display = (idx + 1 === step) ? 'block' : 'none';
+    });
+    
+    document.getElementById('backBtn').style.display = (step > 1) ? 'inline-block' : 'none';
+    document.getElementById('nextBtn').style.display = (step < totalSteps) ? 'inline-block' : 'none';
+    document.getElementById('finishBtn').style.display = (step === totalSteps) ? 'inline-block' : 'none';
+  }
+  
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    // Capture current answer
+    if (currentStep === 1) {
+      const selected = document.querySelector('input[name="locations"]:checked');
+      if (selected) answers.locations = selected.value;
+    } else if (currentStep === 2) {
+      const selected = document.querySelector('input[name="industry"]:checked');
+      if (selected) answers.industry = selected.value;
+    }
+    
+    if (currentStep < totalSteps) {
+      currentStep++;
+      updateProgress();
+      showQuestion(currentStep);
+    }
+  });
+  
+  document.getElementById('backBtn').addEventListener('click', function() {
+    if (currentStep > 1) {
+      currentStep--;
+      updateProgress();
+      showQuestion(currentStep);
+    }
+  });
+  
+  document.getElementById('finishBtn').addEventListener('click', function() {
+    // Capture final answer
+    const selected = document.querySelector('input[name="goal"]:checked');
+    if (selected) answers.goal = selected.value;
+    
+    // Send to backend
+    fetch('/save-onboarding', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(answers)
+    }).then(response => {
+      if (response.ok) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('onboardingModal'));
+        modal.hide();
+      }
+    });
+  });
+  
+  document.getElementById('skipBtn').addEventListener('click', function() {
+    // Mark as completed but with null values
+    fetch('/save-onboarding', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ skipped: true })
+    }).then(response => {
+      if (response.ok) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('onboardingModal'));
+        modal.hide();
+      }
+    });
+  });
+  
+  // Initialize
+  updateProgress();
+  showQuestion(currentStep);
+</script>
+

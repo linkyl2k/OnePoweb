@@ -1249,6 +1249,16 @@ def ensure_subscription_columns():
         c.execute("ALTER TABLE users ADD COLUMN trial_until TEXT NULL")
     if "trial_used" not in columns:
         c.execute("ALTER TABLE users ADD COLUMN trial_used INTEGER DEFAULT 0")
+    
+    # עמודות onboarding
+    if "onboarding_completed" not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0")
+    if "business_locations" not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN business_locations TEXT NULL")
+    if "business_industry" not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN business_industry TEXT NULL")
+    if "primary_goal" not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN primary_goal TEXT NULL")
 
     conn.commit()
     conn.close()
@@ -4174,11 +4184,13 @@ def index():
     messages, plots = [], []
     current_lang = get_language()  # Получаем текущий язык
     print(f"🌐 index(): current_lang = {current_lang}")
+    u = current_user()  # Get current user for onboarding check
 
     def _render():
         return render_template("index.html",
                                messages=messages, plots=plots,
-                               active="home", title="ניתוח דוח")
+                               active="home", title="ניתוח דוח",
+                               current_user=u)
 
     # GET – מסך העלאה
     if request.method == "GET":
@@ -7616,6 +7628,44 @@ def profile():
     u = current_user()
     return render_template("profile.html", user=u, active="profile", title="הפרופיל שלי")
 
+@app.route("/save-onboarding", methods=["POST"])
+@login_required
+def save_onboarding():
+    """Save user's onboarding answers"""
+    try:
+        data = request.get_json()
+        u = current_user()
+        
+        if not u:
+            return jsonify({"error": "Not authenticated"}), 401
+        
+        db = get_db()
+        
+        # If user skipped, just mark as completed
+        if data.get("skipped"):
+            db.execute(
+                "UPDATE users SET onboarding_completed = 1 WHERE id = ?",
+                (u["id"],)
+            )
+        else:
+            # Save all answers
+            db.execute(
+                """UPDATE users 
+                   SET onboarding_completed = 1, 
+                       business_locations = ?, 
+                       business_industry = ?, 
+                       primary_goal = ?
+                   WHERE id = ?""",
+                (data.get("locations"), data.get("industry"), data.get("goal"), u["id"])
+            )
+        
+        db.commit()
+        return jsonify({"success": True}), 200
+    
+    except Exception as e:
+        print(f"Error saving onboarding: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
@@ -8496,6 +8546,7 @@ def robots():
 if __name__ == "__main__":
     # יוצרים הקשר אפליקציה רגע לפני ההרצה
     with app.app_context():
+        init_db()  # Initialize database with all columns including onboarding
         ensure_tables()  # כאן נוצרת/מתעדכנת הטבלה
 
     app.run(debug=True)

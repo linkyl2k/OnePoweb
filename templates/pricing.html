@@ -6,10 +6,10 @@
   <div class="text-center mb-5">
     <h1 class="display-5 fw-bold mb-3">
       <i class="bi bi-gem me-2" style="color: #1abc9c;"></i>
-      {{ t('pricing_title') }}
+      {% if current_lang == 'he' %}תמחור ותוכניות{% elif current_lang == 'en' %}Pricing & Plans{% else %}Цены и тарифы{% endif %}
     </h1>
     <p class="lead text-muted" style="max-width: 600px; margin: 0 auto;">
-      {{ t('pricing_subtitle') }}
+      {% if current_lang == 'he' %}בחר את התוכנית המתאימה לעסק שלך{% elif current_lang == 'en' %}Choose the right plan for your business{% else %}Выберите подходящий тариф для вашего бизнеса{% endif %}
     </p>
   </div>
 
@@ -17,7 +17,7 @@
   {% if session.uid %}
   <div class="text-center mb-4">
     <div class="d-inline-flex align-items-center gap-2 px-4 py-2" style="background: rgba(255,255,255,0.05); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);">
-      <span class="text-muted">{{ t('pricing_current') }}</span>
+      <span class="text-muted">{% if current_lang == 'he' %}התוכנית הנוכחית שלך:{% elif current_lang == 'en' %}Your current plan:{% else %}Ваш текущий план:{% endif %}</span>
       {% if trial_active %}
         <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #000; padding: 6px 12px;">
           <i class="bi bi-clock me-1"></i>PRO ({% if current_lang == 'he' %}ניסיון{% elif current_lang == 'en' %}Trial{% else %}Пробный{% endif %})
@@ -46,7 +46,7 @@
     <div class="col-12 col-md-6 col-lg-4">
       <div class="pricing-card {% if current_plan == 'free' and not trial_active %}current{% endif %}">
         {% if current_plan == 'free' and not trial_active %}
-        <div class="current-badge">{{ t('pricing_your_plan') }}</div>
+        <div class="current-badge">{% if current_lang == 'he' %}התוכנית שלך{% elif current_lang == 'en' %}Your Plan{% else %}Ваш план{% endif %}</div>
         {% endif %}
         <div class="pricing-header">
           <div class="pricing-icon free">
@@ -54,7 +54,7 @@
           </div>
           <h3 class="pricing-name">FREE</h3>
           <div class="pricing-price">
-            <span class="amount">{{ t('pricing_free') }}</span>
+            <span class="amount">{% if current_lang == 'he' %}חינם{% elif current_lang == 'en' %}Free{% else %}Бесплатно{% endif %}</span>
           </div>
           <p class="pricing-desc">{% if current_lang == 'he' %}להתחלה ולהתנסות{% elif current_lang == 'en' %}To get started and try{% else %}Для начала и пробного использования{% endif %}</p>
         </div>
@@ -72,7 +72,7 @@
         <div class="pricing-action">
           {% if session.uid %}
             {% if current_plan == 'free' and not trial_active %}
-              <span class="btn btn-outline-secondary w-100 disabled">{{ t('pricing_current_badge') }}</span>
+              <span class="btn btn-outline-secondary w-100 disabled">{% if current_lang == 'he' %}תוכנית נוכחית{% elif current_lang == 'en' %}Current Plan{% else %}Текущий план{% endif %}</span>
             {% else %}
               <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary w-100">{% if current_lang == 'he' %}ניהול מנוי{% elif current_lang == 'en' %}Manage Subscription{% else %}Управление подпиской{% endif %}</a>
             {% endif %}
@@ -87,7 +87,7 @@
     <div class="col-12 col-md-6 col-lg-4">
       <div class="pricing-card {% if current_plan == 'basic' %}current{% endif %}">
         {% if current_plan == 'basic' %}
-        <div class="current-badge basic">{{ t('pricing_your_plan') }}</div>
+        <div class="current-badge basic">{% if current_lang == 'he' %}התוכנית שלך{% elif current_lang == 'en' %}Your Plan{% else %}Ваш план{% endif %}</div>
         {% endif %}
         <div class="pricing-header">
           <div class="pricing-icon basic">
@@ -114,7 +114,7 @@
         <div class="pricing-action">
           {% if session.uid %}
             {% if current_plan == 'basic' %}
-              <span class="btn btn-basic w-100 disabled">{{ t('pricing_current_badge') }}</span>
+              <span class="btn btn-basic w-100 disabled">{% if current_lang == 'he' %}תוכנית נוכחית{% elif current_lang == 'en' %}Current Plan{% else %}Текущий план{% endif %}</span>
             {% else %}
               <a href="{{ url_for('subscribe', plan='basic') }}" class="btn btn-basic w-100">
                 {% if current_plan == 'free' %}{% if current_lang == 'he' %}שדרג ל-BASIC{% elif current_lang == 'en' %}Upgrade to BASIC{% else %}Обновить до BASIC{% endif %}{% else %}{% if current_lang == 'he' %}עבור ל-BASIC{% elif current_lang == 'en' %}Switch to BASIC{% else %}Перейти на BASIC{% endif %}{% endif %}
@@ -132,9 +132,9 @@
       <div class="pricing-card featured {% if current_plan == 'pro' %}current{% endif %}">
         <div class="popular-badge">{% if current_lang == 'he' %}הכי פופולרי{% elif current_lang == 'en' %}Most Popular{% else %}Самый популярный{% endif %}</div>
         {% if current_plan == 'pro' and not trial_active %}
-        <div class="current-badge pro">{{ t('pricing_your_plan') }}</div>
+        <div class="current-badge pro">{% if current_lang == 'he' %}התוכנית שלך{% elif current_lang == 'en' %}Your Plan{% else %}Ваш план{% endif %}</div>
         {% elif trial_active %}
-        <div class="current-badge trial">{{ t('pricing_trial') }}</div>
+        <div class="current-badge trial">{% if current_lang == 'he' %}תקופת ניסיון{% elif current_lang == 'en' %}Trial Period{% else %}Пробный период{% endif %}</div>
         {% endif %}
         <div class="pricing-header">
           <div class="pricing-icon pro">
@@ -161,7 +161,7 @@
         <div class="pricing-action">
           {% if session.uid %}
             {% if current_plan == 'pro' and not trial_active %}
-              <span class="btn btn-pro w-100 disabled">{{ t('pricing_current_badge') }}</span>
+              <span class="btn btn-pro w-100 disabled">{% if current_lang == 'he' %}תוכנית נוכחית{% elif current_lang == 'en' %}Current Plan{% else %}Текущий план{% endif %}</span>
             {% elif trial_active %}
               <a href="{{ url_for('subscribe', plan='pro') }}" class="btn btn-pro w-100">{% if current_lang == 'he' %}המשך עם PRO{% elif current_lang == 'en' %}Continue with PRO{% else %}Продолжить с PRO{% endif %}</a>
             {% else %}
@@ -188,7 +188,7 @@
       </div>
       <form method="POST" action="{{ url_for('start_trial') }}">
         <button type="submit" class="btn btn-trial">
-          <i class="bi bi-play-fill me-1"></i>{{ t('pricing_try_trial') }}
+          <i class="bi bi-play-fill me-1"></i>{% if current_lang == 'he' %}נסה 7 ימים חינם{% elif current_lang == 'en' %}Try 7 days free{% else %}Попробовать 7 дней бесплатно{% endif %}
         </button>
       </form>
     </div>

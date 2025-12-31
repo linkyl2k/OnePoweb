@@ -24,7 +24,7 @@
           <div class="form-group">
             <label for="email" class="form-label">
               <span class="label-icon">✉️</span>
-              {{ t('contact_email') }}
+              {% if current_lang == 'he' %}אימייל{% elif current_lang == 'en' %}Email{% else %}Email{% endif %}
             </label>
             <input type="email" id="email" name="email" class="form-input" 
                    placeholder="your@email.com" required>
@@ -34,7 +34,7 @@
         <div class="form-group">
           <label for="subject" class="form-label">
             <span class="label-icon">📋</span>
-            {{ t('contact_subject') }}
+            {% if current_lang == 'he' %}נושא{% elif current_lang == 'en' %}Subject{% else %}Тема{% endif %}
           </label>
           <select id="subject" name="subject" class="form-input">
             <option value="general">{% if current_lang == 'he' %}שאלה כללית{% elif current_lang == 'en' %}General Question{% else %}Общий вопрос{% endif %}</option>
@@ -49,14 +49,14 @@
         <div class="form-group">
           <label for="message" class="form-label">
             <span class="label-icon">💬</span>
-            {{ t('contact_message') }}
+            {% if current_lang == 'he' %}הודעה{% elif current_lang == 'en' %}Message{% else %}Сообщение{% endif %}
           </label>
           <textarea id="message" name="message" class="form-input form-textarea" 
                     rows="5" placeholder="{% if current_lang == 'he' %}ספר/י לנו במה נוכל לעזור...{% elif current_lang == 'en' %}Tell us how we can help...{% else %}Расскажите, чем мы можем помочь...{% endif %}" required></textarea>
         </div>
         
         <button type="submit" class="submit-btn">
-          <span class="btn-text">{{ t('contact_send') }}</span>
+          <span class="btn-text">{% if current_lang == 'he' %}שלח הודעה{% elif current_lang == 'en' %}Send Message{% else %}Отправить сообщение{% endif %}</span>
           <span class="btn-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>

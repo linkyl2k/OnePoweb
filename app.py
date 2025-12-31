@@ -6714,30 +6714,10 @@ def paypal_create_order():
         except (KeyError, TypeError, AttributeError):
             return jsonify({"error": "User ID not found"}), 401
         
-        # Calculate price with referral discount
+        # Calculate price (no discounts)
         base_price_usd = PLAN_PRICES[plan]["usd"]
-        # Handle both dict-like access and Row access
-        try:
-            if hasattr(u, 'keys') and "referral_discount" in u.keys():
-                referral_discount = int(u["referral_discount"] or 0)
-            elif "referral_discount" in dict(u).keys():
-                referral_discount = int(dict(u)["referral_discount"] or 0)
-            else:
-                referral_discount = 0
-        except (KeyError, TypeError, AttributeError):
-            referral_discount = 0
-        
-        if referral_discount > 0:
-            discount_percent = min(referral_discount, 50)
-            discount_usd = int(base_price_usd * discount_percent / 100)
-        else:
-            discount_usd = 0
-        
-        net_price_usd = base_price_usd - discount_usd
-        
-        # If price is 0 (fully covered by discount), activate immediately
-        if net_price_usd <= 0:
-            return activate_subscription(user_id, plan, referral_discount)
+        net_price_usd = base_price_usd
+        discount_usd = 0
         
         access_token = get_paypal_access_token()
         if not access_token:
@@ -6845,7 +6825,7 @@ def paypal_create_order():
                 "subscription_id": subscription_id,
                 "plan": plan,
                 "amount_usd": net_price_usd,
-                "discount_used": discount_usd
+                "discount_used": 0
             }
             
             # Return approval URL for redirect
@@ -6979,7 +6959,7 @@ def paypal_create_subscription_id():
                 "subscription_id": subscription_id,
                 "plan": plan,
                 "amount_usd": net_price_usd,
-                "discount_used": discount_usd
+                "discount_used": 0  # No discounts after removing referral system
             }
             
             # Return ONLY the subscription ID - no approval_url

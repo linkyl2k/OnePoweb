@@ -3667,7 +3667,7 @@ def get_user_reports(user_id: int, limit: int = 50, period_type: str = None) -> 
         """, (user_id, period_type, limit)).fetchall()
     else:
         rows = db.execute("""
-            SELECT id, name, period_type, period_start, period_end, summary_json, created_at
+            SELECT id, name, period_type, period_start, period_end, summary_json, created_at, currency
             FROM reports
             WHERE user_id = ?
             ORDER BY period_start DESC, created_at DESC
@@ -7335,6 +7335,8 @@ def dashboard():
     # חישוב סטטיסטיקות מצטברות
     total_sales = 0
     latest_summary = {}
+    # Use currency from the latest report for total_sales display
+    total_sales_currency_code = None
     
     for r in reports:
         try:
@@ -7342,6 +7344,9 @@ def dashboard():
             total_sales += summary.get("total_sales", 0)
             if not latest_summary and summary:
                 latest_summary = summary
+            # Get currency from the first (latest) report
+            if not total_sales_currency_code and r.get("currency"):
+                total_sales_currency_code = r.get("currency")
         except:
             pass
     
@@ -7369,6 +7374,15 @@ def dashboard():
     
     # Get current language for currency fallback and labels
     current_lang = get_language()
+    
+    # Determine currency for total_sales display
+    # Use currency from latest report, or fallback to current session currency
+    total_sales_currency = None
+    if total_sales_currency_code:
+        total_sales_currency = get_currency_by_code(total_sales_currency_code)
+    else:
+        # Fallback to current session currency
+        total_sales_currency = get_currency(current_lang)
     
     # Period type labels based on current language
     if current_lang == "he":
@@ -7400,6 +7414,7 @@ def dashboard():
                           filter_type=filter_type,
                           period_type_labels=period_type_labels,
                           total_sales=total_sales,
+                          total_sales_currency_symbol=total_sales_currency["symbol"] if total_sales_currency else get_currency(current_lang)["symbol"],
                           total_reports=len(reports),
                           latest_summary=latest_summary,
                           comparison=comparison,

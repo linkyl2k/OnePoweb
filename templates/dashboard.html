@@ -18,7 +18,7 @@
       <div class="card bg-primary text-white shadow h-100">
         <div class="card-body text-center">
           <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_total_sales') }}</h6>
-          <h2 class="card-title mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(total_sales) }}</h2>
+          <h2 class="card-title mb-0">{{ total_sales_currency_symbol if total_sales_currency_symbol else currency_symbol }}{{ "{:,.0f}".format(total_sales) }}</h2>
         </div>
       </div>
     </div>

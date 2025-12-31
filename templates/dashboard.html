@@ -17,7 +17,7 @@
     <div class="col-md-3">
       <div class="card bg-primary text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_total_sales') }}</h6>
+          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{{ t('dashboard_total_sales') }}</h6>
           <h2 class="card-title mb-0">{{ total_sales_currency_symbol if total_sales_currency_symbol else currency_symbol }}{{ "{:,.0f}".format(total_sales) }}</h2>
         </div>
       </div>
@@ -25,7 +25,7 @@
     <div class="col-md-3">
       <div class="card bg-success text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_saved_reports') }}</h6>
+          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{{ t('dashboard_saved_reports') }}</h6>
           <h2 class="card-title mb-0">{{ total_reports }}</h2>
         </div>
       </div>
@@ -33,16 +33,24 @@
     <div class="col-md-3">
       <div class="card bg-info text-white shadow h-100">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_avg_daily') }}</h6>
+          <h6 class="card-subtitle mb-2 opacity-75" style="text-decoration: none;">{{ t('dashboard_avg_daily') }}</h6>
           <h2 class="card-title mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(latest_summary.get('avg_daily', 0)) }}</h2>
         </div>
       </div>
     </div>
     <div class="col-md-3">
-      <div class="card bg-warning text-dark shadow h-100">
+      <div class="card shadow h-100" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); border: none;">
         <div class="card-body text-center">
-          <h6 class="card-subtitle mb-2 opacity-75">{{ t('dashboard_plan') }}</h6>
-          <h2 class="card-title mb-0">{{ user.plan|upper }}</h2>
+          <h6 class="card-subtitle mb-2 opacity-75" style="color: rgba(255,255,255,0.9); text-decoration: none;">{{ t('dashboard_plan') }}</h6>
+          {% if user.plan|upper == 'PRO' %}
+          <div class="d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2 rounded-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <i class="bi bi-rocket-takeoff" style="font-size: 1.2rem; color: #fff;"></i>
+            <h2 class="card-title mb-0" style="color: #fff; font-weight: 700; text-decoration: none; letter-spacing: 1px;">PRO</h2>
+            <i class="bi bi-star-fill" style="font-size: 0.9rem; color: #fbbf24;"></i>
+          </div>
+          {% else %}
+          <h2 class="card-title mb-0" style="color: #fff; text-decoration: none;">{{ user.plan|upper }}</h2>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -324,7 +332,7 @@
             {% for report in reports %}
             {% set summary = report.summary_json | fromjson if report.summary_json else {} %}
             <tr>
-              <td><strong>{{ report.name }}</strong></td>
+              <td><strong style="text-decoration: none;">{{ report.name }}</strong></td>
               <td>
                 {% set pt = report.get('period_type', 'month') %}
                 {% if pt == 'month' %}

@@ -783,12 +783,6 @@ TRANSLATIONS = {
         "profile_manage_subscription": "Управление подпиской",
         "profile_cancel_subscription": "Отменить подписку",
         "profile_cancel_warning": "Ваша подписка будет отменена в конце текущего периода",
-        "profile_referrals": "Реферальная программа",
-        "profile_referral_link": "Ваша реферальная ссылка",
-        "profile_referral_copy": "Копировать",
-        "profile_referral_desc": "Поделитесь этой ссылкой с друзьями и получите 50% скидку на следующий месяц",
-        "profile_referral_count": "Приглашено пользователей",
-        "profile_referral_pending": "Ожидающая скидка",
         "profile_saved_reports": "Сохраненные отчеты",
         "profile_no_saved_reports": "Нет сохраненных отчетов",
         "profile_load_report": "Загрузить отчет",
@@ -1235,10 +1229,6 @@ def ensure_subscription_columns():
         c.execute("ALTER TABLE users ADD COLUMN trial_until TEXT NULL")
     if "trial_used" not in columns:
         c.execute("ALTER TABLE users ADD COLUMN trial_used INTEGER DEFAULT 0")
-    
-    # עמודת הנחת רפרל (50% חד-פעמי)
-    if "referral_discount" not in columns:
-        c.execute("ALTER TABLE users ADD COLUMN referral_discount INTEGER DEFAULT 0")
 
     conn.commit()
     conn.close()
@@ -3932,12 +3922,6 @@ def _generate_comparison_insight(m1: dict, m2: dict, best_day=None, worst_day=No
     
     return base
 
-
-    # הוספת עמודות חדשות אם חסרות (SQLite סובלנית פה)
-    try:
-        db.execute("ALTER TABLE users ADD COLUMN referred_by INTEGER")
-    except Exception:
-        pass
     try:
         db.execute("ALTER TABLE users ADD COLUMN credit_balance INTEGER NOT NULL DEFAULT 0")
     except Exception:
@@ -6610,29 +6594,9 @@ def subscribe():
         print(f"⚠️ Error ensuring ref_code: {e}")
         # Continue anyway - not critical
     
-    # Calculate price with referral discount (50% off, one time)
+    # Calculate price
     base_price_usd = PLAN_PRICES[plan]["usd"]
-    
-    # Check for referral discount (50% off next month)
-    # Handle both dict-like access and Row access
-    try:
-        if hasattr(u, 'keys') and "referral_discount" in u.keys():
-            referral_discount = int(u["referral_discount"] or 0)
-        elif "referral_discount" in dict(u).keys():
-            referral_discount = int(dict(u)["referral_discount"] or 0)
-        else:
-            referral_discount = 0
-    except (KeyError, TypeError, AttributeError):
-        referral_discount = 0
-    
-    if referral_discount > 0:
-        # 50% discount on current plan
-        discount_percent = min(referral_discount, 50)
-        discount_usd = int(base_price_usd * discount_percent / 100)
-    else:
-        discount_usd = 0
-    
-    net_price_usd = base_price_usd - discount_usd
+    net_price_usd = base_price_usd
 
     # Ensure PayPal client ID is a string (not None)
     paypal_client_id = PAYPAL_CLIENT_ID or ""
@@ -6641,8 +6605,6 @@ def subscribe():
     return render_template("checkout.html",
         plan=plan,
         base_price_usd=base_price_usd,
-        referral_discount=referral_discount,
-        discount_usd=discount_usd,
         net_price_usd=net_price_usd,
         paypal_client_id=paypal_client_id,
         paypal_mode=paypal_mode
@@ -6859,30 +6821,9 @@ def paypal_create_subscription_id():
         except (KeyError, TypeError, AttributeError):
             return jsonify({"error": "User ID not found"}), 401
         
-        # Calculate price with referral discount
+        # Get base price
         base_price_usd = PLAN_PRICES[plan]["usd"]
-        try:
-            if hasattr(u, 'keys') and "referral_discount" in u.keys():
-                referral_discount = int(u["referral_discount"] or 0)
-            elif "referral_discount" in dict(u).keys():
-                referral_discount = int(dict(u)["referral_discount"] or 0)
-            else:
-                referral_discount = 0
-        except (KeyError, TypeError, AttributeError):
-            referral_discount = 0
-        
-        if referral_discount > 0:
-            discount_percent = min(referral_discount, 50)
-            discount_usd = int(base_price_usd * discount_percent / 100)
-        else:
-            discount_usd = 0
-        
-        net_price_usd = base_price_usd - discount_usd
-        
-        # If price is 0 (fully covered by discount), activate immediately
-        if net_price_usd <= 0:
-            result = activate_subscription(user_id, plan, referral_discount)
-            return result
+        net_price_usd = base_price_usd
         
         access_token = get_paypal_access_token()
         if not access_token:
@@ -7151,7 +7092,7 @@ def paypal_subscription_return():
         return redirect(url_for("subscribe", plan="basic"))
 
 
-def activate_subscription(user_id, plan, discount_used):
+def activate_subscription(user_id, plan, subscription_info=None):
     """Activate subscription after successful payment"""
     try:
         print(f"[Activate] Starting subscription activation for user {user_id}, plan: {plan}")
@@ -7175,69 +7116,40 @@ def activate_subscription(user_id, plan, discount_used):
             except Exception as e:
                 print(f"[Activate] Warning: Could not add canceled_at column: {e}")
         
-        # Update user plan and reset referral discount (one-time use)
-        # Also store PayPal subscription_id if provided
+        # Update user plan and store PayPal subscription_id if provided
         cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
         subscription_id_param = None
-        if isinstance(discount_used, dict) and "subscription_id" in discount_used:
-            subscription_id_param = discount_used["subscription_id"]
-            discount_used = discount_used.get("discount", 0)
+        if isinstance(subscription_info, dict) and "subscription_id" in subscription_info:
+            subscription_id_param = subscription_info["subscription_id"]
         
         if "canceled_at" in cols:
             if "paypal_subscription_id" in cols and subscription_id_param:
                 db.execute("""
                     UPDATE users 
-                    SET plan=?, referral_discount=0, canceled_at=NULL, paypal_subscription_id=?
+                    SET plan=?, canceled_at=NULL, paypal_subscription_id=?
                     WHERE id=?
                 """, (plan, subscription_id_param, user_id))
             else:
                 db.execute("""
                     UPDATE users 
-                    SET plan=?, referral_discount=0, canceled_at=NULL 
+                    SET plan=?, canceled_at=NULL 
                     WHERE id=?
                 """, (plan, user_id))
         else:
             if "paypal_subscription_id" in cols and subscription_id_param:
                 db.execute("""
                     UPDATE users 
-                    SET plan=?, referral_discount=0, paypal_subscription_id=?
+                    SET plan=?, paypal_subscription_id=?
                     WHERE id=?
                 """, (plan, subscription_id_param, user_id))
             else:
                 db.execute("""
                     UPDATE users 
-                    SET plan=?, referral_discount=0
+                    SET plan=?
                     WHERE id=?
                 """, (plan, user_id))
         db.commit()
         print(f"[Activate] User plan updated to {plan}")
-        
-        # Grant referral bonus to referrer (one-time 50% discount on next month)
-        try:
-            # Safe access to referred_by and ref_bonus_granted
-            referrer_id = None
-            if hasattr(u, 'keys') and "referred_by" in u.keys():
-                referrer_id = u["referred_by"]
-            elif "referred_by" in dict(u).keys():
-                referrer_id = dict(u)["referred_by"]
-            
-            already_granted = 0
-            if hasattr(u, 'keys') and "ref_bonus_granted" in u.keys():
-                already_granted = int(u["ref_bonus_granted"] or 0)
-            elif "ref_bonus_granted" in dict(u).keys():
-                already_granted = int(dict(u)["ref_bonus_granted"] or 0)
-            
-            if referrer_id and not already_granted and int(referrer_id) != int(user_id):
-                # Give referrer 50% discount on next payment (one time only)
-                db.execute(
-                    "UPDATE users SET referral_discount=50 WHERE id=? AND (referral_discount IS NULL OR referral_discount=0)",
-                    (referrer_id,),
-                )
-                db.execute("UPDATE users SET ref_bonus_granted=1 WHERE id=?", (user_id,))
-                db.commit()
-        except (KeyError, TypeError, AttributeError, ValueError) as e:
-            print(f"⚠️ Error granting referral bonus: {e}")
-            # Continue anyway - not critical
         
         success_url = url_for("subscribe_success", plan=plan)
         print(f"[Activate] Success! Redirecting to: {success_url}")
@@ -7462,59 +7374,9 @@ def login():
     session["uid"] = user["id"]
     return redirect(url_for("profile"))
 
-@app.route("/referrals")
-@login_required
-def referrals():
-    user = current_user()
-    if not user:
-        return redirect(url_for("login"))
 
-    # אם יש לך הפונקציה הזו - נשמור שלמשתמש יש ref_code
-    try:
-        ensure_user_ref_code(user["id"])
-    except Exception:
-        pass
 
-    db = get_db()
 
-    # יתרת זיכוי (אם אין עמודה/ערך -> 0)
-    try:
-        credit_balance = int(user.get("credit_balance") or 0)
-    except Exception:
-        credit_balance = 0
-
-    # כמה נרשמו דרך קוד ההפניה שלי
-    try:
-        referred_count = db.execute(
-            "SELECT COUNT(*) AS c FROM users WHERE referred_by = ?",
-            (user["id"],)
-        ).fetchone()["c"]
-    except Exception:
-        referred_count = 0
-
-    # קישור ההפניה המלא
-    ref_link = url_for("signup", ref=user["ref_code"], _external=True)
-    
-    # הנחת רפרל (50% חד-פעמי)
-    try:
-        if hasattr(user, 'keys') and "referral_discount" in user.keys():
-            referral_discount = int(user["referral_discount"] or 0)
-        elif "referral_discount" in dict(user).keys():
-            referral_discount = int(dict(user)["referral_discount"] or 0)
-        else:
-            referral_discount = 0
-    except (KeyError, TypeError, AttributeError):
-        referral_discount = 0
-
-    return render_template(
-        "referrals.html",
-        user=user,
-        ref_link=ref_link,
-        credit_balance=credit_balance,
-        referred_count=referred_count,
-        referral_discount=referral_discount,
-        title="הפניות (Referral)"
-    )
 
 
 
@@ -7874,16 +7736,6 @@ def signup():
 
     # דואגים שלמשתמש החדש יהיה ref_code
     ensure_user_ref_code(user["id"])
-
-    # טיפול בהפניה: אם היה ref בסשן, נקשר את המשתמש למפנה
-    ref_code = session.pop("pending_ref", None)
-    if ref_code:
-        referrer = db.execute("SELECT * FROM users WHERE ref_code=?", (ref_code,)).fetchone()
-        if referrer and referrer["id"] != user["id"]:
-            # שומרים מי הפנה אותי + עדכון מונה אצל המפנה
-            db.execute("UPDATE users SET referred_by=? WHERE id=?", (referrer["id"], user["id"]))
-            db.execute("UPDATE users SET referred_count=COALESCE(referred_count,0)+1 WHERE id=?", (referrer["id"],))
-            db.commit()
 
     # שליחת מייל אימות
     try:

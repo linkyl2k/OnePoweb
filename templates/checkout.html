@@ -24,16 +24,6 @@
         <span>${{ base_price_usd }} <small class="text-muted">(USD)</small></span>
       </div>
       
-      {% if referral_discount > 0 %}
-      <div class="d-flex justify-content-between mb-2" style="color: #34d399;">
-        <span><i class="bi bi-gift me-1"></i> {% if current_lang == 'he' %}הנחת רפרל ({{ referral_discount }}%){% elif current_lang == 'en' %}Referral Discount ({{ referral_discount }}%){% else %}Реферальная скидка ({{ referral_discount }}%){% endif %}</span>
-        <span>-${{ discount_usd }} <small class="text-muted">(USD)</small></span>
-      </div>
-      <div class="small text-muted mb-2">
-        <i class="bi bi-info-circle me-1"></i> {% if current_lang == 'he' %}הנחה חד-פעמית מהזמנת חבר{% elif current_lang == 'en' %}One-time discount from friend's order{% else %}Одноразовая скидка от заказа друга{% endif %}
-      </div>
-      {% endif %}
-      
       <hr style="border-color: var(--border);">
       
       <div class="d-flex justify-content-between" style="font-size: 1.25rem; font-weight: bold;">

@@ -4185,7 +4185,7 @@ def landing():
     u = current_user()
     if u:
         # Logged in users go to upload page
-        return redirect(url_for('index'))
+        return redirect(url_for('upload'))
     else:
         # Guests go to about page
         return redirect(url_for('about'))
@@ -4201,7 +4201,8 @@ def get_started():
     return render_template("get_started.html", active="get_started", title="Get Started")
 
 @app.route("/upload", methods=["GET", "POST"])
-def index():
+@login_required
+def upload():
     messages, plots = [], []
     current_lang = get_language()  # Получаем текущий язык
     print(f"🌐 index(): current_lang = {current_lang}")

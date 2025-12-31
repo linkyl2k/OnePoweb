@@ -314,7 +314,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-xl sticky-top shadow-sm-sm" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('index') }}">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('landing') }}">
         <i class="bi bi-graph-up-arrow"></i>
         OnePoweb
       </a>
@@ -325,7 +325,7 @@
         <ul class="navbar-nav me-auto">
           {% if session.uid %}
             <li class="nav-item">
-              <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('index') }}">{{ t('nav_home') }}</a>
+              <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('upload') }}">{{ t('nav_home') }}</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if active=='dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>

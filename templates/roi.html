@@ -433,7 +433,7 @@
           <div class="col-6 col-md-4">
             <div class="text-center p-3" style="background: rgba(46,160,255,0.08); border-radius: 10px;">
               <div class="small text-muted">{% if current_lang == 'he' %}עלות השירות{% elif current_lang == 'en' %}Service Cost{% else %}Стоимость услуги{% endif %}</div>
-              <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">{{ currency_symbol }}{{ "{:,.0f}".format(roi.service_cost or 20) }}</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #34c3ff;">$20</div>
               <div class="small text-muted">{% if current_lang == 'he' %}לחודש{% elif current_lang == 'en' %}per month{% else %}в месяц{% endif %}</div>
             </div>
           </div>

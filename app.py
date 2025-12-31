@@ -2153,15 +2153,29 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
     out["roi_percent_optimistic"] = (total_gain * 1.4 / max(1e-9, params.service_cost)) * 100.0
 
     # Переводим текст в зависимости от языка
+    # Маппинг дней недели с иврита на другие языки
+    day_translation = {
+        "he": {"ראשון": "ראשון", "שני": "שני", "שלישי": "שלישי", "רביעי": "רביעי", 
+               "חמישי": "חמישי", "שישי": "שישי", "שבת": "שבת"},
+        "en": {"ראשון": "Sunday", "שני": "Monday", "שלישי": "Tuesday", "רביעי": "Wednesday",
+               "חמישי": "Thursday", "שישי": "Friday", "שבת": "Saturday"},
+        "ru": {"ראשון": "Воскресенье", "שני": "Понедельник", "שלישי": "Вторник", "רביעי": "Среда",
+               "חמישי": "Четверг", "שישי": "Пятница", "שבת": "Суббота"}
+    }
+    
     parts = []
     if "weak_day" in out["components"]:
         c = out["components"]["weak_day"]
+        # Переводим день недели
+        day_name_he = c['day']
+        day_name = day_translation.get(lang, day_translation["he"]).get(day_name_he, day_name_he)
+        
         if lang == "he":
-            parts.append(f"יום חלש ('{c['day']}') יעלה לרמת הימים הרגילים: +{c['monthly_gain']:,.0f} {currency_symbol}/חודש.")
+            parts.append(f"יום חלש ('{day_name}') יעלה לרמת הימים הרגילים: +{c['monthly_gain']:,.0f} {currency_symbol}/חודש.")
         elif lang == "en":
-            parts.append(f"Weak day ('{c['day']}') raised to regular days level: +{currency_symbol}{c['monthly_gain']:,.0f}/month.")
+            parts.append(f"Weak day ('{day_name}') raised to regular days level: +{currency_symbol}{c['monthly_gain']:,.0f}/month.")
         else:  # ru
-            parts.append(f"Слабый день ('{c['day']}') поднят до уровня обычных дней: +{currency_symbol}{c['monthly_gain']:,.0f}/месяц.")
+            parts.append(f"Слабый день ('{day_name}') поднят до уровня обычных дней: +{currency_symbol}{c['monthly_gain']:,.0f}/месяц.")
     if "evening_hours" in out["components"]:
         c = out["components"]["evening_hours"]
         if lang == "he":
@@ -2180,24 +2194,27 @@ def estimate_roi(df, params: ROIParams = ROIParams(), lang: str = "he") -> Dict[
             parts.append(f"Продвижение 'хвоста продуктов' (≈{int(params.tail_share_cutoff*100)}% от выручки) на +{int(params.tail_boost_ratio*100)}% → +{currency_symbol}{c['monthly_gain']:,.0f}/месяц.")
 
     # Текстовый итог ROI по языкам
+    # Стоимость услуги всегда $20 (в долларах)
+    service_cost_display = "$20"
+    
     if lang == "he":
         summary_text = (
             f"פוטנציאל שיפור חודשי (בתנאי שפועלים על התובנות): ~{total_gain:,.0f} {currency_symbol}. "
-            f"עלות השירות: {params.service_cost:,.0f} {currency_symbol}. "
+            f"עלות השירות: {service_cost_display}. "
             f"ROI תיאורטי: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ הערכה זו מבוססת על ניתוח הנתונים בלבד. התוצאות בפועל תלויות בפעולות שתנקטו."
     elif lang == "en":
         summary_text = (
             f"Monthly improvement potential (if you act on insights): ~{currency_symbol}{total_gain:,.0f}. "
-            f"Service cost: {currency_symbol}{params.service_cost:,.0f}. "
+            f"Service cost: {service_cost_display}. "
             f"Theoretical ROI: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ This estimate is based on data analysis only. Actual results depend on actions taken."
     else:  # ru
         summary_text = (
             f"Потенциал улучшения в месяц (при условии действий на основе инсайтов): ~{currency_symbol}{total_gain:,.0f}. "
-            f"Стоимость услуги: {currency_symbol}{params.service_cost:,.0f}. "
+            f"Стоимость услуги: {service_cost_display}. "
             f"Теоретический ROI: {out['roi_percent']:,.0f}%."
         )
         disclaimer = "⚠️ Эта оценка основана только на анализе данных. Фактические результаты зависят от предпринятых действий."

@@ -4332,7 +4332,8 @@ def index():
                 "ai": ai,               # ← הוספת השדה
             })
         except Exception as e:
-            messages.append(f"שגיאה: מכירות לפי שעה — {e}")
+            print(f"⚠️ Skipping hourly chart: {e}")
+            # Пропускаем график, если нет нужных колонок
 
     # ------------------------------------------------------------------
     # 2️⃣ מכירות לפי יום בשבוע — איזה ימים חזקים/חלשים
@@ -4436,7 +4437,8 @@ def index():
                               "note": t("chart_note_sales_by_weekday"),
                               "ai": ai})
         except Exception as e:
-            messages.append(f"שגיאה: מכירות לפי יום בשבוע — {e}")
+            print(f"⚠️ Skipping weekday chart: {e}")
+            # Пропускаем график, если нет нужных колонок
 
     # ------------------------------------------------------------------
     # 4️⃣ מכירות יומיות — מגמות ואנומליות
@@ -4487,7 +4489,8 @@ def index():
                           "note": t("chart_note_daily_sales"),
                           "ai": ai})
         except Exception as e:
-            messages.append(f"שגיאה: מכירות יומיות — {e}")
+            print(f"⚠️ Skipping daily sales chart: {e}")
+            # Пропускаем график, если нет нужных колонок
 
     # ------------------------------------------------------------------
     # 5️⃣ Top 10 מוצרים – כמות/הכנסות
@@ -4585,7 +4588,8 @@ def index():
                                   "note": t("chart_note_top_revenue"),
                                   "ai": ai})
         except Exception as e:
-            messages.append(f"שגיאה: מוצרים – כמות/הכנסות — {e}")
+            print(f"⚠️ Skipping products chart: {e}")
+            # Пропускаем график, если нет нужных колонок
 
     # ------------------------------------------------------------------
     # 8️⃣ פילוח אמצעי תשלום — מזומן מול אשראי
@@ -4676,10 +4680,11 @@ def index():
                 else:
                     messages.append("אין נתונים לגרף 'פילוח אמצעי תשלום'.")
             except Exception as e:
-                messages.append(f"שגיאה: פילוח אמצעי תשלום — {e}")
+                print(f"⚠️ Skipping payment methods chart: {e}")
+                # Пропускаем график, если нет нужных колонок
 
         else:
-            messages.append("לא נמצאה עמודה המתאימה לאמצעי תשלום — דילגנו על הפילוח.")
+            print("⚠️ No payment method column found, skipping chart")
 
     # ------------------------------------------------------------------
     # 6️⃣ ממוצע קנייה (צ'ק ממוצע) לפי שעה — מתי מגיעים VIP
@@ -4746,7 +4751,8 @@ def index():
             else:
                 messages.append("דילגנו על 'ממוצע קנייה' — חסרה עמודת שעה או מספר עסקה.")
         except Exception as e:
-            messages.append(f"שגיאה: ממוצע קנייה לפי שעה — {e}")
+            print(f"⚠️ Skipping average ticket chart: {e}")
+            # Пропускаем график, если нет нужных колонок
 
     # ------------------------------------------------------------------
     # 3️⃣ מפת חום (Heatmap) – שעה × יום בשבוע — ויזואליזציה מרשימה
@@ -4868,7 +4874,8 @@ def index():
             else:
                 messages.append("דילגנו על 'מפת חום' — חסרה עמודת שעה או יום בשבוע.")
         except Exception as e:
-            messages.append(f"שגיאה: מפת חום — {e}")
+            print(f"⚠️ Skipping heatmap chart: {e}")
+            # Пропускаем график, если нет нужных колонок
 
     # ------------------------------------------------------------------
     # 7️⃣ סופ"ש מול ימי חול — השוואה ישראלית
@@ -4964,7 +4971,8 @@ def index():
             else:
                 messages.append("דילגנו על 'סופ\"ש מול ימי חול' — חסרה עמודת יום בשבוע.")
         except Exception as e:
-            messages.append(f"שגיאה: סופ\"ש מול ימי חול — {e}")
+            print(f"⚠️ Skipping weekend comparison chart: {e}")
+            # Пропускаем график, если нет нужных колонок
 
 
     # ===== אם אין גרפים =====

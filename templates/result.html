@@ -37,8 +37,8 @@
               <i class="bi bi-clipboard-data" style="font-size: 1.4rem; color: #fff;"></i>
       </div>
             <div>
-              <h4 class="mb-0" style="color: var(--text);">{{ t('results_summary') }}</h4>
-              <p class="mb-0 text-muted small">{{ t('results_summary_desc') }}</p>
+              <h4 class="mb-0" style="color: var(--text);">{% if current_lang == 'he' %}סיכום{% elif current_lang == 'en' %}Summary{% else %}Сводка{% endif %}</h4>
+              <p class="mb-0 text-muted small">{% if current_lang == 'he' %}ניתוח מקיף של הביצועים{% elif current_lang == 'en' %}Comprehensive performance analysis{% else %}Комплексный анализ показателей{% endif %}</p>
             </div>
           </div>
 
@@ -95,8 +95,8 @@
               📋
             </div>
             <div>
-              <h4 class="mb-0" style="color: var(--text);">{{ t('results_action_plan') }}</h4>
-              <p class="mb-0 text-muted small">{{ t('results_action_desc') }}</p>
+              <h4 class="mb-0" style="color: var(--text);">{% if current_lang == 'he' %}תכנית פעולה{% elif current_lang == 'en' %}Action Plan{% else %}План действий{% endif %}</h4>
+              <p class="mb-0 text-muted small">{% if current_lang == 'he' %}המלצות ליישום מיידי{% elif current_lang == 'en' %}Recommendations for immediate implementation{% else %}Рекомендации к немедленному внедрению{% endif %}</p>
             </div>
           </div>
 
@@ -115,7 +115,7 @@
                   
                   <details class="action-details">
                     <summary style="cursor: pointer; color: #2ea0ff; font-size: 0.85rem;">
-                      <i class="bi bi-chevron-down me-1"></i>{{ t('results_how_to') }}
+                      <i class="bi bi-chevron-down me-1"></i>{% if current_lang == 'he' %}איך לעשות זאת{% elif current_lang == 'en' %}How to do it{% else %}Как это сделать{% endif %}
                     </summary>
                     <ul class="mt-2 mb-0 ps-3 small" style="color: var(--muted);">
                       {% for step in item.how_to %}

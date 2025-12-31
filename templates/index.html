@@ -60,14 +60,14 @@
         <label class="period-option">
           <input type="radio" name="period_type" value="month" checked>
           <div class="period-card">
-            <div class="period-icon">📅</div>
+            <div class="period-icon period-icon-number">30</div>
             <div class="period-label">{{ t('month') }}</div>
           </div>
         </label>
         <label class="period-option">
           <input type="radio" name="period_type" value="week">
           <div class="period-card">
-            <div class="period-icon">📆</div>
+            <div class="period-icon period-icon-number">7</div>
             <div class="period-label">{{ t('week') }}</div>
           </div>
         </label>
@@ -81,7 +81,7 @@
         <label class="period-option">
           <input type="radio" name="period_type" value="custom">
           <div class="period-card">
-            <div class="period-icon">⚙️</div>
+            <div class="period-icon period-icon-number">✕</div>
             <div class="period-label">{{ t('custom') }}</div>
           </div>
         </label>
@@ -666,6 +666,27 @@
 .period-icon {
   font-size: 1.5rem;
   margin-bottom: 0.4rem;
+}
+
+.period-icon-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(6,182,212,0.3);
+  margin: 0 auto 0.4rem auto;
+}
+
+.period-option input:checked + .period-card .period-icon-number {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 12px rgba(16,185,129,0.4);
 }
 
 .period-label {

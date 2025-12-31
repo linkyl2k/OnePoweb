@@ -8541,10 +8541,6 @@ def server_error(e):
         msg = "שגיאה בשרת"
     return render_template("error.html", code=500, msg=msg), 500
 
-@app.route("/landing")
-def landing():
-    return render_template("landing.html", active="landing", title="למה OnePoweb")
-
 @app.route("/_debug/tables")
 def debug_tables():
     db = get_db()

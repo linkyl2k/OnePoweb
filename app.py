@@ -3550,12 +3550,14 @@ def migrate_reports_add_period_type():
 # 📊 פונקציות לשמירה וטעינה של דוחות מוצפנים
 # =============================================================================
 
-def save_report(user_id: int, df: pd.DataFrame, name: str = None, period_type: str = "month") -> int:
+def save_report(user_id: int, df: pd.DataFrame, name: str = None, period_type: str = "month", plots_info: list = None, roi_data: dict = None) -> int:
     """
     שומר דוח מוצפן לבסיס הנתונים.
     מחזיר את ה-ID של הדוח.
     
     period_type: month/week/day/custom
+    plots_info: list of plot dicts with filename, title, etc.
+    roi_data: ROI calculation results
     """
     db = get_db()
     
@@ -3621,6 +3623,22 @@ def save_report(user_id: int, df: pd.DataFrame, name: str = None, period_type: s
         "days": days_count,
         "top_product": str(df[COL_ITEM].mode().iloc[0]) if COL_ITEM in df.columns and not df[COL_ITEM].mode().empty else None,
     }
+    
+    # Добавляем информацию о графиках (для восстановления на multi-worker)
+    if plots_info:
+        summary["plots"] = [
+            {
+                "filename": p.get("filename", ""),
+                "title": p.get("title", ""),
+                "note": p.get("note", ""),
+                "ai": (p.get("ai") or "")[:400]  # Ограничиваем размер AI текста
+            }
+            for p in plots_info
+        ]
+    
+    # Добавляем ROI данные
+    if roi_data:
+        summary["roi"] = roi_data
     
     cursor = db.execute("""
         INSERT INTO reports (user_id, name, period_type, period_start, period_end, encrypted_data, summary_json, currency)
@@ -4986,7 +5004,9 @@ def index():
                 user_id=u["id"], 
                 df=df, 
                 name=period_name if period_name else None,
-                period_type=period_type
+                period_type=period_type,
+                plots_info=plots,  # Сохраняем информацию о графиках
+                roi_data=roi_data  # Сохраняем ROI данные
             )
             print(f"💾 דוח נשמר בהצלחה (ID: {report_id}, סוג: {period_type})")
             saved_report_id = report_id
@@ -5622,18 +5642,20 @@ def export_pdf():
                 report_lang = get_language()
             
             # Создаем snapshot из данных отчета
+            # Загружаем графики и ROI из summary_json
+            plots_from_db = summary_json.get("plots", [])
+            roi_from_db = summary_json.get("roi", {})
+            
             snap = {
                 "generated_at": created_at,
                 "lang": report_lang,
                 "summary": f"Report: {report_name}",
                 "summary_ai": "",
-                "roi": {},
-                "plots": []
+                "roi": roi_from_db,
+                "plots": plots_from_db
             }
             
-            # TODO: Здесь можно регенерировать графики из DataFrame
-            # Пока используем только summary данные
-            print(f"📄 PDF: Loaded from saved report {report_id}, name={report_name}")
+            print(f"📄 PDF: Loaded from saved report {report_id}, name={report_name}, plots={len(plots_from_db)}, roi={bool(roi_from_db)}")
             
         except Exception as e:
             print(f"❌ Error loading report {report_id}: {e}")
@@ -8033,15 +8055,26 @@ def result():
                 reports = get_user_reports(u["id"], limit=1)
                 if reports:
                     latest_report = reports[0]
+                    saved_report_id = latest_report.get("id")
                     summary_json = latest_report.get("summary_json")
                     if summary_json:
                         summary_data = json.loads(summary_json)
-                        # Пробуем восстановить ROI
+                        # Восстанавливаем графики из сохраненного отчета
+                        if summary_data.get("plots"):
+                            plots = summary_data.get("plots", [])
+                            print(f"✅ Restored {len(plots)} plots from latest report (ID: {saved_report_id})")
+                        # Восстанавливаем ROI
                         if summary_data.get("roi"):
                             roi = summary_data.get("roi", {})
                             print(f"✅ Restored ROI from latest report")
+                        # Восстанавливаем summary
+                        if summary_data.get("total_sales"):
+                            summary = f"Total: {summary_data.get('total_sales', 0):,.0f}"
+                        print(f"🔄 Attempting to reload from last saved report (ID: {saved_report_id})")
         except Exception as e:
             print(f"⚠️ Error restoring data from report: {e}")
+            import traceback
+            traceback.print_exc()
 
     messages = []
     if not plots or len(plots) == 0:

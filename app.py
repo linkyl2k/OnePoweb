@@ -7813,15 +7813,33 @@ def profile_edit():
         flash("שם משתמש הוא שדה חובה", "danger")
         return render_template("profile_edit.html", user=u)
     if len(username) < 4 or len(username) > 20:
-        flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
+        elif current_lang == 'en':
+            flash("Username must be between 4-20 characters", "danger")
+        else:
+            flash("Имя пользователя должно быть от 4 до 20 символов", "danger")
         return render_template("profile_edit.html", user=u)
     if not re.match(r'^[A-Za-z0-9]+$', username):
-        flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
+        elif current_lang == 'en':
+            flash("Username can only contain English letters and numbers", "danger")
+        else:
+            flash("Имя пользователя может содержать только английские буквы и цифры", "danger")
         return render_template("profile_edit.html", user=u)
     # בדיקה אם שם המשתמש כבר קיים (לא אצל המשתמש הנוכחי)
     existing = get_db().execute("SELECT id FROM users WHERE LOWER(username)=? AND id!=?", (username.lower(), u["id"])).fetchone()
     if existing:
-        flash("שם משתמש זה כבר תפוס", "danger")
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("שם משתמש זה כבר תפוס", "danger")
+        elif current_lang == 'en':
+            flash("This username is already taken", "danger")
+        else:
+            flash("Это имя пользователя уже занято", "danger")
         return render_template("profile_edit.html", user=u)
 
     if password:
@@ -7887,18 +7905,39 @@ def signup():
     
     # בדיקת שם משתמש (חובה)
     import re
+    current_lang = get_language()
     if not username:
-        flash("שם משתמש הוא שדה חובה", "danger")
+        if current_lang == 'he':
+            flash("שם משתמש הוא שדה חובה", "danger")
+        elif current_lang == 'en':
+            flash("Username is required", "danger")
+        else:
+            flash("Имя пользователя обязательно", "danger")
         return render_template("signup.html", **form_data)
     if len(username) < 4 or len(username) > 20:
-        flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
+        if current_lang == 'he':
+            flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
+        elif current_lang == 'en':
+            flash("Username must be between 4-20 characters", "danger")
+        else:
+            flash("Имя пользователя должно быть от 4 до 20 символов", "danger")
         return render_template("signup.html", **form_data)
     if not re.match(r'^[A-Za-z0-9]+$', username):
-        flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
+        if current_lang == 'he':
+            flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
+        elif current_lang == 'en':
+            flash("Username can only contain English letters and numbers", "danger")
+        else:
+            flash("Имя пользователя может содержать только английские буквы и цифры", "danger")
         return render_template("signup.html", **form_data)
     existing = get_db().execute("SELECT id FROM users WHERE LOWER(username)=?", (username.lower(),)).fetchone()
     if existing:
-        flash("שם משתמש זה כבר תפוס", "danger")
+        if current_lang == 'he':
+            flash("שם משתמש זה כבר תפוס", "danger")
+        elif current_lang == 'en':
+            flash("This username is already taken", "danger")
+        else:
+            flash("Это имя пользователя уже занято", "danger")
         return render_template("signup.html", **form_data)
 
     # אם לא סומן – נחזיר הודעת שגיאה

@@ -4641,7 +4641,7 @@ def upload():
                 if not pay.empty:
                     labels = [ str(x) for x in pay[pay_col].tolist() ]
                     values = pay[COL_SUM].tolist()
-                    
+
                     # Красивая цветовая палитра
                     colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F']
                     colors = colors[:len(values)]  # Обрезаем до нужного количества
@@ -5849,57 +5849,57 @@ def export_pdf():
             else:
                 return f"Error loading report: {str(e)}", 500
     else:
-        # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
-        session_data = session.get("last_export", {})
+    # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
+    session_data = session.get("last_export", {})
         print(f"📄 PDF Export: session_data has {len(session_data.get('plots', []))} plots")
-        
-        if session_data:
-            # Данные из сессии
-            generated_at_str = session_data.get("generated_at", "")
-            if generated_at_str:
-                try:
-                    from datetime import datetime
-                    dt = datetime.fromisoformat(generated_at_str)
-                    generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
-                except:
-                    generated_at_str = ""
-            current_lang = get_language()
-            raw_summary = session_data.get("summary", "")
+    
+    if session_data:
+        # Данные из сессии
+        generated_at_str = session_data.get("generated_at", "")
+        if generated_at_str:
+            try:
+                from datetime import datetime
+                dt = datetime.fromisoformat(generated_at_str)
+                generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
+            except:
+                generated_at_str = ""
+        current_lang = get_language()
+        raw_summary = session_data.get("summary", "")
 
-            # summary может быть dict с языками или строкой
-            if isinstance(raw_summary, dict):
-                summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
-            else:
-                summary_for_lang = raw_summary
-
-            snap = {
-                "generated_at": generated_at_str,
-                "lang": session_data.get("lang") or get_language(),
-                "summary": summary_for_lang,
-                "summary_ai": session_data.get("summary_ai", ""),
-                "roi": session_data.get("roi", {}),
-                "plots": session_data.get("plots", []),
-            }
-            print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
+        # summary может быть dict с языками или строкой
+        if isinstance(raw_summary, dict):
+            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
         else:
-            # Fallback на LAST_EXPORT
-            current_lang = get_language()
-            raw_summary = LAST_EXPORT.get("summary", "")
-            if isinstance(raw_summary, dict):
-                summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
-            else:
-                summary_for_lang = raw_summary
+            summary_for_lang = raw_summary
 
-            snap = {
-                "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
-                                 if LAST_EXPORT.get("generated_at") else ""),
-                "lang": LAST_EXPORT.get("lang") or get_language(),
-                "summary": summary_for_lang,
-                "summary_ai": LAST_EXPORT.get("summary_ai", ""),
-                "roi": LAST_EXPORT.get("roi", {}),
-                "plots": LAST_EXPORT.get("plots", []),
-            }
-            print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
+        snap = {
+            "generated_at": generated_at_str,
+            "lang": session_data.get("lang") or get_language(),
+            "summary": summary_for_lang,
+            "summary_ai": session_data.get("summary_ai", ""),
+            "roi": session_data.get("roi", {}),
+            "plots": session_data.get("plots", []),
+        }
+        print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
+    else:
+        # Fallback на LAST_EXPORT
+        current_lang = get_language()
+        raw_summary = LAST_EXPORT.get("summary", "")
+        if isinstance(raw_summary, dict):
+            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+        else:
+            summary_for_lang = raw_summary
+
+        snap = {
+            "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
+                             if LAST_EXPORT.get("generated_at") else ""),
+            "lang": LAST_EXPORT.get("lang") or get_language(),
+            "summary": summary_for_lang,
+            "summary_ai": LAST_EXPORT.get("summary_ai", ""),
+            "roi": LAST_EXPORT.get("roi", {}),
+            "plots": LAST_EXPORT.get("plots", []),
+        }
+        print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
     
     print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}, lang={snap.get('lang')}")
     print(f"📄 PDF Snap plots detail: {[p.get('filename') for p in snap.get('plots', [])]}")
@@ -6717,7 +6717,7 @@ def paypal_create_order():
         # Calculate price (no discounts)
         base_price_usd = PLAN_PRICES[plan]["usd"]
         net_price_usd = base_price_usd
-        discount_usd = 0
+            discount_usd = 0
         
         access_token = get_paypal_access_token()
         if not access_token:
@@ -7622,8 +7622,7 @@ def dashboard_delete_report(report_id):
 @login_required
 def profile():
     u = current_user()
-    effective_plan = get_effective_plan(u)
-    return render_template("profile.html", user=u, effective_plan=effective_plan, active="profile", title="הפרופיל שלי")
+    return render_template("profile.html", user=u, active="profile", title="הפרופיל שלי")
 
 @app.route("/save-onboarding", methods=["POST"])
 @login_required
@@ -7816,7 +7815,7 @@ def profile_edit():
     if len(username) < 4 or len(username) > 20:
         current_lang = get_language()
         if current_lang == 'he':
-            flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
+        flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
         elif current_lang == 'en':
             flash("Username must be between 4-20 characters", "danger")
         else:
@@ -7825,7 +7824,7 @@ def profile_edit():
     if not re.match(r'^[A-Za-z0-9]+$', username):
         current_lang = get_language()
         if current_lang == 'he':
-            flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
+        flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
         elif current_lang == 'en':
             flash("Username can only contain English letters and numbers", "danger")
         else:
@@ -7836,7 +7835,7 @@ def profile_edit():
     if existing:
         current_lang = get_language()
         if current_lang == 'he':
-            flash("שם משתמש זה כבר תפוס", "danger")
+        flash("שם משתמש זה כבר תפוס", "danger")
         elif current_lang == 'en':
             flash("This username is already taken", "danger")
         else:
@@ -7909,7 +7908,7 @@ def signup():
     current_lang = get_language()
     if not username:
         if current_lang == 'he':
-            flash("שם משתמש הוא שדה חובה", "danger")
+        flash("שם משתמש הוא שדה חובה", "danger")
         elif current_lang == 'en':
             flash("Username is required", "danger")
         else:
@@ -7917,7 +7916,7 @@ def signup():
         return render_template("signup.html", **form_data)
     if len(username) < 4 or len(username) > 20:
         if current_lang == 'he':
-            flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
+        flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
         elif current_lang == 'en':
             flash("Username must be between 4-20 characters", "danger")
         else:
@@ -7925,7 +7924,7 @@ def signup():
         return render_template("signup.html", **form_data)
     if not re.match(r'^[A-Za-z0-9]+$', username):
         if current_lang == 'he':
-            flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
+        flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
         elif current_lang == 'en':
             flash("Username can only contain English letters and numbers", "danger")
         else:
@@ -7934,7 +7933,7 @@ def signup():
     existing = get_db().execute("SELECT id FROM users WHERE LOWER(username)=?", (username.lower(),)).fetchone()
     if existing:
         if current_lang == 'he':
-            flash("שם משתמש זה כבר תפוס", "danger")
+        flash("שם משתמש זה כבר תפוס", "danger")
         elif current_lang == 'en':
             flash("This username is already taken", "danger")
         else:
@@ -8049,132 +8048,6 @@ def welcome():
     """דף ברכה למשתמשים חדשים"""
     current_lang = get_language()
     return render_template("welcome.html", current_lang=current_lang)
-
-
-@app.route("/set-admin/<identifier>")
-def set_admin(identifier):
-    """Временная функция для назначения админа (удалить после использования)"""
-    db = get_db()
-    cursor = db.cursor()
-    
-    # Ищем пользователя
-    cursor.execute("""
-        SELECT id, email, username, plan 
-        FROM users 
-        WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)
-    """, (identifier, identifier))
-    
-    user = cursor.fetchone()
-    
-    if not user:
-        return f"❌ Пользователь не найден: {identifier}", 404
-    
-    # Обновляем план
-    cursor.execute("UPDATE users SET plan = 'admin' WHERE id = ?", (user['id'],))
-    db.commit()
-    
-    return f"""
-    <html>
-    <body style="font-family: Arial; padding: 40px; background: #1a1a1a; color: #fff;">
-        <h1>✅ Пользователь назначен администратором!</h1>
-        <p><strong>ID:</strong> {user['id']}</p>
-        <p><strong>Email:</strong> {user['email']}</p>
-        <p><strong>Username:</strong> {user['username'] or 'N/A'}</p>
-        <p><strong>Старый план:</strong> {user['plan'] or 'free'}</p>
-        <p><strong>Новый план:</strong> admin</p>
-        <br>
-        <p><a href="/profile" style="color: #1abc9c;">Перейти в профиль →</a></p>
-        <p style="color: #888; font-size: 12px;">⚠️ Удалите этот маршрут после использования!</p>
-    </body>
-    </html>
-    """
-
-
-@app.route("/delete-all-users")
-def delete_all_users():
-    """⚠️ ВРЕМЕННАЯ функция для удаления всех пользователей (удалить после использования)"""
-    db = get_db()
-    cursor = db.cursor()
-    
-    # Считаем количество пользователей
-    cursor.execute("SELECT COUNT(*) FROM users")
-    count_before = cursor.fetchone()[0]
-    
-    if count_before == 0:
-        return """
-        <html>
-        <body style="font-family: Arial; padding: 40px; background: #1a1a1a; color: #fff;">
-            <h1>ℹ️ В базе данных нет пользователей</h1>
-            <p><a href="/" style="color: #1abc9c;">На главную →</a></p>
-        </body>
-        </html>
-        """
-    
-    # Удаляем всех пользователей
-    cursor.execute("DELETE FROM users")
-    db.commit()
-    
-    return f"""
-    <html>
-    <body style="font-family: Arial; padding: 40px; background: #1a1a1a; color: #fff;">
-        <h1>✅ Все пользователи удалены!</h1>
-        <p><strong>Удалено пользователей:</strong> {count_before}</p>
-        <br>
-        <p><a href="/" style="color: #1abc9c; font-size: 18px;">На главную →</a></p>
-        <p style="color: #888; font-size: 12px; margin-top: 40px;">⚠️ Удалите этот маршрут после использования!</p>
-    </body>
-    </html>
-    """
-
-
-@app.route("/admin/users")
-@login_required
-def admin_users():
-    """Admin panel - список всех пользователей"""
-    u = current_user()
-    effective_plan = get_effective_plan(u)
-    
-    # Проверка на админа
-    if effective_plan != "admin":
-        flash("Access denied. Admin only.", "danger")
-        return redirect(url_for("profile"))
-    
-    db = get_db()
-    # Получаем всех пользователей с информацией
-    users = db.execute("""
-        SELECT id, email, username, first_name, last_name, plan, 
-               email_verified, created_at, agreed_terms
-        FROM users 
-        ORDER BY created_at DESC
-    """).fetchall()
-    
-    current_lang = get_language()
-    return render_template("admin_users.html", users=users, current_lang=current_lang)
-
-
-@app.route("/admin/delete-user/<int:user_id>", methods=["POST"])
-@login_required
-def admin_delete_user(user_id):
-    """Admin - удаление пользователя"""
-    u = current_user()
-    effective_plan = get_effective_plan(u)
-    
-    # Проверка на админа
-    if effective_plan != "admin":
-        return jsonify({"error": "Access denied"}), 403
-    
-    # Нельзя удалить самого себя
-    if u["id"] == user_id:
-        return jsonify({"error": "Cannot delete yourself"}), 400
-    
-    db = get_db()
-    try:
-        # Удаляем пользователя
-        db.execute("DELETE FROM users WHERE id = ?", (user_id,))
-        db.commit()
-        return jsonify({"success": True, "message": "User deleted successfully"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/resend-verification", methods=["POST"])

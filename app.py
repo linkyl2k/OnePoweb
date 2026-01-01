@@ -6717,7 +6717,7 @@ def paypal_create_order():
         # Calculate price (no discounts)
         base_price_usd = PLAN_PRICES[plan]["usd"]
         net_price_usd = base_price_usd
-            discount_usd = 0
+        discount_usd = 0
         
         access_token = get_paypal_access_token()
         if not access_token:

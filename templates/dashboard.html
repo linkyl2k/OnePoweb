@@ -7,7 +7,7 @@
       <h2 class="mb-1" style="text-decoration: none !important;">📊 {% if current_lang == 'he' %}לוח בקרה{% elif current_lang == 'en' %}Dashboard{% else %}Панель управления{% endif %}</h2>
       <p class="text-muted mb-0">{% if current_lang == 'he' %}השוואת תקופות וניתוח מגמות{% elif current_lang == 'en' %}Period comparison and trend analysis{% else %}Сравнение периодов и анализ трендов{% endif %}</p>
     </div>
-    <a class="btn btn-primary" href="{{ url_for('index') }}">
+    <a class="btn btn-primary" href="{{ url_for('upload') }}">
       <i class="bi bi-plus-lg"></i> {% if current_lang == 'he' %}העלה דוח חדש{% elif current_lang == 'en' %}Upload New Report{% else %}Загрузить новый отчет{% endif %}
     </a>
   </div>
@@ -373,7 +373,7 @@
       <div class="text-center py-5 text-muted">
         <h4 style="text-decoration: none !important;">{% if current_lang == 'he' %}אין דוחות שמורים עדיין{% elif current_lang == 'en' %}No saved reports yet{% else %}Нет сохраненных отчетов{% endif %}</h4>
         <p>{% if current_lang == 'he' %}העלה את הדוח הראשון שלך וכל הניתוחים יישמרו אוטומטית{% elif current_lang == 'en' %}Upload your first report and all analyses will be saved automatically{% else %}Загрузите первый отчет, и все анализы будут сохраняться автоматически{% endif %}</p>
-        <a class="btn btn-primary" href="{{ url_for('index') }}">{% if current_lang == 'he' %}העלה דוח{% elif current_lang == 'en' %}Upload Report{% else %}Загрузить отчет{% endif %}</a>
+        <a class="btn btn-primary" href="{{ url_for('upload') }}">{% if current_lang == 'he' %}העלה דוח{% elif current_lang == 'en' %}Upload Report{% else %}Загрузить отчет{% endif %}</a>
       </div>
       {% endif %}
     </div>

@@ -16,7 +16,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h3 class="mb-0">{{ t('results_title') }}</h3>
       <div class="d-flex gap-2">
-        <a class="btn btn-outline-secondary" href="{{ url_for('index') }}">{{ t('results_upload_new') }}</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('upload') }}">{{ t('results_upload_new') }}</a>
         {% if user_plan == 'pro' %}
           <a class="btn btn-primary" href="{{ url_for('export_pdf', report_id=saved_report_id) if saved_report_id else url_for('export_pdf') }}">{{ t('results_download_pdf') }}</a>
         {% else %}

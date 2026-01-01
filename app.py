@@ -4164,9 +4164,9 @@ def set_language(lang):
             default_currencies = {"he": "ILS", "ru": "RUB", "en": "USD"}
             session["currency"] = default_currencies.get(lang, "USD")
         
-        return_url = request.args.get("return_url") or request.referrer or url_for("index")
+        return_url = request.args.get("return_url") or request.referrer or url_for("about")
         return redirect(return_url)
-    return redirect(url_for("index"))
+    return redirect(url_for("about"))
 
 @app.route("/set-currency/<currency_code>")
 def set_currency(currency_code):
@@ -4176,7 +4176,7 @@ def set_currency(currency_code):
         session["currency"] = currency_code
         session.permanent = True
         session.modified = True
-    return_url = request.args.get("return_url") or request.referrer or url_for("index")
+    return_url = request.args.get("return_url") or request.referrer or url_for("about")
     return redirect(return_url)
 
 @app.route("/")
@@ -5240,13 +5240,13 @@ def demo_analysis():
     demo_file = os.path.join(app.static_folder, "demo", "sample_sales.csv")
     if not os.path.exists(demo_file):
         flash("קובץ הדמו לא נמצא", "danger")
-        return redirect(url_for("index"))
+        return redirect(url_for("upload"))
     
     try:
         df = pd.read_csv(demo_file, encoding="utf-8")
     except Exception as e:
         flash(f"שגיאה בטעינת קובץ הדמו: {e}", "danger")
-        return redirect(url_for("index"))
+        return redirect(url_for("upload"))
     
     # נרמול עמודות
     df.columns = [c.strip() for c in df.columns]
@@ -5254,7 +5254,7 @@ def demo_analysis():
     
     if df.empty:
         flash("קובץ הדמו ריק", "warning")
-        return redirect(url_for("index"))
+        return redirect(url_for("upload"))
     
     # ניקוי גרפים קודמים
     _clean_plots_dir()
@@ -7787,7 +7787,7 @@ def delete_account():
     session.clear()
     
     flash(t("account_deleted_success", lang), "success")
-    return redirect(url_for("index"))
+    return redirect(url_for("about"))
 
 
 @app.route("/profile/edit", methods=["GET", "POST"])
@@ -7857,7 +7857,7 @@ def profile_edit():
 def logout():
     session.clear()
     flash("התנתקת בהצלחה", "success")
-    return redirect(url_for("index"))
+    return redirect(url_for("about"))
 
 
 from datetime import datetime

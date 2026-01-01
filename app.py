@@ -7815,7 +7815,7 @@ def profile_edit():
     if len(username) < 4 or len(username) > 20:
         current_lang = get_language()
         if current_lang == 'he':
-        flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
+            flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
         elif current_lang == 'en':
             flash("Username must be between 4-20 characters", "danger")
         else:
@@ -7824,7 +7824,7 @@ def profile_edit():
     if not re.match(r'^[A-Za-z0-9]+$', username):
         current_lang = get_language()
         if current_lang == 'he':
-        flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
+            flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
         elif current_lang == 'en':
             flash("Username can only contain English letters and numbers", "danger")
         else:
@@ -7835,7 +7835,7 @@ def profile_edit():
     if existing:
         current_lang = get_language()
         if current_lang == 'he':
-        flash("שם משתמש זה כבר תפוס", "danger")
+            flash("שם משתמש זה כבר תפוס", "danger")
         elif current_lang == 'en':
             flash("This username is already taken", "danger")
         else:

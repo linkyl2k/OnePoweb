@@ -187,6 +187,20 @@
               <i class="bi bi-chevron-{{ 'left' if current_lang == 'he' else 'right' }}" style="color: var(--muted);"></i>
             </a>
 
+            {% if effective_plan == 'admin' %}
+            <!-- Admin Panel -->
+            <a href="{{ url_for('admin_users') }}" class="d-flex align-items-center p-3 text-decoration-none" style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.1)); border-radius: 12px; border: 1px solid rgba(245,158,11,0.3); transition: all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg, rgba(245,158,11,0.2), rgba(251,191,36,0.15))'; this.style.borderColor='rgba(245,158,11,0.4)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.1))'; this.style.borderColor='rgba(245,158,11,0.3)';">
+              <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(245,158,11,0.3), rgba(251,191,36,0.2)); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                <i class="bi bi-shield-check" style="font-size: 1.1rem; color: #fbbf24;"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div style="color: var(--text); font-weight: 500;">{% if current_lang == 'he' %}ניהול משתמשים{% elif current_lang == 'en' %}User Management{% else %}Управление пользователями{% endif %}</div>
+                <small class="text-muted">{% if current_lang == 'he' %}צפה ומחק משתמשים{% elif current_lang == 'en' %}View and delete users{% else %}Просмотр и удаление пользователей{% endif %}</small>
+              </div>
+              <i class="bi bi-chevron-{{ 'left' if current_lang == 'he' else 'right' }}" style="color: var(--muted);"></i>
+            </a>
+            {% endif %}
+
             <!-- Delete Account -->
             <a href="#" onclick="confirmDelete(); return false;" class="d-flex align-items-center p-2 text-decoration-none mt-2" style="background: transparent; border: none; transition: opacity 0.2s; opacity: 0.5;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='0.5';">
               <div style="width: 24px; height: 24px; border-radius: 6px; background: transparent; display: flex; align-items: center; justify-content: center; margin-right: 8px;">

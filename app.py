@@ -7622,7 +7622,8 @@ def dashboard_delete_report(report_id):
 @login_required
 def profile():
     u = current_user()
-    return render_template("profile.html", user=u, active="profile", title="הפרופיל שלי")
+    effective_plan = get_effective_plan(u)
+    return render_template("profile.html", user=u, effective_plan=effective_plan, active="profile", title="הפרופיל שלי")
 
 @app.route("/save-onboarding", methods=["POST"])
 @login_required
@@ -8048,6 +8049,56 @@ def welcome():
     """דף ברכה למשתמשים חדשים"""
     current_lang = get_language()
     return render_template("welcome.html", current_lang=current_lang)
+
+
+@app.route("/admin/users")
+@login_required
+def admin_users():
+    """Admin panel - список всех пользователей"""
+    u = current_user()
+    effective_plan = get_effective_plan(u)
+    
+    # Проверка на админа
+    if effective_plan != "admin":
+        flash("Access denied. Admin only.", "danger")
+        return redirect(url_for("profile"))
+    
+    db = get_db()
+    # Получаем всех пользователей с информацией
+    users = db.execute("""
+        SELECT id, email, username, first_name, last_name, plan, 
+               email_verified, created_at, agreed_terms
+        FROM users 
+        ORDER BY created_at DESC
+    """).fetchall()
+    
+    current_lang = get_language()
+    return render_template("admin_users.html", users=users, current_lang=current_lang)
+
+
+@app.route("/admin/delete-user/<int:user_id>", methods=["POST"])
+@login_required
+def admin_delete_user(user_id):
+    """Admin - удаление пользователя"""
+    u = current_user()
+    effective_plan = get_effective_plan(u)
+    
+    # Проверка на админа
+    if effective_plan != "admin":
+        return jsonify({"error": "Access denied"}), 403
+    
+    # Нельзя удалить самого себя
+    if u["id"] == user_id:
+        return jsonify({"error": "Cannot delete yourself"}), 400
+    
+    db = get_db()
+    try:
+        # Удаляем пользователя
+        db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        db.commit()
+        return jsonify({"success": True, "message": "User deleted successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/resend-verification", methods=["POST"])

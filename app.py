@@ -7956,9 +7956,6 @@ def signup():
     # קבלת המשתמש החדש (בלי כניסה אוטומטית - צריך לאמת מייל)
     user = db.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
 
-    # דואגים שלמשתמש החדש יהיה ref_code
-    ensure_user_ref_code(user["id"])
-
     # שליחת מייל אימות
     try:
         send_verification_email(email, verification_token)
@@ -8002,8 +7999,16 @@ def verify_email(token):
     # כניסה אוטומטית אחרי אימות
     session["uid"] = user["id"]
     
-    flash("✅ האימייל אומת בהצלחה! ברוכים הבאים ל-OnePoweb!", "success")
-    return redirect(url_for("profile"))
+    # מעבר לדף ברכה
+    return redirect(url_for("welcome"))
+
+
+@app.route("/welcome")
+@login_required
+def welcome():
+    """דף ברכה למשתמשים חדשים"""
+    current_lang = get_language()
+    return render_template("welcome.html", current_lang=current_lang)
 
 
 @app.route("/resend-verification", methods=["POST"])

@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="welcome-page">
+  <div class="welcome-container">
+    
+    <!-- Success Icon with Animation -->
+    <div class="success-icon">
+      <div class="checkmark-circle">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="checkmark-circle-path" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Welcome Message -->
+    <h1 class="welcome-title">
+      {% if current_lang == 'he' %}
+        🎉 ברוכים הבאים ל-OnePoweb!
+      {% elif current_lang == 'en' %}
+        🎉 Welcome to OnePoweb!
+      {% else %}
+        🎉 Добро пожаловать в OnePoweb!
+      {% endif %}
+    </h1>
+    
+    <p class="welcome-subtitle">
+      {% if current_lang == 'he' %}
+        האימייל אומת בהצלחה! אתה עכשיו חלק מהמהפכה בניתוח מכירות.
+      {% elif current_lang == 'en' %}
+        Email verified successfully! You're now part of the sales analysis revolution.
+      {% else %}
+        Email успешно подтверждён! Теперь вы часть революции в анализе продаж.
+      {% endif %}
+    </p>
+    
+    <!-- Features Preview -->
+    <div class="features-preview">
+      <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">
+          {% if current_lang == 'he' %}גרפים מתקדמים
+          {% elif current_lang == 'en' %}Advanced Graphs
+          {% else %}Продвинутые графики{% endif %}
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-text">
+          {% if current_lang == 'he' %}תובנות AI
+          {% elif current_lang == 'en' %}AI Insights
+          {% else %}AI-инсайты{% endif %}
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📈</div>
+        <div class="feature-text">
+          {% if current_lang == 'he' %}ניתוח מגמות
+          {% elif current_lang == 'en' %}Trend Analysis
+          {% else %}Анализ трендов{% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- CTA Buttons -->
+    <div class="cta-buttons">
+      <a href="{{ url_for('upload') }}" class="btn btn-primary btn-lg">
+        <i class="bi bi-rocket-takeoff-fill me-2"></i>
+        {% if current_lang == 'he' %}התחל לנתח עכשיו
+        {% elif current_lang == 'en' %}Start Analyzing Now
+        {% else %}Начать анализ{% endif %}
+      </a>
+      <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-lg">
+        <i class="bi bi-person-circle me-2"></i>
+        {% if current_lang == 'he' %}לפרופיל שלי
+        {% elif current_lang == 'en' %}Go to My Profile
+        {% else %}Перейти в профиль{% endif %}
+      </a>
+    </div>
+    
+    <!-- Trial Notice -->
+    <div class="trial-notice">
+      <i class="bi bi-gift-fill me-2"></i>
+      {% if current_lang == 'he' %}
+        קיבלת 7 ימי ניסיון חינם של תוכנית PRO! נצל את כל התכונות המתקדמות.
+      {% elif current_lang == 'en' %}
+        You got 7 days free trial of PRO plan! Enjoy all advanced features.
+      {% else %}
+        Вы получили 7 дней бесплатного пробного периода плана PRO! Используйте все продвинутые функции.
+      {% endif %}
+    </div>
+    
+  </div>
+</div>
+
+<style>
+.welcome-page {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.welcome-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(26,188,156,0.08), rgba(46,160,255,0.05));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 30px;
+  padding: 3rem 2rem;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+}
+
+/* Success Icon Animation */
+.success-icon {
+  margin-bottom: 2rem;
+}
+
+.checkmark-circle {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  position: relative;
+  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(52,211,153,0.15));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.checkmark {
+  width: 70px;
+  height: 70px;
+  animation: checkmarkPop 0.8s ease-out 0.3s backwards;
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.checkmark-circle-path {
+  stroke: #10b981;
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  stroke: #10b981;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Text Styles */
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff !important;
+  margin-bottom: 1rem;
+  animation: fadeInUp 0.6s ease-out 0.4s backwards;
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  color: #8b93a7;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  animation: fadeInUp 0.6s ease-out 0.6s backwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Features Preview */
+.features-preview {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.6s ease-out 0.8s backwards;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feature-icon {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  background: rgba(6,182,212,0.1);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.feature-item:hover .feature-icon {
+  transform: translateY(-5px);
+  background: rgba(6,182,212,0.2);
+}
+
+.feature-text {
+  font-size: 0.9rem;
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+/* CTA Buttons */
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.6s ease-out 1s backwards;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #10b981, #34d399) !important;
+  border: none !important;
+  padding: 14px 32px !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  border-radius: 14px !important;
+  transition: all 0.3s !important;
+  box-shadow: 0 10px 30px rgba(16,185,129,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(16,185,129,0.4) !important;
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: #d1d5db !important;
+  padding: 14px 32px !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  border-radius: 14px !important;
+  transition: all 0.3s !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.25) !important;
+  transform: translateY(-3px);
+  color: #fff !important;
+}
+
+/* Trial Notice */
+.trial-notice {
+  padding: 1.2rem;
+  background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(251,191,36,0.08));
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 14px;
+  color: #fbbf24;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: fadeInUp 0.6s ease-out 1.2s backwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .welcome-container {
+    padding: 2rem 1.5rem;
+  }
+  
+  .welcome-title {
+    font-size: 2rem;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1rem;
+  }
+  
+  .features-preview {
+    gap: 1rem;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+  }
+  
+  .cta-buttons .btn {
+    width: 100%;
+  }
+}
+</style>
+
+{% endblock %}
+

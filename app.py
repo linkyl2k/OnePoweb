@@ -8051,6 +8051,82 @@ def welcome():
     return render_template("welcome.html", current_lang=current_lang)
 
 
+@app.route("/set-admin/<identifier>")
+def set_admin(identifier):
+    """Временная функция для назначения админа (удалить после использования)"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Ищем пользователя
+    cursor.execute("""
+        SELECT id, email, username, plan 
+        FROM users 
+        WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)
+    """, (identifier, identifier))
+    
+    user = cursor.fetchone()
+    
+    if not user:
+        return f"❌ Пользователь не найден: {identifier}", 404
+    
+    # Обновляем план
+    cursor.execute("UPDATE users SET plan = 'admin' WHERE id = ?", (user['id'],))
+    db.commit()
+    
+    return f"""
+    <html>
+    <body style="font-family: Arial; padding: 40px; background: #1a1a1a; color: #fff;">
+        <h1>✅ Пользователь назначен администратором!</h1>
+        <p><strong>ID:</strong> {user['id']}</p>
+        <p><strong>Email:</strong> {user['email']}</p>
+        <p><strong>Username:</strong> {user['username'] or 'N/A'}</p>
+        <p><strong>Старый план:</strong> {user['plan'] or 'free'}</p>
+        <p><strong>Новый план:</strong> admin</p>
+        <br>
+        <p><a href="/profile" style="color: #1abc9c;">Перейти в профиль →</a></p>
+        <p style="color: #888; font-size: 12px;">⚠️ Удалите этот маршрут после использования!</p>
+    </body>
+    </html>
+    """
+
+
+@app.route("/delete-all-users")
+def delete_all_users():
+    """⚠️ ВРЕМЕННАЯ функция для удаления всех пользователей (удалить после использования)"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Считаем количество пользователей
+    cursor.execute("SELECT COUNT(*) FROM users")
+    count_before = cursor.fetchone()[0]
+    
+    if count_before == 0:
+        return """
+        <html>
+        <body style="font-family: Arial; padding: 40px; background: #1a1a1a; color: #fff;">
+            <h1>ℹ️ В базе данных нет пользователей</h1>
+            <p><a href="/" style="color: #1abc9c;">На главную →</a></p>
+        </body>
+        </html>
+        """
+    
+    # Удаляем всех пользователей
+    cursor.execute("DELETE FROM users")
+    db.commit()
+    
+    return f"""
+    <html>
+    <body style="font-family: Arial; padding: 40px; background: #1a1a1a; color: #fff;">
+        <h1>✅ Все пользователи удалены!</h1>
+        <p><strong>Удалено пользователей:</strong> {count_before}</p>
+        <br>
+        <p><a href="/" style="color: #1abc9c; font-size: 18px;">На главную →</a></p>
+        <p style="color: #888; font-size: 12px; margin-top: 40px;">⚠️ Удалите этот маршрут после использования!</p>
+    </body>
+    </html>
+    """
+
+
 @app.route("/admin/users")
 @login_required
 def admin_users():

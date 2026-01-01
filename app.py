@@ -5849,74 +5849,74 @@ def export_pdf():
             else:
                 return f"Error loading report: {str(e)}", 500
     else:
-    # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
-    session_data = session.get("last_export", {})
+        # Пробуем получить данные из сессии, если нет - из LAST_EXPORT
+        session_data = session.get("last_export", {})
         print(f"📄 PDF Export: session_data has {len(session_data.get('plots', []))} plots")
-    
-    if session_data:
-        # Данные из сессии
-        generated_at_str = session_data.get("generated_at", "")
-        if generated_at_str:
-            try:
-                from datetime import datetime
-                dt = datetime.fromisoformat(generated_at_str)
-                generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
-            except:
-                generated_at_str = ""
-        current_lang = get_language()
-        raw_summary = session_data.get("summary", "")
+        
+        if session_data:
+            # Данные из сессии
+            generated_at_str = session_data.get("generated_at", "")
+            if generated_at_str:
+                try:
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(generated_at_str)
+                    generated_at_str = dt.strftime("%Y-%m-%d %H:%M")
+                except:
+                    generated_at_str = ""
+            current_lang = get_language()
+            raw_summary = session_data.get("summary", "")
 
-        # summary может быть dict с языками или строкой
-        if isinstance(raw_summary, dict):
-            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+            # summary может быть dict с языками или строкой
+            if isinstance(raw_summary, dict):
+                summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+            else:
+                summary_for_lang = raw_summary
+
+            snap = {
+                "generated_at": generated_at_str,
+                "lang": session_data.get("lang") or get_language(),
+                "summary": summary_for_lang,
+                "summary_ai": session_data.get("summary_ai", ""),
+                "roi": session_data.get("roi", {}),
+                "plots": session_data.get("plots", []),
+            }
+            print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
         else:
-            summary_for_lang = raw_summary
+            # Fallback на LAST_EXPORT
+            current_lang = get_language()
+            raw_summary = LAST_EXPORT.get("summary", "")
+            if isinstance(raw_summary, dict):
+                summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
+            else:
+                summary_for_lang = raw_summary
 
-        snap = {
-            "generated_at": generated_at_str,
-            "lang": session_data.get("lang") or get_language(),
-            "summary": summary_for_lang,
-            "summary_ai": session_data.get("summary_ai", ""),
-            "roi": session_data.get("roi", {}),
-            "plots": session_data.get("plots", []),
-        }
-        print(f"📄 PDF: Loaded from session, {len(snap.get('plots', []))} plots")
-    else:
-        # Fallback на LAST_EXPORT
-        current_lang = get_language()
-        raw_summary = LAST_EXPORT.get("summary", "")
-        if isinstance(raw_summary, dict):
-            summary_for_lang = raw_summary.get(current_lang) or raw_summary.get("he") or ""
-        else:
-            summary_for_lang = raw_summary
+            snap = {
+                "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
+                                 if LAST_EXPORT.get("generated_at") else ""),
+                "lang": LAST_EXPORT.get("lang") or get_language(),
+                "summary": summary_for_lang,
+                "summary_ai": LAST_EXPORT.get("summary_ai", ""),
+                "roi": LAST_EXPORT.get("roi", {}),
+                "plots": LAST_EXPORT.get("plots", []),
+            }
+            print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
+        
+        print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}, lang={snap.get('lang')}")
+        print(f"📄 PDF Snap plots detail: {[p.get('filename') for p in snap.get('plots', [])]}")
 
-        snap = {
-            "generated_at": (LAST_EXPORT.get("generated_at").strftime("%Y-%m-%d %H:%M")
-                             if LAST_EXPORT.get("generated_at") else ""),
-            "lang": LAST_EXPORT.get("lang") or get_language(),
-            "summary": summary_for_lang,
-            "summary_ai": LAST_EXPORT.get("summary_ai", ""),
-            "roi": LAST_EXPORT.get("roi", {}),
-            "plots": LAST_EXPORT.get("plots", []),
-        }
-        print(f"📄 PDF: Loaded from LAST_EXPORT, {len(snap.get('plots', []))} plots")
-    
-    print(f"📄 PDF Snap: {len(snap.get('plots', []))} plots, ROI={bool(snap.get('roi'))}, lang={snap.get('lang')}")
-    print(f"📄 PDF Snap plots detail: {[p.get('filename') for p in snap.get('plots', [])]}")
+        # Проверка, есть ли данные для экспорта
+        if not snap.get('plots') and not snap.get('summary') and not snap.get('roi'):
+            current_lang = get_language()
+            if current_lang == 'he':
+                error_msg = "לא נמצאו נתונים לייצוא. אנא העלה דוח תחילה."
+            elif current_lang == 'ru':
+                error_msg = "Нет данных для экспорта. Пожалуйста, сначала загрузите отчет."
+            else:
+                error_msg = "No data found for export. Please upload a report first."
+            return f"<h1>Error</h1><p>{error_msg}</p><p><a href='/'>Go back</a></p>", 404
 
-    # Проверка, есть ли данные для экспорта
-    if not snap.get('plots') and not snap.get('summary') and not snap.get('roi'):
-        current_lang = get_language()
-        if current_lang == 'he':
-            error_msg = "לא נמצאו נתונים לייצוא. אנא העלה דוח תחילה."
-        elif current_lang == 'ru':
-            error_msg = "Нет данных для экспорта. Пожалуйста, сначала загрузите отчет."
-        else:
-            error_msg = "No data found for export. Please upload a report first."
-        return f"<h1>Error</h1><p>{error_msg}</p><p><a href='/'>Go back</a></p>", 404
-
-    # Язык PDF берём из snapshot (язык анализа), а не из текущей сессии
-    pdf_lang_code = snap.get("lang") or get_language()
+        # Язык PDF берём из snapshot (язык анализа), а не из текущей сессии
+        pdf_lang_code = snap.get("lang") or get_language()
 
     # ---------- 2) עזרים ----------
     def _esc(s: str) -> str:

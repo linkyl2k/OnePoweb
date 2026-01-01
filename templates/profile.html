@@ -99,7 +99,9 @@
                 <div style="font-size: 2rem;">🎁</div>
                 <div class="flex-grow-1">
                   <strong style="color: #fbbf24;">{{ t('profile_trial_available') }}</strong>
-                  <p class="mb-0 small text-muted">{{ t('profile_trial_desc') }}</p>
+                  <p class="mb-0 small text-muted">
+                    {% if current_lang == 'he' %}נדרש כרטיס אשראי. לא יחויב במשך 7 ימים.{% elif current_lang == 'en' %}Credit card required. You won't be charged for 7 days.{% else %}Требуется карта. Спишется только через 7 дней.{% endif %}
+                  </p>
                 </div>
                 <form method="POST" action="{{ url_for('start_trial') }}">
                   <button type="submit" class="btn" style="background: linear-gradient(90deg, #f59e0b, #fbbf24); color: #000; font-weight: 600; border-radius: 10px; padding: 10px 20px;">

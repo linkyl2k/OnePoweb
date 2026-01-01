@@ -8,7 +8,16 @@
       <i class="bi bi-{% if plan == 'pro' %}rocket-takeoff{% else %}star{% endif %}" style="font-size: 1.75rem; color: #fff;"></i>
     </div>
     <h2 style="color: #fff;">{% if current_lang == 'he' %}תשלום עבור {{ plan|upper }}{% elif current_lang == 'en' %}Payment for {{ plan|upper }}{% else %}Оплата за {{ plan|upper }}{% endif %}</h2>
+    {% if with_trial %}
+    <div class="alert alert-info mb-3" style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.1)); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; color: #fbbf24;">
+      <i class="bi bi-gift-fill me-2"></i>
+      <strong>{% if current_lang == 'he' %}7 ימי ניסיון חינם!{% elif current_lang == 'en' %}7 Days Free Trial!{% else %}7 дней бесплатно!{% endif %}</strong>
+      <br>
+      <small>{% if current_lang == 'he' %}לא יחויב במשך 7 ימים. לאחר מכן ${{ base_price_usd }}/חודש.{% elif current_lang == 'en' %}You won't be charged for 7 days. Then ${{ base_price_usd }}/month.{% else %}Не будет списано в течение 7 дней. Затем ${{ base_price_usd }}/месяц.{% endif %}</small>
+    </div>
+    {% else %}
     <p class="text-muted">{% if current_lang == 'he' %}מנוי חודשי ל-OnePoweb{% elif current_lang == 'en' %}Monthly subscription to OnePoweb{% else %}Месячная подписка на OnePoweb{% endif %}</p>
+    {% endif %}
   </div>
 
   <!-- Order Summary -->
@@ -139,6 +148,7 @@
 <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&vault=true&intent=subscription&enable-funding=card&components=buttons,card-fields"></script>
 <script>
 const plan = "{{ plan }}";
+const withTrial = {{ 'true' if with_trial else 'false' }};
 
 paypal.Buttons({
   style: {
@@ -151,13 +161,13 @@ paypal.Buttons({
   
   // Create subscription on server - returns subscription ID only, no redirect
   createSubscription: function(data, actions) {
-    console.log('[PayPal] Creating subscription for plan:', plan);
+    console.log('[PayPal] Creating subscription for plan:', plan, 'with_trial:', withTrial);
     return fetch('/api/paypal/create-subscription-id', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ plan: plan })
+      body: JSON.stringify({ plan: plan, trial: withTrial })
     })
     .then(response => {
       console.log('[PayPal] Response status:', response.status);
@@ -211,7 +221,8 @@ paypal.Buttons({
       },
       body: JSON.stringify({
         subscription_id: data.subscriptionID,
-        plan: plan
+        plan: plan,
+        trial: withTrial
       })
     })
     .then(response => response.json())
@@ -266,7 +277,7 @@ if (paypal.CardFields) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ plan: plan })
+        body: JSON.stringify({ plan: plan, trial: withTrial })
       })
       .then(response => response.json())
       .then(data => {

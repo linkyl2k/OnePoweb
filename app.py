@@ -6505,10 +6505,11 @@ def get_or_create_paypal_product():
     return None
 
 
-def get_or_create_paypal_plan(plan_name, price_usd):
+def get_or_create_paypal_plan(plan_name, price_usd, with_trial=False):
     """
     Создает или получает план подписки в PayPal.
     Возвращает plan_id или None.
+    with_trial: если True, создает план с 7-дневным trial периодом
     """
     access_token = get_paypal_access_token()
     if not access_token:
@@ -6527,8 +6528,8 @@ def get_or_create_paypal_plan(plan_name, price_usd):
         "Prefer": "return=representation"
     }
     
-    # Проверяем, есть ли уже план
-    plan_name_search = f"OnePoweb {plan_name.upper()}"
+    # Проверяем, есть ли уже план (с учетом trial)
+    plan_name_search = f"OnePoweb {plan_name.upper()}" + (" (Trial)" if with_trial else "")
     response = requests.get(
         f"{PAYPAL_API_URL}/v1/billing/plans",
         headers=headers,
@@ -6545,27 +6546,51 @@ def get_or_create_paypal_plan(plan_name, price_usd):
     else:
         print(f"[PayPal] Failed to list plans: {response.status_code} - {response.text[:500]}")
     
+    # Создаем billing cycles
+    billing_cycles = []
+    
+    # Если нужен trial - добавляем trial цикл
+    if with_trial:
+        billing_cycles.append({
+            "frequency": {
+                "interval_unit": "DAY",
+                "interval_count": 7
+            },
+            "tenure_type": "TRIAL",
+            "sequence": 1,
+            "total_cycles": 1,
+            "pricing_scheme": {
+                "fixed_price": {
+                    "value": "0.00",
+                    "currency_code": "USD"
+                }
+            }
+        })
+    
+    # Регулярный цикл (после trial или сразу)
+    billing_cycles.append({
+        "frequency": {
+            "interval_unit": "MONTH",
+            "interval_count": 1
+        },
+        "tenure_type": "REGULAR",
+        "sequence": 2 if with_trial else 1,
+        "total_cycles": 0,  # 0 = бесконечно (автоматическое продление)
+        "pricing_scheme": {
+            "fixed_price": {
+                "value": f"{price_usd:.2f}",
+                "currency_code": "USD"
+            }
+        }
+    })
+    
     # Создаем новый план
     plan_data = {
         "product_id": product_id,
         "name": plan_name_search,
-        "description": f"Monthly subscription for OnePoweb {plan_name.upper()} plan",
+        "description": f"Monthly subscription for OnePoweb {plan_name.upper()} plan" + (" with 7-day free trial" if with_trial else ""),
         "status": "ACTIVE",
-        "billing_cycles": [{
-            "frequency": {
-                "interval_unit": "MONTH",
-                "interval_count": 1
-            },
-            "tenure_type": "REGULAR",
-            "sequence": 1,
-            "total_cycles": 0,  # 0 = бесконечно (автоматическое продление)
-            "pricing_scheme": {
-                "fixed_price": {
-                    "value": f"{price_usd:.2f}",
-                    "currency_code": "USD"
-                }
-            }
-        }],
+        "billing_cycles": billing_cycles,
         "payment_preferences": {
             "auto_bill_outstanding": True,
             "setup_fee_failure_action": "CONTINUE",
@@ -6656,6 +6681,8 @@ def paypal_debug():
 def subscribe():
     """Show checkout page with PayPal button"""
     plan = request.args.get("plan", "basic")
+    trial = request.args.get("trial", "false").lower() == "true"  # Проверяем trial параметр
+    
     if plan not in ("basic", "pro"):
         plan = "basic"
 
@@ -6663,6 +6690,11 @@ def subscribe():
     if not u:
         flash_t("msg_login_required", "warning")
         return redirect(url_for("login"))
+    
+    # Проверка trial_used для trial подписки
+    if trial and u.get("trial_used"):
+        flash_t("msg_trial_used", "warning")
+        return redirect(url_for("profile"))
     
     try:
         ensure_user_ref_code(u["id"])
@@ -6682,6 +6714,7 @@ def subscribe():
         plan=plan,
         base_price_usd=base_price_usd,
         net_price_usd=net_price_usd,
+        with_trial=trial,
         paypal_client_id=paypal_client_id,
         paypal_mode=paypal_mode
     )
@@ -6857,6 +6890,7 @@ def paypal_create_subscription_id():
     try:
         data = request.get_json() or {}
         plan = data.get("plan", "basic")
+        with_trial = data.get("trial", False)  # Проверяем, нужен ли trial
         
         if plan not in ("basic", "pro"):
             return jsonify({"error": "Invalid plan"}), 400
@@ -6864,6 +6898,10 @@ def paypal_create_subscription_id():
         u = current_user()
         if not u:
             return jsonify({"error": "User not found"}), 401
+        
+        # Проверка trial_used для trial подписки
+        if with_trial and u.get("trial_used"):
+            return jsonify({"error": "Trial period already used"}), 400
         
         # Get user ID safely
         try:
@@ -6891,8 +6929,8 @@ def paypal_create_subscription_id():
             "Content-Type": "application/json"
         }
         
-        # Get or create subscription plan
-        plan_id = get_or_create_paypal_plan(plan, base_price_usd)
+        # Get or create subscription plan (с trial если нужно)
+        plan_id = get_or_create_paypal_plan(plan, base_price_usd, with_trial=with_trial)
         if not plan_id:
             return jsonify({"error": "Failed to create subscription plan."}), 500
         
@@ -6984,6 +7022,7 @@ def paypal_activate_subscription_api():
         data = request.get_json() or {}
         subscription_id = data.get("subscription_id")
         plan = data.get("plan", "basic")
+        with_trial = data.get("trial", False)  # Проверяем, была ли это trial подписка
         
         if not subscription_id:
             return jsonify({"error": "Subscription ID required"}), 400
@@ -7030,6 +7069,13 @@ def paypal_activate_subscription_api():
         
         # Activate subscription
         result = activate_subscription(user_id, plan, {"subscription_id": subscription_id, "discount": discount_used})
+        
+        # Если это была trial подписка - помечаем trial_used
+        if with_trial:
+            db = get_db()
+            db.execute("UPDATE users SET trial_used = 1 WHERE id = ?", (user_id,))
+            db.commit()
+            print(f"[PayPal] Marked trial_used for user {user_id}")
         
         # Clear pending subscription
         session.pop("pending_subscription", None)
@@ -7379,35 +7425,24 @@ def subscribe_success():
 @app.route("/start-trial", methods=["POST"])
 @login_required
 def start_trial():
-    """מפעיל תקופת ניסיון חינמית של 7 ימים"""
+    """מפעיל תקופת ניסיון חינמית של 7 ימים - דורש כרטיס אשראי"""
     u = current_user()
     if not u:
         flash_t("msg_login_required", "warning")
         return redirect(url_for("login"))
     
     # בדיקה אם כבר ניצל תקופת ניסיון
-    if u["trial_used"]:
+    if u.get("trial_used"):
         flash_t("msg_trial_used", "warning")
         return redirect(url_for("profile"))
     
     # בדיקה אם כבר יש מנוי פעיל
-    if u["plan"] in ("basic", "pro"):
+    if u.get("plan") in ("basic", "pro"):
         flash_t("msg_subscription_active", "info")
         return redirect(url_for("profile"))
     
-    # הפעלת תקופת ניסיון
-    trial_end = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
-    
-    db = get_db()
-    db.execute("""
-        UPDATE users 
-        SET trial_until = ?, trial_used = 1
-        WHERE id = ?
-    """, (trial_end, u["id"]))
-    db.commit()
-    
-    flash(f"🎉 {t('msg_trial_started')} PRO {t('plan_free')} עד {trial_end}", "success")
-    return redirect(url_for("profile"))
+    # מעבר לדף תשלום עם trial
+    return redirect(url_for("subscribe", plan="pro", trial="true"))
 
 
 # --- placeholders so templates with url_for('login'/'signup') won't crash ---

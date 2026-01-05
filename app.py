@@ -326,6 +326,10 @@ TRANSLATIONS = {
         "profile_plan": "תוכנית",
         "profile_edit": "ערוך פרופיל",
         "profile_change_password": "שנה סיסמה",
+        "profile_current_status": "סטטוס נוכחי",
+        "profile_active": "פעיל",
+        "profile_cancelled": "בוטל",
+        "profile_no_subscription": "אין מנוי",
         
         # Flash сообщения
         "msg_login_required": "יש להתחבר קודם",
@@ -489,6 +493,10 @@ TRANSLATIONS = {
         "profile_plan": "Plan",
         "profile_edit": "Edit Profile",
         "profile_change_password": "Change Password",
+        "profile_current_status": "Current Status",
+        "profile_active": "Active",
+        "profile_cancelled": "Cancelled",
+        "profile_no_subscription": "No Subscription",
         
         # Flash messages
         "msg_login_required": "Please login first",

@@ -6158,7 +6158,7 @@ def export_pdf():
                 </div>
               </div>
               <div style="margin-top: 10px; font-size: 8.5pt; color: #666;">
-                {service_cost_label}. {disclaimer}
+                """ + service_cost_label + ". " + disclaimer + """
               </div>
             </div>
             """

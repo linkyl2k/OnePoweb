@@ -5845,8 +5845,9 @@ def export_pdf():
                 "plots": plots_from_db
             }
             
-            # Язык PDF берём из snapshot (язык анализа), а не из текущей сессии
-            pdf_lang_code = snap.get("lang") or get_language()
+            # Язык PDF берём из текущей сессии, а не из сохраненного отчета
+            # Это позволяет пользователю экспортировать PDF на любом языке
+            pdf_lang_code = get_language()
             
             print(f"📄 PDF: Loaded from saved report {report_id}, name={report_name}, plots={len(plots_from_db)}, roi={bool(roi_from_db)}")
             
@@ -5928,8 +5929,9 @@ def export_pdf():
                 error_msg = "No data found for export. Please upload a report first."
             return f"<h1>Error</h1><p>{error_msg}</p><p><a href='/'>Go back</a></p>", 404
 
-        # Язык PDF берём из snapshot (язык анализа), а не из текущей сессии
-        pdf_lang_code = snap.get("lang") or get_language()
+        # Язык PDF берём из текущей сессии
+        # Это позволяет пользователю видеть PDF на выбранном языке
+        pdf_lang_code = get_language()
 
     # ---------- 2) עזרים ----------
     def _esc(s: str) -> str:

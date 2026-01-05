@@ -31,14 +31,24 @@
         </p>
         
         <div class="d-flex gap-3 mb-5">
-          <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(46,160,255,0.4); transition: all 0.3s;">
-            Get Started Free <i class="bi bi-arrow-right ms-2"></i>
-          </a>
-          <a href="#features" class="btn btn-lg btn-outline-light" style="padding: 1rem 2rem; border-radius: 16px; border: 2px solid rgba(255,255,255,0.2);">
-            Learn More
-          </a>
+          {% if session.uid %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(46,160,255,0.4); transition: all 0.3s;">
+              Go to Dashboard <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+            <a href="{{ url_for('upload') }}" class="btn btn-lg btn-outline-light" style="padding: 1rem 2rem; border-radius: 16px; border: 2px solid rgba(255,255,255,0.2);">
+              Upload Data
+            </a>
+          {% else %}
+            <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(46,160,255,0.4); transition: all 0.3s;">
+              Get Started Free <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+            <a href="#features" class="btn btn-lg btn-outline-light" style="padding: 1rem 2rem; border-radius: 16px; border: 2px solid rgba(255,255,255,0.2);">
+              Learn More
+            </a>
+          {% endif %}
         </div>
         
+        {% if not session.uid %}
         <div class="d-flex gap-4 text-muted">
           <div>
             <i class="bi bi-check-circle-fill text-success me-2"></i>
@@ -49,6 +59,7 @@
             <span>7-day free trial</span>
           </div>
         </div>
+        {% endif %}
       </div>
       
       <!-- Right Side - Visual/Screenshot -->
@@ -164,11 +175,19 @@
 <div class="py-5" style="background: linear-gradient(135deg, #1a1f36 0%, #0f1419 100%);">
   <div class="container py-5">
     <div class="text-center">
-      <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Business?</h2>
-      <p class="lead text-muted mb-5">Join thousands of businesses making smarter decisions with OnePoweb</p>
-      <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1.25rem 4rem; border-radius: 16px; color: white; font-weight: 600; font-size: 1.25rem; box-shadow: 0 10px 40px rgba(46,160,255,0.4);">
-        Get Started - It's Free <i class="bi bi-arrow-right ms-2"></i>
-      </a>
+      {% if session.uid %}
+        <h2 class="display-4 fw-bold text-white mb-4">Start Analyzing Your Data</h2>
+        <p class="lead text-muted mb-5">Upload your sales data and get instant insights</p>
+        <a href="{{ url_for('upload') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1.25rem 4rem; border-radius: 16px; color: white; font-weight: 600; font-size: 1.25rem; box-shadow: 0 10px 40px rgba(46,160,255,0.4);">
+          Upload Data Now <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+      {% else %}
+        <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Business?</h2>
+        <p class="lead text-muted mb-5">Join thousands of businesses making smarter decisions with OnePoweb</p>
+        <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1.25rem 4rem; border-radius: 16px; color: white; font-weight: 600; font-size: 1.25rem; box-shadow: 0 10px 40px rgba(46,160,255,0.4);">
+          Get Started - It's Free <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -6105,10 +6105,20 @@ def export_pdf():
             badge_label_monthly = "Estimated Monthly Addition"
             badge_label_roi = "Estimated ROI"
         
+        # Упрощенный заголовок без лишних деталей
+        service_cost_label = (
+            "עלות שירות: $20" if current_lang == 'he' else
+            ("Стоимость услуги: $20" if current_lang == 'ru' else "Service cost: $20")
+        )
+        disclaimer = (
+            "* הערכה זו מבוססת על ניתוח נתונים בלבד. תוצאות בפועל תלויות בפעולות שננקטו." if current_lang == 'he' else
+            ("* Эта оценка основана только на анализе данных. Фактические результаты зависят от предпринятых действий." if current_lang == 'ru' else 
+             "* This estimate is based on data analysis only. Actual results depend on actions taken.")
+        )
+        
         roi_inline_html = (
             f"<section class='roi-card' dir={'rtl' if current_lang == 'he' else 'ltr'}>"
             f"<div class='roi-header'>{roi_header}</div>"
-            + (f"<div class='roi-text'>{roi_text}</div>" if roi_text else "")
             + f"""
             <div class="roi-badges">
               <div class="badge badge-green">
@@ -6122,37 +6132,33 @@ def export_pdf():
             </div>
             """
             + roi_table_html +
-            """
-            <div class="roi-scenarios" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-              <div style="font-size: 0.9em; margin-bottom: 10px; font-weight: bold;">""" + (
-                "תרחישי הערכה:" if current_lang == 'he' else 
-                ("Сценарии оценки:" if current_lang == 'ru' else "Estimation Scenarios:")
-              ) + """</div>
-              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 6px; border: 1px solid rgba(239,68,68,0.3);">
-                  <div style="font-size: 0.75em; color: #f87171;">""" + (
+            f"""
+            <div class="roi-scenarios" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd;">
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <div style="flex: 1; min-width: 140px; padding: 8px; background: rgba(239,68,68,0.08); border-radius: 8px; border: 1px solid rgba(239,68,68,0.25);">
+                  <div style="font-size: 8.5pt; color: #666; margin-bottom: 2px;">""" + (
                     "שמרני (60%)" if current_lang == 'he' else 
                     ("Консервативный (60%)" if current_lang == 'ru' else "Conservative (60%)")
                   ) + """</div>
-                  <div style="font-size: 1.1em; font-weight: bold; color: #ef4444;">""" + f"{currency_symbol}{roi_gain_cons:,.0f}" + """</div>
-                  <div style="font-size: 0.7em; color: #f87171;">ROI: $20</div>
+                  <div style="font-size: 14pt; font-weight: bold; color: #ef4444;">""" + f"{currency_symbol}{roi_gain_cons:,.0f}" + """</div>
                 </div>
-                <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(16,185,129,0.1); border-radius: 6px; border: 1px solid rgba(16,185,129,0.3);">
-                  <div style="font-size: 0.75em; color: #10b981;">""" + (
+                <div style="flex: 1; min-width: 140px; padding: 8px; background: rgba(16,185,129,0.08); border-radius: 8px; border: 1px solid rgba(16,185,129,0.25);">
+                  <div style="font-size: 8.5pt; color: #666; margin-bottom: 2px;">""" + (
                     "בסיסי (100%)" if current_lang == 'he' else 
                     ("Базовый (100%)" if current_lang == 'ru' else "Base (100%)")
                   ) + """</div>
-                  <div style="font-size: 1.1em; font-weight: bold; color: #34d399;">""" + f"{currency_symbol}{roi_gain:,.0f}" + """</div>
-                  <div style="font-size: 0.7em; color: #10b981;">ROI: $20</div>
+                  <div style="font-size: 14pt; font-weight: bold; color: #10b981;">""" + f"{currency_symbol}{roi_gain:,.0f}" + """</div>
                 </div>
-                <div style="flex: 1; min-width: 120px; padding: 8px; background: rgba(34,197,94,0.1); border-radius: 6px; border: 1px solid rgba(34,197,94,0.3);">
-                  <div style="font-size: 0.75em; color: #16a34a;">""" + (
+                <div style="flex: 1; min-width: 140px; padding: 8px; background: rgba(34,197,94,0.08); border-radius: 8px; border: 1px solid rgba(34,197,94,0.25);">
+                  <div style="font-size: 8.5pt; color: #666; margin-bottom: 2px;">""" + (
                     "אופטימי (140%)" if current_lang == 'he' else 
                     ("Оптимистичный (140%)" if current_lang == 'ru' else "Optimistic (140%)")
                   ) + """</div>
-                  <div style="font-size: 1.1em; font-weight: bold; color: #22c55e;">""" + f"{currency_symbol}{roi_gain_opt:,.0f}" + """</div>
-                  <div style="font-size: 0.7em; color: #16a34a;">ROI: $20</div>
+                  <div style="font-size: 14pt; font-weight: bold; color: #22c55e;">""" + f"{currency_symbol}{roi_gain_opt:,.0f}" + """</div>
                 </div>
+              </div>
+              <div style="margin-top: 10px; font-size: 8.5pt; color: #666;">
+                {service_cost_label}. {disclaimer}
               </div>
             </div>
             """
@@ -6270,17 +6276,17 @@ def export_pdf():
         }}
         .badge {{
           border-radius: 10px;
-          padding: 6mm;
-          min-width: 55mm;
+          padding: 7mm;
+          min-width: 60mm;
           box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
         }}
-        .badge-green {{ background:#eafff4; border:1px solid #2e8b57; }}
-        .badge-blue  {{ background:#eef5ff; border:1px solid #3a71d1; }}
+        .badge-green {{ background:#eafff4; border:2px solid #2e8b57; }}
+        .badge-blue  {{ background:#eef5ff; border:2px solid #3a71d1; }}
         .badge-label {{
-          font-size: 9pt; color:#555; margin-bottom: 2mm;
+          font-size: 10pt; color:#555; margin-bottom: 3mm; font-weight: 600;
         }}
         .badge-value {{
-          font-size: 20pt; font-weight: 800; letter-spacing: 0.5px;
+          font-size: 24pt; font-weight: 800; letter-spacing: 0.5px;
         }}
 
         /* ===== ROI Table ===== */
@@ -6288,17 +6294,21 @@ def export_pdf():
         .roi-table {{
           width: 100%;
           border-collapse: collapse;
-          font-size: 10pt;
+          font-size: 11pt;
           direction: {pdf_dir};
           text-align: {'right' if pdf_dir == 'rtl' else 'left'};
         }}
         .roi-table th, .roi-table td {{
-          border: 1px solid #ddd;
-          padding: 3mm 4mm;
-          vertical-align: top;
+          border: 1px solid #ccc;
+          padding: 4mm 5mm;
+          vertical-align: middle;
         }}
         .roi-table thead th {{
-          background:#f7f7f7; font-weight:700;
+          background:#e8f5e9; font-weight:700; color: #145a43;
+        }}
+        .roi-table td:last-child {{
+          font-weight: 700;
+          color: #145a43;
         }}
       </style>
     </head>

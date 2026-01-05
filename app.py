@@ -318,6 +318,7 @@ TRANSLATIONS = {
         "password_english": "אותיות אנגליות בלבד",
         "password_upper": "אות גדולה (A-Z)",
         "password_digit": "ספרה (0-9)",
+        "security_note": "החיבור מאובטח ומוצפן",
         
         # Профиль
         "profile_title": "הפרופיל שלי",
@@ -485,6 +486,7 @@ TRANSLATIONS = {
         "password_english": "English letters only",
         "password_upper": "Uppercase letter (A-Z)",
         "password_digit": "Digit (0-9)",
+        "security_note": "Connection is secure and encrypted",
         
         # Profile
         "profile_title": "My Profile",

@@ -5845,6 +5845,9 @@ def export_pdf():
                 "plots": plots_from_db
             }
             
+            # Язык PDF берём из snapshot (язык анализа), а не из текущей сессии
+            pdf_lang_code = snap.get("lang") or get_language()
+            
             print(f"📄 PDF: Loaded from saved report {report_id}, name={report_name}, plots={len(plots_from_db)}, roi={bool(roi_from_db)}")
             
         except Exception as e:

@@ -143,7 +143,8 @@
         
         {% if session.uid %}
           {% set u = current_user() %}
-          {% if u and u.get('demo_used', 0) %}
+          {% set demo_used = u['demo_used'] if u and 'demo_used' in u.keys() else 0 %}
+          {% if u and demo_used %}
             <div class="alert alert-info">
               <i class="bi bi-info-circle me-2"></i>
               {% if current_lang == 'he' %}

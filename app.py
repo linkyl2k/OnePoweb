@@ -5250,7 +5250,8 @@ def demo_try():
         return redirect(url_for("login"))
     
     # Check if user already used demo
-    if u.get("demo_used"):
+    demo_used = u['demo_used'] if 'demo_used' in u.keys() else 0
+    if demo_used:
         current_lang = get_language()
         if current_lang == 'he':
             flash("כבר השתמשת בדמו. צור קשר אם תרצה לנסות שוב!", "warning")

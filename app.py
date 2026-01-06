@@ -365,6 +365,36 @@ TRANSLATIONS = {
         # Checkout
         "checkout_order_summary": "סיכום ההזמנה",
         
+        # Get Started / Onboarding
+        "nav_get_started": "התחל",
+        "get_started_title": "להכיר אותך...",
+        "get_started_subtitle": "עזור לנו להתאים את החוויה שלך",
+        "get_started_q1_title": "כמה סניפים יש לעסק שלך?",
+        "get_started_q1_desc": "זה עוזר לנו להתאים תובנות במיוחד לקנה המידה של העסק שלך",
+        "get_started_location_single": "יחיד",
+        "get_started_q2_title": "באיזו תעשייה אתה?",
+        "get_started_q2_desc": "נספק המלצות ספציפיות לתעשייה",
+        "get_started_q3_title": "מה המטרה העיקרית שלך?",
+        "get_started_q3_desc": "בואו נתמקד במה שהכי חשוב לך",
+        "get_started_industry_restaurant": "מסעדה/קפה",
+        "get_started_industry_retail": "קמעונאות",
+        "get_started_industry_services": "שירותים",
+        "get_started_industry_ecommerce": "מסחר אלקטרוני",
+        "get_started_industry_healthcare": "בריאות",
+        "get_started_industry_other": "אחר",
+        "get_started_goal_revenue": "הגברת הכנסות",
+        "get_started_goal_revenue_desc": "הגדל את המכירות וההכנסות שלך",
+        "get_started_goal_operations": "אופטימיזציה של פעולות",
+        "get_started_goal_operations_desc": "שיפור יעילות והפחתת עלויות",
+        "get_started_goal_customers": "הבנת לקוחות",
+        "get_started_goal_customers_desc": "קבל תובנות על התנהגות קונים",
+        "get_started_goal_performance": "מעקב ביצועים",
+        "get_started_goal_performance_desc": "ניטור מדדי KPI ומטריקות",
+        "get_started_skip": "דלג לעת עתה →",
+        "get_started_back": "חזור",
+        "get_started_next": "הבא",
+        "get_started_continue": "המשך",
+        
         # Chart titles (Hebrew - same as original)
         "chart_sales_by_hour": "מכירות לפי שעה",
         "chart_sales_by_weekday": "מכירות לפי יום בשבוע",
@@ -587,6 +617,36 @@ TRANSLATIONS = {
         
         # Checkout
         "checkout_order_summary": "Order Summary",
+        
+        # Get Started / Onboarding
+        "nav_get_started": "Get Started",
+        "get_started_title": "Getting to know you...",
+        "get_started_subtitle": "Help us personalize your experience",
+        "get_started_q1_title": "How many locations does your business have?",
+        "get_started_q1_desc": "This helps us tailor insights specifically for your business scale",
+        "get_started_location_single": "Single",
+        "get_started_q2_title": "What industry are you in?",
+        "get_started_q2_desc": "We'll provide industry-specific recommendations",
+        "get_started_q3_title": "What's your primary goal?",
+        "get_started_q3_desc": "Let's focus on what matters most to you",
+        "get_started_industry_restaurant": "Restaurant/Cafe",
+        "get_started_industry_retail": "Retail",
+        "get_started_industry_services": "Services",
+        "get_started_industry_ecommerce": "E-commerce",
+        "get_started_industry_healthcare": "Healthcare",
+        "get_started_industry_other": "Other",
+        "get_started_goal_revenue": "Increase Revenue",
+        "get_started_goal_revenue_desc": "Boost your sales and income",
+        "get_started_goal_operations": "Optimize Operations",
+        "get_started_goal_operations_desc": "Improve efficiency and reduce costs",
+        "get_started_goal_customers": "Understand Customers",
+        "get_started_goal_customers_desc": "Gain insights into buyer behavior",
+        "get_started_goal_performance": "Track Performance",
+        "get_started_goal_performance_desc": "Monitor KPIs and metrics",
+        "get_started_skip": "Skip for now →",
+        "get_started_back": "Back",
+        "get_started_next": "Next",
+        "get_started_continue": "Continue",
         
         # About page translations
         "about_ai_badge": "✨ AI-Powered Analytics",
@@ -1005,6 +1065,36 @@ TRANSLATIONS = {
         # Checkout
         "checkout_title": "Оформление заказа",
         "checkout_order_summary": "Сводка заказа",
+        
+        # Get Started / Onboarding
+        "nav_get_started": "Начать",
+        "get_started_title": "Давайте познакомимся...",
+        "get_started_subtitle": "Помогите нам персонализировать ваш опыт",
+        "get_started_q1_title": "Сколько локаций у вашего бизнеса?",
+        "get_started_q1_desc": "Это помогает нам адаптировать аналитику специально под масштаб вашего бизнеса",
+        "get_started_location_single": "Одна",
+        "get_started_q2_title": "В какой отрасли вы работаете?",
+        "get_started_q2_desc": "Мы предоставим рекомендации, специфичные для вашей отрасли",
+        "get_started_q3_title": "Какова ваша основная цель?",
+        "get_started_q3_desc": "Давайте сосредоточимся на том, что для вас важнее всего",
+        "get_started_industry_restaurant": "Ресторан/Кафе",
+        "get_started_industry_retail": "Розничная торговля",
+        "get_started_industry_services": "Услуги",
+        "get_started_industry_ecommerce": "Интернет-магазин",
+        "get_started_industry_healthcare": "Здравоохранение",
+        "get_started_industry_other": "Другое",
+        "get_started_goal_revenue": "Увеличить доходы",
+        "get_started_goal_revenue_desc": "Повысьте ваши продажи и доходы",
+        "get_started_goal_operations": "Оптимизировать операции",
+        "get_started_goal_operations_desc": "Повысьте эффективность и снизьте затраты",
+        "get_started_goal_customers": "Понять клиентов",
+        "get_started_goal_customers_desc": "Получите инсайты о поведении покупателей",
+        "get_started_goal_performance": "Отслеживать производительность",
+        "get_started_goal_performance_desc": "Мониторинг KPI и метрик",
+        "get_started_skip": "Пропустить сейчас →",
+        "get_started_back": "Назад",
+        "get_started_next": "Далее",
+        "get_started_continue": "Продолжить",
         "checkout_plan": "План",
         "checkout_price": "Цена",
         "checkout_discount": "Реферальная скидка",
@@ -4376,7 +4466,7 @@ def about():
 @app.route("/get-started")
 def get_started():
     """Onboarding questions for new users"""
-    return render_template("get_started.html", active="get_started", title="Get Started")
+    return render_template("get_started.html", active="get_started", title=t("get_started_title"))
 
 @app.route("/upload", methods=["GET", "POST"])
 @login_required

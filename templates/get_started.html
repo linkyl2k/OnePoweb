@@ -10,8 +10,8 @@
         
         <!-- Progress Header -->
         <div class="text-center mb-5">
-          <h2 class="text-white fw-bold mb-2">Getting to know you...</h2>
-          <p class="text-muted">Help us personalize your experience</p>
+          <h2 class="text-white fw-bold mb-2">{{ t('get_started_title') }}</h2>
+          <p class="text-muted">{{ t('get_started_subtitle') }}</p>
           
           <div class="mt-4">
             <div class="d-flex justify-content-between mb-2 px-3">
@@ -34,8 +34,8 @@
                 <div style="width: 100px; height: 100px; margin: 0 auto 1.5rem; border-radius: 24px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 40px rgba(46,160,255,0.4);">
                   <i class="bi bi-shop" style="font-size: 3rem; color: white;"></i>
                 </div>
-                <h3 class="text-white mb-3 fw-bold" style="font-size: 2rem;">How many locations does your business have?</h3>
-                <p class="text-muted mb-0" style="font-size: 1.1rem;">This helps us tailor insights specifically for your business scale</p>
+                <h3 class="text-white mb-3 fw-bold" style="font-size: 2rem;">{{ t('get_started_q1_title') }}</h3>
+                <p class="text-muted mb-0" style="font-size: 1.1rem;">{{ t('get_started_q1_desc') }}</p>
               </div>
               
               <div class="row g-4">
@@ -43,7 +43,7 @@
                   <input type="radio" class="btn-check" name="locations" id="loc1" value="1" autocomplete="off">
                   <label class="btn btn-outline-light w-100 py-4" for="loc1" style="border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s; height: 100%;">
                     <div style="font-size: 3rem; margin-bottom: 1rem;">🏪</div>
-                    <div class="fw-bold" style="font-size: 1.1rem;">Single</div>
+                    <div class="fw-bold" style="font-size: 1.1rem;">{{ t('get_started_location_single') }}</div>
                   </label>
                 </div>
                 <div class="col-6 col-md-3">
@@ -76,8 +76,8 @@
                 <div style="width: 100px; height: 100px; margin: 0 auto 1.5rem; border-radius: 24px; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 40px rgba(16,185,129,0.4);">
                   <i class="bi bi-briefcase" style="font-size: 3rem; color: white;"></i>
                 </div>
-                <h3 class="text-white mb-3 fw-bold" style="font-size: 2rem;">What industry are you in?</h3>
-                <p class="text-muted mb-0" style="font-size: 1.1rem;">We'll provide industry-specific recommendations</p>
+                <h3 class="text-white mb-3 fw-bold" style="font-size: 2rem;">{{ t('get_started_q2_title') }}</h3>
+                <p class="text-muted mb-0" style="font-size: 1.1rem;">{{ t('get_started_q2_desc') }}</p>
               </div>
               
               <div class="row g-4">
@@ -85,42 +85,42 @@
                   <input type="radio" class="btn-check" name="industry" id="ind1" value="Restaurant/Cafe" autocomplete="off">
                   <label class="btn btn-outline-light w-100 py-4" for="ind1" style="border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🍽️</div>
-                    <div class="fw-bold">Restaurant/Cafe</div>
+                    <div class="fw-bold">{{ t('get_started_industry_restaurant') }}</div>
                   </label>
                 </div>
                 <div class="col-6 col-md-4">
                   <input type="radio" class="btn-check" name="industry" id="ind2" value="Retail" autocomplete="off">
                   <label class="btn btn-outline-light w-100 py-4" for="ind2" style="border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🛍️</div>
-                    <div class="fw-bold">Retail</div>
+                    <div class="fw-bold">{{ t('get_started_industry_retail') }}</div>
                   </label>
                 </div>
                 <div class="col-6 col-md-4">
                   <input type="radio" class="btn-check" name="industry" id="ind3" value="Services" autocomplete="off">
                   <label class="btn btn-outline-light w-100 py-4" for="ind3" style="border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">💼</div>
-                    <div class="fw-bold">Services</div>
+                    <div class="fw-bold">{{ t('get_started_industry_services') }}</div>
                   </label>
                 </div>
                 <div class="col-6 col-md-4">
                   <input type="radio" class="btn-check" name="industry" id="ind4" value="E-commerce" autocomplete="off">
                   <label class="btn btn-outline-light w-100 py-4" for="ind4" style="border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🛒</div>
-                    <div class="fw-bold">E-commerce</div>
+                    <div class="fw-bold">{{ t('get_started_industry_ecommerce') }}</div>
                   </label>
                 </div>
                 <div class="col-6 col-md-4">
                   <input type="radio" class="btn-check" name="industry" id="ind5" value="Healthcare" autocomplete="off">
                   <label class="btn btn-outline-light w-100 py-4" for="ind5" style="border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🏥</div>
-                    <div class="fw-bold">Healthcare</div>
+                    <div class="fw-bold">{{ t('get_started_industry_healthcare') }}</div>
                   </label>
                 </div>
                 <div class="col-6 col-md-4">
                   <input type="radio" class="btn-check" name="industry" id="ind6" value="Other" autocomplete="off">
                   <label class="btn btn-outline-light w-100 py-4" for="ind6" style="border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🎯</div>
-                    <div class="fw-bold">Other</div>
+                    <div class="fw-bold">{{ t('get_started_industry_other') }}</div>
                   </label>
                 </div>
               </div>
@@ -132,8 +132,8 @@
                 <div style="width: 100px; height: 100px; margin: 0 auto 1.5rem; border-radius: 24px; background: linear-gradient(135deg, #f59e0b, #fbbf24); display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 40px rgba(245,158,11,0.4);">
                   <i class="bi bi-bullseye" style="font-size: 3rem; color: white;"></i>
                 </div>
-                <h3 class="text-white mb-3 fw-bold" style="font-size: 2rem;">What's your primary goal?</h3>
-                <p class="text-muted mb-0" style="font-size: 1.1rem;">Let's focus on what matters most to you</p>
+                <h3 class="text-white mb-3 fw-bold" style="font-size: 2rem;">{{ t('get_started_q3_title') }}</h3>
+                <p class="text-muted mb-0" style="font-size: 1.1rem;">{{ t('get_started_q3_desc') }}</p>
               </div>
               
               <div class="row g-4">
@@ -143,8 +143,8 @@
                     <div class="d-flex align-items-center">
                       <div style="font-size: 2.5rem; margin-right: 1.5rem;">📈</div>
                       <div>
-                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">Increase Revenue</div>
-                        <div class="small text-muted">Boost your sales and income</div>
+                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">{{ t('get_started_goal_revenue') }}</div>
+                        <div class="small text-muted">{{ t('get_started_goal_revenue_desc') }}</div>
                       </div>
                     </div>
                   </label>
@@ -155,8 +155,8 @@
                     <div class="d-flex align-items-center">
                       <div style="font-size: 2.5rem; margin-right: 1.5rem;">⚙️</div>
                       <div>
-                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">Optimize Operations</div>
-                        <div class="small text-muted">Improve efficiency and reduce costs</div>
+                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">{{ t('get_started_goal_operations') }}</div>
+                        <div class="small text-muted">{{ t('get_started_goal_operations_desc') }}</div>
                       </div>
                     </div>
                   </label>
@@ -167,8 +167,8 @@
                     <div class="d-flex align-items-center">
                       <div style="font-size: 2.5rem; margin-right: 1.5rem;">👥</div>
                       <div>
-                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">Understand Customers</div>
-                        <div class="small text-muted">Gain insights into buyer behavior</div>
+                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">{{ t('get_started_goal_customers') }}</div>
+                        <div class="small text-muted">{{ t('get_started_goal_customers_desc') }}</div>
                       </div>
                     </div>
                   </label>
@@ -179,8 +179,8 @@
                     <div class="d-flex align-items-center">
                       <div style="font-size: 2.5rem; margin-right: 1.5rem;">📊</div>
                       <div>
-                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">Track Performance</div>
-                        <div class="small text-muted">Monitor KPIs and metrics</div>
+                        <div class="fw-bold mb-1" style="font-size: 1.1rem;">{{ t('get_started_goal_performance') }}</div>
+                        <div class="small text-muted">{{ t('get_started_goal_performance_desc') }}</div>
                       </div>
                     </div>
                   </label>
@@ -194,17 +194,17 @@
           <div class="mt-5 pt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
             <div class="d-flex justify-content-between align-items-center">
               <button type="button" class="btn btn-link text-muted" id="skipBtn" style="text-decoration: none; font-size: 1rem;">
-                Skip for now →
+                {{ t('get_started_skip') }}
               </button>
               <div>
                 <button type="button" class="btn btn-outline-light me-3" id="backBtn" style="display: none; border-radius: 14px; padding: 0.875rem 2rem; border: 2px solid rgba(255,255,255,0.2);">
-                  <i class="bi bi-arrow-left me-2"></i> Back
+                  <i class="bi bi-arrow-left me-2"></i> {{ t('get_started_back') }}
                 </button>
                 <button type="button" class="btn btn-primary" id="nextBtn" style="border-radius: 14px; padding: 0.875rem 2.5rem; background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; box-shadow: 0 8px 20px rgba(46,160,255,0.4); font-weight: 600;">
-                  Next <i class="bi bi-arrow-right ms-2"></i>
+                  {{ t('get_started_next') }} <i class="bi bi-arrow-right ms-2"></i>
                 </button>
                 <button type="button" class="btn btn-success" id="finishBtn" style="display: none; border-radius: 14px; padding: 0.875rem 2.5rem; background: linear-gradient(135deg, #10b981, #34d399); border: none; box-shadow: 0 8px 20px rgba(16,185,129,0.4); font-weight: 600;">
-                  Continue <i class="bi bi-arrow-right ms-2"></i>
+                  {{ t('get_started_continue') }} <i class="bi bi-arrow-right ms-2"></i>
                 </button>
               </div>
             </div>

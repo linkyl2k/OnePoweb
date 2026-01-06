@@ -357,7 +357,7 @@
             <!-- Get Started button for guests -->
             <li class="nav-item me-2">
               <a href="{{ url_for('get_started') }}" class="btn" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 0.75rem 2rem; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(46,160,255,0.4); transition: all 0.3s;">
-                Get Started <i class="bi bi-arrow-right ms-2"></i>
+                {{ t('nav_get_started') }} <i class="bi bi-arrow-right ms-2"></i>
               </a>
             </li>
           {% endif %}

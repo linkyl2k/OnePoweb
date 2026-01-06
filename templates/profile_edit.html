@@ -13,7 +13,7 @@
             <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #2ea0ff, #1abc9c); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; font-weight: bold; box-shadow: 0 8px 24px rgba(46,160,255,0.3);">
               {{ (user.first_name or user.email)[0]|upper }}
             </div>
-            <h4 class="mb-1" style="color: #fff;">עריכת פרופיל</h4>
+            <h4 class="mb-1" style="color: #fff;">{{ t('profile_edit_title') }}</h4>
             <p class="mb-0 small text-muted">{{ user.email }}</p>
           </div>
           
@@ -27,19 +27,19 @@
                   <div style="width: 36px; height: 36px; background: rgba(46,160,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
                     <i class="bi bi-person" style="color: #2ea0ff;"></i>
                   </div>
-                  <h6 class="mb-0">פרטים אישיים</h6>
+                  <h6 class="mb-0">{{ t('profile_personal_details') }}</h6>
                 </div>
                 
     <div class="row g-3">
       <div class="col-12 col-md-6">
-                    <label class="form-label small text-muted">שם פרטי</label>
+                    <label class="form-label small text-muted">{{ t('profile_first_name') }}</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
                       <input name="first_name" type="text" class="form-control" value="{{ user.first_name or '' }}" placeholder="ישראל">
                     </div>
       </div>
       <div class="col-12 col-md-6">
-                    <label class="form-label small text-muted">שם משפחה</label>
+                    <label class="form-label small text-muted">{{ t('profile_last_name') }}</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
                       <input name="last_name" type="text" class="form-control" value="{{ user.last_name or '' }}" placeholder="ישראלי">
@@ -49,12 +49,12 @@
                 
                 <!-- Username -->
                 <div class="mt-3">
-                  <label class="form-label small text-muted">שם משתמש (לכניסה מהירה)</label>
+                  <label class="form-label small text-muted">{{ t('profile_username_label') }}</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-at"></i></span>
                     <input name="username" type="text" class="form-control" value="{{ user.username or '' }}" placeholder="username" pattern="^[A-Za-z0-9]{4,20}$" minlength="4" maxlength="20" required>
                   </div>
-                  <div class="form-text small">4-20 תווים: אותיות אנגליות וספרות בלבד</div>
+                  <div class="form-text small">{{ t('profile_username_hint') }}</div>
       </div>
     </div>
 
@@ -68,21 +68,21 @@
                     <i class="bi bi-shield-lock" style="color: #1abc9c;"></i>
     </div>
     <div>
-                    <h6 class="mb-0">שינוי סיסמה</h6>
-                    <span class="small text-muted">השאר ריק אם לא רוצה לשנות</span>
+                    <h6 class="mb-0">{{ t('profile_password_section') }}</h6>
+                    <span class="small text-muted">{{ t('profile_password_optional') }}</span>
                   </div>
                 </div>
                 
                 <div class="row g-3">
                   <div class="col-12 col-md-6">
-                    <label class="form-label small text-muted">סיסמה חדשה</label>
+                    <label class="form-label small text-muted">{{ t('profile_new_password') }}</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-lock"></i></span>
                       <input name="password" type="password" class="form-control" id="password" minlength="8" maxlength="32" placeholder="סיסמה חזקה">
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label class="form-label small text-muted">אימות סיסמה</label>
+                    <label class="form-label small text-muted">{{ t('profile_confirm_password') }}</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                       <input name="confirm_password" type="password" class="form-control" id="confirm_password" minlength="8" maxlength="32" placeholder="הקלד שוב">
@@ -92,12 +92,12 @@
                 
                 <!-- Password Requirements (shown when typing) -->
                 <div id="password-requirements" class="mt-3 p-2" style="display: none; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                  <div class="small text-muted mb-1">דרישות סיסמה:</div>
+                  <div class="small text-muted mb-1">{{ t('profile_password_requirements') }}</div>
                   <div class="d-flex flex-wrap gap-2">
-                    <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">8-32 תווים</span>
-                    <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אותיות אנגליות בלבד</span>
-                    <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">אות גדולה (A-Z)</span>
-                    <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">ספרה (0-9)</span>
+                    <span class="badge" id="req-length" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('profile_password_length') }}</span>
+                    <span class="badge" id="req-english" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('profile_password_english') }}</span>
+                    <span class="badge" id="req-upper" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('profile_password_upper') }}</span>
+                    <span class="badge" id="req-digit" style="background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal;">{{ t('profile_password_digit') }}</span>
                   </div>
                   <div id="password-match" class="small mt-2" style="display: none;"></div>
                 </div>
@@ -117,9 +117,9 @@
                   </div>
                   <div class="small {% if user.email_verified %}text-success{% else %}text-warning{% endif %}">
                     {% if user.email_verified %}
-                      <i class="bi bi-check-circle me-1"></i>אימייל מאומת
+                      <i class="bi bi-check-circle me-1"></i>{{ t('profile_email_verified') }}
                     {% else %}
-                      <i class="bi bi-exclamation-circle me-1"></i>אימייל לא מאומת
+                      <i class="bi bi-exclamation-circle me-1"></i>{{ t('profile_email_not_verified') }}
                     {% endif %}
                   </div>
                 </div>
@@ -127,7 +127,7 @@
                 <form method="POST" action="{{ url_for('resend_verification') }}" class="d-inline">
                   <input type="hidden" name="email" value="{{ user.email }}">
                   <button type="submit" class="btn btn-sm" style="background: rgba(251,191,36,0.15); color: #fbbf24; border: none; border-radius: 8px;">
-                    שלח שוב
+                    {{ t('profile_resend_verification') }}
                   </button>
                 </form>
                 {% endif %}
@@ -136,10 +136,10 @@
               <!-- Action Buttons -->
               <div class="d-flex gap-3 pt-2">
                 <button type="submit" class="btn flex-grow-1 py-2" style="background: linear-gradient(90deg, #2ea0ff, #1abc9c); color: #fff; border: none; border-radius: 12px; font-weight: 600;">
-                  <i class="bi bi-check2-circle me-2"></i>שמור שינויים
+                  <i class="bi bi-check2-circle me-2"></i>{{ t('profile_save_changes') }}
                 </button>
                 <a href="{{ url_for('profile') }}" class="btn py-2 px-4" style="background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
-                  ביטול
+                  {{ t('profile_cancel') }}
                 </a>
     </div>
 
@@ -153,11 +153,11 @@
       <div class="text-center">
         <p class="small text-muted mb-2">
           <i class="bi bi-calendar3 me-1"></i>
-          נרשמת: {{ user.agreed_at[:10] if user.agreed_at else 'לא ידוע' }}
+          {{ t('profile_registered') }}: {{ user.agreed_at[:10] if user.agreed_at else ('לא ידוע' if current_lang == 'he' else 'Unknown' if current_lang == 'en' else 'Неизвестно') }}
         </p>
         <p class="small text-muted mb-0">
           <i class="bi bi-shield-check me-1"></i>
-          הנתונים שלך מוגנים ומוצפנים
+          {{ t('profile_data_protected') }}
         </p>
       </div>
       
@@ -176,6 +176,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const reqEnglish = document.getElementById('req-english');
   const reqUpper = document.getElementById('req-upper');
   const reqDigit = document.getElementById('req-digit');
+  
+  // Translations for JavaScript
+  const passwordsMatch = '{{ t("profile_passwords_match") }}';
+  const passwordsNoMatch = '{{ t("profile_passwords_no_match") }}';
   
   const validStyle = 'background: rgba(16,185,129,0.2); color: #34d399;';
   const invalidStyle = 'background: rgba(255,255,255,0.05); color: var(--muted);';
@@ -225,10 +229,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (confirm.value.length > 0 && password.value.length > 0) {
       matchDiv.style.display = 'block';
       if (password.value === confirm.value) {
-        matchDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>הסיסמאות תואמות';
+        matchDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>' + passwordsMatch;
         matchDiv.style.color = '#34d399';
       } else {
-        matchDiv.innerHTML = '<i class="bi bi-x-circle me-1"></i>הסיסמאות לא תואמות';
+        matchDiv.innerHTML = '<i class="bi bi-x-circle me-1"></i>' + passwordsNoMatch;
         matchDiv.style.color = '#f87171';
       }
     } else {

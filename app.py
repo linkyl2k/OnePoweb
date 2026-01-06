@@ -335,6 +335,32 @@ TRANSLATIONS = {
         "profile_trial_desc": "קבל גישה מלאה לכל הפיצ'רים של Pro ל-2 ימים. אחר כך תתחיל מנוי PRO. בלי כרטיס אשראי",
         "profile_start_trial": "התחל תקופת ניסיון",
         
+        # Profile Edit
+        "profile_edit_title": "עריכת פרופיל",
+        "profile_personal_details": "פרטים אישיים",
+        "profile_first_name": "שם פרטי",
+        "profile_last_name": "שם משפחה",
+        "profile_username_label": "שם משתמש (לכניסה מהירה)",
+        "profile_username_hint": "4-20 תווים: אותיות אנגליות וספרות בלבד",
+        "profile_password_section": "שינוי סיסמה",
+        "profile_password_optional": "השאר ריק אם לא רוצה לשנות",
+        "profile_new_password": "סיסמה חדשה",
+        "profile_confirm_password": "אימות סיסמה",
+        "profile_password_requirements": "דרישות סיסמה:",
+        "profile_password_length": "8-32 תווים",
+        "profile_password_english": "אותיות אנגליות בלבד",
+        "profile_password_upper": "אות גדולה (A-Z)",
+        "profile_password_digit": "ספרה (0-9)",
+        "profile_passwords_match": "הסיסמאות תואמות",
+        "profile_passwords_no_match": "הסיסמאות לא תואמות",
+        "profile_email_verified": "אימייל מאומת",
+        "profile_email_not_verified": "אימייל לא מאומת",
+        "profile_resend_verification": "שלח שוב",
+        "profile_save_changes": "שמור שינויים",
+        "profile_cancel": "ביטול",
+        "profile_registered": "נרשמת",
+        "profile_data_protected": "הנתונים שלך מוגנים ומוצפנים",
+        
         # Flash сообщения
         "msg_login_required": "יש להתחבר קודם",
         "msg_login_success": "התחברת בהצלחה!",
@@ -348,6 +374,13 @@ TRANSLATIONS = {
         "msg_trial_used": "כבר ניצלת את תקופת הניסיון",
         "msg_subscription_active": "המנוי הופעל בהצלחה!",
         "msg_subscription_cancelled": "המנוי בוטל",
+        "msg_profile_updated": "הפרופיל עודכן בהצלחה",
+        "msg_fill_name": "נא למלא שם ושם משפחה",
+        "msg_username_required": "שם משתמש הוא שדה חובה",
+        "msg_username_length": "שם משתמש חייב להיות בין 4-20 תווים",
+        "msg_username_format": "שם משתמש יכול להכיל רק אותיות אנגליות וספרות",
+        "msg_username_taken": "שם משתמש זה כבר תפוס",
+        "msg_password_mismatch": "האימות לא תואם את הסיסמה החדשה",
         
         # Ошибки
         "error_404": "דף לא נמצא",
@@ -588,6 +621,32 @@ TRANSLATIONS = {
         "profile_trial_desc": "Get full access to all Pro features for 2 days. After that, PRO subscription will start. No credit card",
         "profile_start_trial": "Start trial period",
         
+        # Profile Edit
+        "profile_edit_title": "Edit Profile",
+        "profile_personal_details": "Personal Details",
+        "profile_first_name": "First Name",
+        "profile_last_name": "Last Name",
+        "profile_username_label": "Username (for quick login)",
+        "profile_username_hint": "4-20 characters: English letters and numbers only",
+        "profile_password_section": "Change Password",
+        "profile_password_optional": "Leave blank if you don't want to change",
+        "profile_new_password": "New Password",
+        "profile_confirm_password": "Confirm Password",
+        "profile_password_requirements": "Password Requirements:",
+        "profile_password_length": "8-32 characters",
+        "profile_password_english": "English letters only",
+        "profile_password_upper": "Uppercase letter (A-Z)",
+        "profile_password_digit": "Digit (0-9)",
+        "profile_passwords_match": "Passwords match",
+        "profile_passwords_no_match": "Passwords do not match",
+        "profile_email_verified": "Email Verified",
+        "profile_email_not_verified": "Email Not Verified",
+        "profile_resend_verification": "Resend",
+        "profile_save_changes": "Save Changes",
+        "profile_cancel": "Cancel",
+        "profile_registered": "Registered",
+        "profile_data_protected": "Your data is protected and encrypted",
+        
         # Flash messages
         "msg_login_required": "Please login first",
         "msg_login_success": "Logged in successfully!",
@@ -601,6 +660,13 @@ TRANSLATIONS = {
         "msg_trial_used": "Trial period already used",
         "msg_subscription_active": "Subscription activated successfully!",
         "msg_subscription_cancelled": "Subscription cancelled",
+        "msg_profile_updated": "Profile updated successfully",
+        "msg_fill_name": "Please fill in first and last name",
+        "msg_username_required": "Username is required",
+        "msg_username_length": "Username must be between 4-20 characters",
+        "msg_username_format": "Username can only contain English letters and numbers",
+        "msg_username_taken": "This username is already taken",
+        "msg_password_mismatch": "Password confirmation does not match the new password",
         
         # Errors
         "error_404": "Page Not Found",
@@ -828,6 +894,32 @@ TRANSLATIONS = {
         "profile_edit": "Редактировать профиль",
         "profile_change_password": "Изменить пароль",
         
+        # Profile Edit
+        "profile_edit_title": "Редактировать профиль",
+        "profile_personal_details": "Личные данные",
+        "profile_first_name": "Имя",
+        "profile_last_name": "Фамилия",
+        "profile_username_label": "Имя пользователя (для быстрого входа)",
+        "profile_username_hint": "4-20 символов: только английские буквы и цифры",
+        "profile_password_section": "Изменить пароль",
+        "profile_password_optional": "Оставьте пустым, если не хотите изменять",
+        "profile_new_password": "Новый пароль",
+        "profile_confirm_password": "Подтвердите пароль",
+        "profile_password_requirements": "Требования к паролю:",
+        "profile_password_length": "8-32 символа",
+        "profile_password_english": "Только английские буквы",
+        "profile_password_upper": "Заглавная буква (A-Z)",
+        "profile_password_digit": "Цифра (0-9)",
+        "profile_passwords_match": "Пароли совпадают",
+        "profile_passwords_no_match": "Пароли не совпадают",
+        "profile_email_verified": "Email подтвержден",
+        "profile_email_not_verified": "Email не подтвержден",
+        "profile_resend_verification": "Отправить снова",
+        "profile_save_changes": "Сохранить изменения",
+        "profile_cancel": "Отмена",
+        "profile_registered": "Зарегистрирован",
+        "profile_data_protected": "Ваши данные защищены и зашифрованы",
+        
         # Flash сообщения
         "msg_login_required": "Сначала войдите в систему",
         "msg_login_success": "Вход выполнен успешно!",
@@ -841,6 +933,13 @@ TRANSLATIONS = {
         "msg_trial_used": "Пробный период уже использован",
         "msg_subscription_active": "Подписка активирована успешно!",
         "msg_subscription_cancelled": "Подписка отменена",
+        "msg_profile_updated": "Профиль успешно обновлен",
+        "msg_fill_name": "Пожалуйста, заполните имя и фамилию",
+        "msg_username_required": "Имя пользователя обязательно",
+        "msg_username_length": "Имя пользователя должно быть от 4 до 20 символов",
+        "msg_username_format": "Имя пользователя может содержать только английские буквы и цифры",
+        "msg_username_taken": "Это имя пользователя уже занято",
+        "msg_password_mismatch": "Подтверждение пароля не совпадает с новым паролем",
         
         # Ошибки
         "error_404": "Страница не найдена",
@@ -8374,7 +8473,7 @@ def delete_account():
 def profile_edit():
     u = current_user()
     if request.method == "GET":
-        return render_template("profile_edit.html", user=u, active="profile", title="עריכת פרופיל")
+        return render_template("profile_edit.html", user=u, active="profile", title=t("profile_edit_title"))
 
     first_name = (request.form.get("first_name") or "").strip()
     last_name = (request.form.get("last_name") or "").strip()
@@ -8383,47 +8482,29 @@ def profile_edit():
     confirm = request.form.get("confirm_password") or ""
 
     if not first_name or not last_name:
-        flash("נא למלא שם ושם משפחה", "danger")
+        flash_t("msg_fill_name", "danger")
         return render_template("profile_edit.html", user=u)
 
     # בדיקת שם משתמש (חובה)
     import re
     if not username:
-        flash("שם משתמש הוא שדה חובה", "danger")
+        flash_t("msg_username_required", "danger")
         return render_template("profile_edit.html", user=u)
     if len(username) < 4 or len(username) > 20:
-        current_lang = get_language()
-        if current_lang == 'he':
-            flash("שם משתמש חייב להיות בין 4-20 תווים", "danger")
-        elif current_lang == 'en':
-            flash("Username must be between 4-20 characters", "danger")
-        else:
-            flash("Имя пользователя должно быть от 4 до 20 символов", "danger")
+        flash_t("msg_username_length", "danger")
         return render_template("profile_edit.html", user=u)
     if not re.match(r'^[A-Za-z0-9]+$', username):
-        current_lang = get_language()
-        if current_lang == 'he':
-            flash("שם משתמש יכול להכיל רק אותיות אנגליות וספרות", "danger")
-        elif current_lang == 'en':
-            flash("Username can only contain English letters and numbers", "danger")
-        else:
-            flash("Имя пользователя может содержать только английские буквы и цифры", "danger")
+        flash_t("msg_username_format", "danger")
         return render_template("profile_edit.html", user=u)
     # בדיקה אם שם המשתמש כבר קיים (לא אצל המשתמש הנוכחי)
     existing = get_db().execute("SELECT id FROM users WHERE LOWER(username)=? AND id!=?", (username.lower(), u["id"])).fetchone()
     if existing:
-        current_lang = get_language()
-        if current_lang == 'he':
-            flash("שם משתמש זה כבר תפוס", "danger")
-        elif current_lang == 'en':
-            flash("This username is already taken", "danger")
-        else:
-            flash("Это имя пользователя уже занято", "danger")
+        flash_t("msg_username_taken", "danger")
         return render_template("profile_edit.html", user=u)
 
     if password:
         if password != confirm:
-            flash("האימות לא תואם את הסיסמה החדשה", "danger")
+            flash_t("msg_password_mismatch", "danger")
             return render_template("profile_edit.html", user=u)
         # Password validation
         current_lang = get_language()
@@ -8446,7 +8527,7 @@ def profile_edit():
         )
     db.commit()
 
-    flash("הפרופיל עודכן בהצלחה", "success")
+    flash_t("msg_profile_updated", "success")
     return redirect(url_for("profile"))
 
 

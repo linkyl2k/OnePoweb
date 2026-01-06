@@ -143,7 +143,7 @@
         
         {% if session.uid %}
           {% set u = current_user() %}
-          {% if u and u.get('demo_used') %}
+          {% if u and u.get('demo_used', 0) %}
             <div class="alert alert-info">
               <i class="bi bi-info-circle me-2"></i>
               {% if current_lang == 'he' %}
@@ -156,11 +156,11 @@
             </div>
           {% else %}
             <div class="d-flex gap-3 justify-content-center flex-wrap">
-              <a href="{{ url_for('static', filename='img/cafe_monthly_report.xlsx') }}" download class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 30px;">
-                <i class="bi bi-download me-2"></i>Download Sample Report
+              <a href="{{ url_for('static', filename='img/cafe_monthly_report.xlsx') }}" download="cafe_monthly_report.xlsx" class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 30px;">
+                <i class="bi bi-download me-2"></i>{% if current_lang == 'he' %}הורד דוח לדוגמה{% elif current_lang == 'ru' %}Скачать пример отчета{% else %}Download Sample Report{% endif %}
               </a>
               <a href="{{ url_for('demo_try') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 12px 30px; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(46,160,255,0.4);">
-                <i class="bi bi-play-circle me-2"></i>Analyze Sample Report
+                <i class="bi bi-play-circle me-2"></i>{% if current_lang == 'he' %}נתח דוח לדוגמה{% elif current_lang == 'ru' %}Проанализировать пример отчета{% else %}Analyze Sample Report{% endif %}
               </a>
             </div>
           {% endif %}

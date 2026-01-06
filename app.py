@@ -5280,14 +5280,31 @@ def demo_analysis():
     
     print("➡ Demo analysis requested")
     
-    # טעינת קובץ הדמו
-    demo_file = os.path.join(app.static_folder, "demo", "sample_sales.csv")
-    if not os.path.exists(demo_file):
-        flash("קובץ הדמו לא נמצא", "danger")
+    # טעינת קובץ הדמו - пробуем сначала xlsx, потом csv
+    demo_file_xlsx = os.path.join(app.static_folder, "img", "cafe_monthly_report.xlsx")
+    demo_file_csv = os.path.join(app.static_folder, "demo", "sample_sales.csv")
+    
+    demo_file = None
+    if os.path.exists(demo_file_xlsx):
+        demo_file = demo_file_xlsx
+    elif os.path.exists(demo_file_csv):
+        demo_file = demo_file_csv
+    
+    if not demo_file:
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("קובץ הדמו לא נמצא", "danger")
+        elif current_lang == 'ru':
+            flash("Демо-файл не найден", "danger")
+        else:
+            flash("Demo file not found", "danger")
         return redirect(url_for("upload"))
     
     try:
-        df = pd.read_csv(demo_file, encoding="utf-8")
+        if demo_file.endswith('.xlsx'):
+            df = pd.read_excel(demo_file)
+        else:
+            df = pd.read_csv(demo_file, encoding="utf-8")
     except Exception as e:
         flash(f"שגיאה בטעינת קובץ הדמו: {e}", "danger")
         return redirect(url_for("upload"))

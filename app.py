@@ -5334,60 +5334,212 @@ def demo_analysis():
     # קביעת פרמטרים לדמו
     hour_start, hour_end = 6, 22
     
-    # --- יצירת גרפים ---
+    # --- יצירת גרפים --- (используем тот же код, что и в основной функции)
     # 1) מכירות לפי שעה
     try:
-        hourly, max_hour = _plot_hourly(df, hour_start, hour_end)
-        fname = _save_fig(hourly, "hourly.png")
-        ai_text = ""
-        if ai_enabled_for_user():
+        if COL_TIME in df.columns:
+            # Добавляем колонку с округленным часом, если её нет
+            if "שעה עגולה" not in df.columns:
+                try:
+                    df["שעה עגולה"] = pd.to_datetime(df[COL_TIME].astype(str), errors="coerce").dt.hour
+                except:
+                    df["שעה עגולה"] = pd.to_numeric(df[COL_TIME], errors="coerce")
+            
+            clip = df[(df["שעה עגולה"] >= hour_start) & (df["שעה עגולה"] <= hour_end)]
+            hourly = clip.groupby("שעה עגולה")[COL_SUM].sum().reset_index()
+            fig = plt.figure(figsize=(9,4))
+            plt.bar(hourly["שעה עגולה"], hourly[COL_SUM])
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
+            if current_lang == "he":
+                plt.title(f"מכירות לפי שעה ({currency_symbol}) {hour_start}:00–{hour_end}:00")
+                plt.xlabel("שעה")
+                plt.ylabel(f'סה"כ ({currency_symbol})')
+            elif current_lang == "en":
+                plt.title(f"Sales by Hour ({currency_symbol}) {hour_start}:00–{hour_end}:00")
+                plt.xlabel("Hour")
+                plt.ylabel(f"Total ({currency_symbol})")
+            else:  # ru
+                plt.title(f"{t('chart_sales_by_hour')} ({currency_symbol}) {hour_start}:00–{hour_end}:00")
+                plt.xlabel(t("chart_axis_hour"))
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
+            fname = _save_fig(fig, "hourly.png")
+            
+            best_hour_row = hourly.loc[hourly[COL_SUM].idxmax()] if not hourly.empty else None
+            max_hour = int(best_hour_row["שעה עגולה"]) if best_hour_row is not None else None
+            brief = {
+                "best_hour": max_hour,
+                "best_hour_sum": float(hourly[COL_SUM].max()) if not hourly.empty else 0.0,
+                "avg_hour": float(hourly[COL_SUM].mean()) if not hourly.empty else 0.0,
+            }
             chart_title_he = "מכירות לפי שעה"
             chart_title = t("chart_sales_by_hour")
-            ai_text = ai_explain(chart_title_he, {"שעת שיא": max_hour}, current_lang)
-        plots.append({
-            "filename": fname, 
-            "title": t("chart_sales_by_hour"),
-            "note": f"🕐 שעת השיא: {max_hour}",
-            "ai": ai_text
-        })
+            ai_text = ai_explain(chart_title_he, brief, current_lang) if ai_enabled_for_user() else ""
+            plots.append({
+                "filename": fname, 
+                "title": chart_title,
+                "note": f"🕐 Peak hour: {max_hour}:00" if max_hour else t("chart_note_sales_by_hour"),
+                "ai": ai_text
+            })
     except Exception as e:
         print(f"⚠️ Demo hourly error: {e}")
+        import traceback
+        traceback.print_exc()
     
     # 2) מכירות לפי יום בשבוע
     try:
-        weekday_fig, top_day = _plot_weekday(df)
-        fname = _save_fig(weekday_fig, "by_weekday.png")
-        ai_text = ""
-        if ai_enabled_for_user():
-            chart_title_he = "מכירות לפי יום"
+        if COL_DATE in df.columns:
+            order_he = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"]
+            day_mapping = {
+                "he": {"ראשון": "ראשון", "שני": "שני", "שלישי": "שלישי", "רביעי": "רביעי", "חמישי": "חמישי", "שישי": "שישי", "שבת": "שבת"},
+                "en": {"ראשון": "Sunday", "שני": "Monday", "שלישי": "Tuesday", "רביעי": "Wednesday", "חמישי": "Thursday", "שישי": "Friday", "שבת": "Saturday"},
+                "ru": {"ראשון": "Воскресенье", "שני": "Понедельник", "שלישי": "Вторник", "רביעי": "Среда", "חמישי": "Четверг", "שישי": "Пятница", "שבת": "Суббота"}
+            }
+            
+            # Добавляем колонку "יום בשבוע" если её нет
+            if "יום בשבוע" not in df.columns:
+                ser_date = pd.to_datetime(df[COL_DATE], errors="coerce")
+                map_he = {0:"ראשון",1:"שני",2:"שלישי",3:"רביעי",4:"חמישי",5:"שישי",6:"שבת"}
+                df["יום בשבוע"] = ser_date.dt.dayofweek.map(map_he)
+            
+            by_wd = df.groupby("יום בשבוע")[COL_SUM].sum().reindex(order_he).reset_index()
+            
+            if current_lang in day_mapping:
+                by_wd["יום בשבוע_translated"] = by_wd["יום בשבוע"].map(day_mapping[current_lang])
+            else:
+                by_wd["יום בשבוע_translated"] = by_wd["יום בשבוע"]
+            
+            fig = plt.figure(figsize=(8,4))
+            plt.bar(by_wd["יום בשבוע_translated"], by_wd[COL_SUM])
+            
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
+            if current_lang == "he":
+                plt.title(f"מכירות לפי יום בשבוע ({currency_symbol})")
+                plt.xlabel("יום")
+                plt.ylabel(f'סה"כ ({currency_symbol})')
+            elif current_lang == "en":
+                plt.title(f"Sales by Day of Week ({currency_symbol})")
+                plt.xlabel("Day")
+                plt.ylabel(f"Total ({currency_symbol})")
+            else:  # ru
+                plt.title(f"{t('chart_sales_by_weekday')} ({currency_symbol})")
+                plt.xlabel(t("chart_axis_day"))
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
+            fname = _save_fig(fig, "by_weekday.png")
+            
+            top = by_wd.sort_values(COL_SUM, ascending=False).iloc[0] if not by_wd.empty else None
+            top_day_he = str(top["יום בשבוע"]) if top is not None else None
+            top_day = day_mapping.get(current_lang, day_mapping["he"]).get(top_day_he, top_day_he) if top_day_he else None
+            
+            brief = {
+                "best_day": top_day,
+                "best_day_sum": float(top[COL_SUM]) if top is not None else 0.0,
+                "avg_day": float(by_wd[COL_SUM].mean()) if not by_wd.empty else 0.0,
+            }
+            chart_title_he = "מכירות לפי יום בשבוע"
             chart_title = t("chart_sales_by_weekday")
-            ai_text = ai_explain(chart_title_he, {"יום שיא": top_day}, current_lang)
-        plots.append({
-            "filename": fname,
-            "title": chart_title,
-            "note": f"📅 יום השיא: {top_day}",
-            "ai": ai_text
-        })
+            ai_text = ai_explain(chart_title_he, brief, current_lang) if ai_enabled_for_user() else ""
+            plots.append({
+                "filename": fname,
+                "title": chart_title,
+                "note": f"📅 Best day: {top_day}" if top_day else t("chart_note_sales_by_weekday"),
+                "ai": ai_text
+            })
     except Exception as e:
         print(f"⚠️ Demo weekday error: {e}")
+        import traceback
+        traceback.print_exc()
     
-    # 3) Top 10 מוצרים
+    # 3) Daily Sales
     try:
-        fig_qty, fig_rev, top_item = _plot_top_products(df)
-        fname_qty = _save_fig(fig_qty, "top_qty.png")
-        fname_rev = _save_fig(fig_rev, "top_rev.png")
-        plots.append({"filename": fname_qty, "title": t("chart_top_quantity"), "note": f"⭐ הכי נמכר: {top_item}"})
-        plots.append({"filename": fname_rev, "title": t("chart_top_revenue"), "note": ""})
+        if COL_DATE in df.columns:
+            daily = df.groupby(COL_DATE)[COL_SUM].sum().reset_index()
+            fig = plt.figure(figsize=(10,4))
+            plt.bar(daily[COL_DATE].astype(str), daily[COL_SUM])
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            
+            if current_lang == "he":
+                plt.title(f"מכירות יומיות ({currency_symbol})")
+                plt.xlabel("תאריך")
+                plt.ylabel(f'סה"כ ({currency_symbol})')
+            elif current_lang == "en":
+                plt.title(f"Daily Sales ({currency_symbol})")
+                plt.xlabel("Date")
+                plt.ylabel(f"Total ({currency_symbol})")
+            else:  # ru
+                plt.title(f"{t('chart_daily_sales')} ({currency_symbol})")
+                plt.xlabel("Дата")
+                plt.ylabel(f"{t('chart_axis_total')} ({currency_symbol})")
+            plt.xticks(rotation=60)
+            fname = _save_fig(fig, "daily.png")
+            plots.append({"filename": fname, "title": t("chart_daily_sales"), "note": t("chart_note_daily_sales")})
+    except Exception as e:
+        print(f"⚠️ Demo daily error: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    # 4) Top Products (если есть колонки)
+    try:
+        # Ищем колонку с продуктами
+        product_col = None
+        for col in df.columns:
+            col_lower = str(col).lower()
+            if any(word in col_lower for word in ['product', 'מוצר', 'producto', 'товар']):
+                product_col = col
+                break
+        
+        if product_col:
+            # Quantity chart
+            qty_col = None
+            for col in df.columns:
+                col_lower = str(col).lower()
+                if any(word in col_lower for word in ['quantity', 'כמות', 'cantidad', 'количество']):
+                    qty_col = col
+                    break
+            
+            if qty_col:
+                qty = df.groupby(product_col)[qty_col].sum().sort_values(ascending=False).head(10).reset_index()
+                fig = plt.figure(figsize=(9,4))
+                plt.bar(qty[product_col].astype(str), qty[qty_col])
+                if current_lang == "he":
+                    plt.title("Top 10 — כמות לפי מוצר")
+                    plt.ylabel("כמות")
+                elif current_lang == "en":
+                    plt.title("Top 10 — Quantity by Product")
+                    plt.ylabel("Quantity")
+                else:
+                    plt.title("Top 10 — " + t("chart_top_quantity"))
+                    plt.ylabel(t("chart_axis_quantity"))
+                plt.xticks(rotation=40, ha="right")
+                fname = _save_fig(fig, "top_qty.png")
+                plots.append({"filename": fname, "title": t("chart_top_quantity"), "note": t("chart_note_top_quantity")})
+            
+            # Revenue chart
+            revenue = df.groupby(product_col)[COL_SUM].sum().sort_values(ascending=False).head(10).reset_index()
+            fig = plt.figure(figsize=(9,4))
+            plt.bar(revenue[product_col].astype(str), revenue[COL_SUM])
+            currency_info = get_currency(current_lang)
+            currency_symbol = currency_info["symbol"]
+            if current_lang == "he":
+                plt.title("Top 10 — הכנסות לפי מוצר")
+                plt.ylabel(f'סה"כ ({currency_symbol})')
+            elif current_lang == "en":
+                plt.title("Top 10 — Revenue by Product")
+                plt.ylabel(f"Total ({currency_symbol})")
+            else:
+                plt.title("Top 10 — " + t("chart_top_revenue"))
+                plt.ylabel(t("chart_axis_total"))
+            plt.xticks(rotation=40, ha="right")
+            fname = _save_fig(fig, "top_rev.png")
+            plots.append({"filename": fname, "title": t("chart_top_revenue"), "note": t("chart_note_top_revenue")})
     except Exception as e:
         print(f"⚠️ Demo products error: {e}")
-    
-    # 4) מפת חום
-    try:
-        hm_fig = _plot_heatmap(df)
-        fname = _save_fig(hm_fig, "heatmap.png")
-        plots.append({"filename": fname, "title": t("chart_heatmap"), "note": "🔥 צבע חם = מכירות גבוהות"})
-    except Exception as e:
-        print(f"⚠️ Demo heatmap error: {e}")
+        import traceback
+        traceback.print_exc()
     
     # --- ROI ---
     try:

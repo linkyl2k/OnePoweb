@@ -5558,6 +5558,17 @@ def demo_analysis():
         print(f"⚠️ Demo action items error: {e}")
         action_items = []
     
+    # Проверка: если графиков нет, показываем ошибку
+    if not plots or len(plots) == 0:
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("לא ניתן ליצור גרפים מהדוח. בדוק שהעמודות נכונות (תאריך, שעה, סכום).", "warning")
+        elif current_lang == 'ru':
+            flash("Не удалось создать графики из отчета. Проверьте, что колонки правильные (дата, время, сумма).", "warning")
+        else:
+            flash("Could not create graphs from report. Check that columns are correct (date, time, amount).", "warning")
+        return redirect(url_for("upload"))
+    
     # --- סיכום ---
     total_sales = float(df[COL_SUM].sum()) if COL_SUM in df.columns else 0.0
     # Переводим текст сводки для демо
@@ -5575,7 +5586,9 @@ def demo_analysis():
         summary_txt = f"📊 Демо-анализ | {t('summary_total_sales')}: {currency_symbol}{total_sales:,.0f} | Создано {len(plots)} графиков"
     
     # שמירה ב-LAST_EXPORT
-    LAST_EXPORT["generated_at"] = datetime.now()
+    from datetime import datetime
+    generated_at = datetime.now()
+    LAST_EXPORT["generated_at"] = generated_at
     LAST_EXPORT["lang"] = current_lang
     LAST_EXPORT["plots"] = plots
     LAST_EXPORT["summary"] = summary_txt
@@ -5583,9 +5596,27 @@ def demo_analysis():
     LAST_EXPORT["roi"] = roi_data
     LAST_EXPORT["action_items"] = action_items
     
-    print(f"✅ Demo: נוצרו {len(plots)} גרפים")
+    # Также сохраняем в сессию для multi-worker окружений (например, Render)
+    session["last_export"] = {
+        "generated_at": generated_at.isoformat(),
+        "lang": current_lang,
+        "plots": plots,
+        "summary": summary_txt,
+        "summary_ai": "זהו ניתוח לדוגמה. העלה דוח משלך לקבלת תובנות מותאמות!",
+        "roi": roi_data,
+        "action_items": action_items
+    }
+    session.permanent = True
+    session.modified = True
+    
+    print(f"✅ Demo: נוצרו {len(plots)} גרפים, сохранено в LAST_EXPORT и session")
+    print(f"📊 Demo session data: plots={len(plots)}, summary={summary_txt[:50]}...")
+    print(f"📊 Demo LAST_EXPORT: plots={len(LAST_EXPORT.get('plots', []))}")
 
-    return redirect(url_for("result"))
+    # Убеждаемся, что редирект идет на правильный URL
+    result_url = url_for("result")
+    print(f"🔄 Redirecting to: {result_url}")
+    return redirect(result_url)
 
 
 # ================================================================================

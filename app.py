@@ -228,7 +228,7 @@ app = Flask(__name__)  # <<< כאן Flask נוצר
 TRANSLATIONS = {
     "he": {  # Иврит (по умолчанию)
         # Навигация
-        "nav_home": "דף הבית",
+        "nav_home": "ניתוח",
         "nav_plans": "תוכניות ומחירים",
         "nav_about": "למה OnePoweb",
         "nav_contact": "צור קשר",
@@ -481,7 +481,7 @@ TRANSLATIONS = {
     },
     "en": {  # English
         # Navigation
-        "nav_home": "Home",
+        "nav_home": "Analysis",
         "nav_plans": "Plans & Pricing",
         "nav_about": "Why OnePoweb",
         "nav_contact": "Contact",
@@ -734,7 +734,7 @@ TRANSLATIONS = {
     },
     "ru": {  # Русский
         # Навигация
-        "nav_home": "Главная",
+        "nav_home": "Анализ",
         "nav_plans": "Тарифы",
         "nav_about": "О OnePoweb",
         "nav_contact": "Контакты",

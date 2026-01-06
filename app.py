@@ -362,6 +362,9 @@ TRANSLATIONS = {
         "results_no_graphs": "אין גרפים להצגה. חזור לעמוד הראשי והעלה דוח חדש.",
         "results_no_graphs_reload": "גרפים לא נמצאו. מפנים ללוח הבקרה שם תוכל לראות דוחות שמורים.",
         
+        # Checkout
+        "checkout_order_summary": "סיכום ההזמנה",
+        
         # Chart titles (Hebrew - same as original)
         "chart_sales_by_hour": "מכירות לפי שעה",
         "chart_sales_by_weekday": "מכירות לפי יום בשבוע",
@@ -581,6 +584,9 @@ TRANSLATIONS = {
         "results_download_pdf": "Download PDF",
         "results_no_graphs": "No charts to display. Go back to the main page and upload a new report.",
         "results_no_graphs_reload": "Graphs not found. Redirecting to dashboard where you can view saved reports.",
+        
+        # Checkout
+        "checkout_order_summary": "Order Summary",
         
         # About page translations
         "about_ai_badge": "✨ AI-Powered Analytics",
@@ -7149,7 +7155,8 @@ def subscribe():
         net_price_usd=net_price_usd,
         with_trial=trial,
         paypal_client_id=paypal_client_id,
-        paypal_mode=paypal_mode
+        paypal_mode=paypal_mode,
+        title=t("checkout_order_summary")
     )
 
 

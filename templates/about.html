@@ -31,7 +31,8 @@
         </p>
         
         <div class="d-flex gap-3 mb-5">
-          {% if session.uid %}
+          {% if is_logged_in %}
+            <!-- Logged in users see different buttons -->
             <a href="{{ url_for('dashboard') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(46,160,255,0.4); transition: all 0.3s;">
               Go to Dashboard <i class="bi bi-arrow-right ms-2"></i>
             </a>
@@ -39,6 +40,7 @@
               Upload Data
             </a>
           {% else %}
+            <!-- Guests see Get Started button -->
             <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #10b981, #34d399); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(16,185,129,0.4); transition: all 0.3s;">
               Get Started Free <i class="bi bi-arrow-right ms-2"></i>
             </a>
@@ -48,7 +50,7 @@
           {% endif %}
         </div>
         
-        {% if not session.uid %}
+        {% if not is_logged_in %}
         <div class="d-flex gap-4 text-muted">
           <div>
             <i class="bi bi-check-circle-fill text-success me-2"></i>

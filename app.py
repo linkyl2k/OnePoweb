@@ -4205,8 +4205,14 @@ def index():
 
 @app.route("/about")
 def about():
-    """About page for guests"""
-    return render_template("about.html", active="about", title="About OnePoweb")
+    """About page - different content based on login status"""
+    u = current_user()
+    if u:
+        # Logged in users: show dashboard/upload focused content
+        return render_template("about.html", active="about", title="About OnePoweb", is_logged_in=True)
+    else:
+        # Guests: show Get Started focused content
+        return render_template("about.html", active="about", title="About OnePoweb", is_logged_in=False)
 
 @app.route("/get-started")
 def get_started():

@@ -17,35 +17,35 @@
       <div class="col-lg-6 mb-5 mb-lg-0">
         <div class="mb-4">
           <span class="badge" style="background: linear-gradient(135deg, rgba(46,160,255,0.2), rgba(52,195,255,0.2)); border: 1px solid rgba(46,160,255,0.3); color: #34c3ff; padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 600;">
-            ✨ AI-Powered Analytics
+            {{ t('about_ai_badge') }}
           </span>
         </div>
         
         <h1 class="display-3 fw-bold text-white mb-4" style="line-height: 1.2;">
-          Transform Your Business Data Into 
-          <span style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Actionable Insights</span>
+          {{ t('about_hero_title') }} 
+          <span style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ t('about_hero_title_gradient') }}</span>
         </h1>
         
         <p class="lead text-muted mb-5" style="font-size: 1.25rem; line-height: 1.8;">
-          OnePoweb analyzes your sales data in seconds and provides AI-driven recommendations to boost revenue, optimize operations, and understand your customers better.
+          {{ t('about_hero_desc') }}
         </p>
         
         <div class="d-flex gap-3 mb-5">
           {% if is_logged_in %}
             <!-- Logged in users see different buttons -->
             <a href="{{ url_for('dashboard') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(46,160,255,0.4); transition: all 0.3s;">
-              Go to Dashboard <i class="bi bi-arrow-right ms-2"></i>
+              {{ t('about_btn_dashboard') }} <i class="bi bi-arrow-right ms-2"></i>
             </a>
             <a href="{{ url_for('upload') }}" class="btn btn-lg btn-outline-light" style="padding: 1rem 2rem; border-radius: 16px; border: 2px solid rgba(255,255,255,0.2);">
-              Upload Data
+              {{ t('about_btn_upload') }}
             </a>
           {% else %}
             <!-- Guests see Get Started button -->
             <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #10b981, #34d399); border: none; padding: 1rem 3rem; border-radius: 16px; color: white; font-weight: 600; box-shadow: 0 10px 40px rgba(16,185,129,0.4); transition: all 0.3s;">
-              Get Started Free <i class="bi bi-arrow-right ms-2"></i>
+              {{ t('about_btn_get_started') }} <i class="bi bi-arrow-right ms-2"></i>
             </a>
             <a href="#features" class="btn btn-lg btn-outline-light" style="padding: 1rem 2rem; border-radius: 16px; border: 2px solid rgba(255,255,255,0.2);">
-              Learn More
+              {{ t('about_btn_learn_more') }}
             </a>
           {% endif %}
         </div>
@@ -54,11 +54,11 @@
         <div class="d-flex gap-4 text-muted">
           <div>
             <i class="bi bi-check-circle-fill text-success me-2"></i>
-            <span>No credit card required</span>
+            <span>{{ t('about_no_card') }}</span>
           </div>
           <div>
             <i class="bi bi-check-circle-fill text-success me-2"></i>
-            <span>7-day free trial</span>
+            <span>{{ t('about_trial') }}</span>
           </div>
         </div>
         {% endif %}
@@ -75,19 +75,19 @@
               <div class="col-4">
                 <div style="background: rgba(46,160,255,0.1); border-radius: 16px; padding: 1.5rem;">
                   <div class="h2 fw-bold text-white mb-2">📊</div>
-                  <div class="small text-muted">Smart Analytics</div>
+                  <div class="small text-muted">{{ t('about_smart_analytics') }}</div>
                 </div>
               </div>
               <div class="col-4">
                 <div style="background: rgba(16,185,129,0.1); border-radius: 16px; padding: 1.5rem;">
                   <div class="h2 fw-bold text-white mb-2">🤖</div>
-                  <div class="small text-muted">AI Insights</div>
+                  <div class="small text-muted">{{ t('about_ai_insights') }}</div>
                 </div>
               </div>
               <div class="col-4">
                 <div style="background: rgba(245,158,11,0.1); border-radius: 16px; padding: 1.5rem;">
                   <div class="h2 fw-bold text-white mb-2">📈</div>
-                  <div class="small text-muted">ROI Boost</div>
+                  <div class="small text-muted">{{ t('about_roi_boost') }}</div>
                 </div>
               </div>
             </div>
@@ -103,8 +103,8 @@
 <div class="py-5" style="background: #1a1f36;">
   <div class="container py-5">
     <div class="text-center mb-5">
-      <h2 class="display-5 fw-bold text-white mb-3">See It In Action</h2>
-      <p class="lead text-muted">Real examples of insights and reports from OnePoweb</p>
+      <h2 class="display-5 fw-bold text-white mb-3">{{ t('about_section_examples') }}</h2>
+      <p class="lead text-muted">{{ t('about_section_examples_desc') }}</p>
     </div>
     
     <div class="row g-4 mb-5">
@@ -112,8 +112,8 @@
         <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;">
           <img src="/static/img/landing1.png" alt="Dashboard Example" class="card-img-top" style="width: 100%; height: auto; display: block; object-fit: cover; min-height: 200px;" onerror="this.style.display='none';">
           <div class="card-body" style="padding: 1.5rem;">
-            <h5 class="text-white mb-2">Visual Analytics</h5>
-            <p class="text-muted mb-0">Beautiful charts showing sales trends, peak hours, and customer behavior patterns</p>
+            <h5 class="text-white mb-2">{{ t('about_visual_analytics') }}</h5>
+            <p class="text-muted mb-0">{{ t('about_visual_analytics_desc') }}</p>
           </div>
         </div>
       </div>
@@ -121,8 +121,8 @@
         <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;">
           <img src="/static/img/landing2.png" alt="Insights Example" class="card-img-top" style="width: 100%; height: auto; display: block; object-fit: cover; min-height: 200px;" onerror="this.style.display='none';">
           <div class="card-body" style="padding: 1.5rem;">
-            <h5 class="text-white mb-2">AI-Powered Insights</h5>
-            <p class="text-muted mb-0">Smart recommendations based on your data to increase revenue and optimize operations</p>
+            <h5 class="text-white mb-2">{{ t('about_ai_powered') }}</h5>
+            <p class="text-muted mb-0">{{ t('about_ai_powered_desc') }}</p>
           </div>
         </div>
       </div>
@@ -130,8 +130,8 @@
         <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;">
           <img src="/static/img/landing3.png" alt="ROI Example" class="card-img-top" style="width: 100%; height: auto; display: block; object-fit: cover; min-height: 200px;" onerror="this.style.display='none';">
           <div class="card-body" style="padding: 1.5rem;">
-            <h5 class="text-white mb-2">ROI Estimation</h5>
-            <p class="text-muted mb-0">Calculate potential monthly gains with actionable recommendations</p>
+            <h5 class="text-white mb-2">{{ t('about_roi_estimation') }}</h5>
+            <p class="text-muted mb-0">{{ t('about_roi_estimation_desc') }}</p>
           </div>
         </div>
       </div>
@@ -140,8 +140,8 @@
     <!-- Try Demo Section -->
     <div class="text-center">
       <div class="card mx-auto" style="max-width: 700px; background: linear-gradient(135deg, rgba(46,160,255,0.1), rgba(16,185,129,0.1)); border: 2px solid rgba(46,160,255,0.3); border-radius: 20px; padding: 2rem;">
-        <h3 class="text-white mb-3">Try It With Real Data</h3>
-        <p class="text-muted mb-4">Download our sample cafe report and analyze it instantly. No signup required!</p>
+        <h3 class="text-white mb-3">{{ t('about_try_demo_title') }}</h3>
+        <p class="text-muted mb-4">{{ t('about_try_demo_desc') }}</p>
         
         {% if session.uid %}
           {% set u = current_user() %}
@@ -179,7 +179,7 @@
             {% endif %}
           </p>
           <a href="{{ url_for('login') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 12px 40px; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(46,160,255,0.4);">
-            <i class="bi bi-google me-2"></i>Sign In to Try Demo
+            <i class="bi bi-google me-2"></i>{{ t('about_signin_btn') }}
           </a>
         {% endif %}
       </div>
@@ -191,8 +191,8 @@
 <div id="features" class="py-5" style="background: #0f1419;">
   <div class="container py-5">
     <div class="text-center mb-5">
-      <h2 class="display-5 fw-bold text-white mb-3">Why Choose OnePoweb?</h2>
-      <p class="lead text-muted">Everything you need to make data-driven decisions</p>
+      <h2 class="display-5 fw-bold text-white mb-3">{{ t('about_why_choose') }}</h2>
+      <p class="lead text-muted">{{ t('about_why_choose_desc') }}</p>
     </div>
     
     <div class="row g-4">
@@ -202,8 +202,8 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
             <i class="bi bi-lightning-charge" style="font-size: 2rem; color: white;"></i>
           </div>
-          <h4 class="text-white mb-3">Instant Analysis</h4>
-          <p class="text-muted mb-0">Upload your sales data and get comprehensive insights in seconds. No manual work required.</p>
+          <h4 class="text-white mb-3">{{ t('about_instant_analysis') }}</h4>
+          <p class="text-muted mb-0">{{ t('about_instant_analysis_desc') }}</p>
         </div>
       </div>
       
@@ -212,8 +212,8 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
             <i class="bi bi-robot" style="font-size: 2rem; color: white;"></i>
           </div>
-          <h4 class="text-white mb-3">AI-Powered Recommendations</h4>
-          <p class="text-muted mb-0">Get personalized action plans based on your business patterns and industry best practices.</p>
+          <h4 class="text-white mb-3">{{ t('about_ai_recommendations') }}</h4>
+          <p class="text-muted mb-0">{{ t('about_ai_recommendations_desc') }}</p>
         </div>
       </div>
       
@@ -222,8 +222,8 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
             <i class="bi bi-graph-up" style="font-size: 2rem; color: white;"></i>
           </div>
-          <h4 class="text-white mb-3">ROI Calculator</h4>
-          <p class="text-muted mb-0">Discover hidden opportunities to increase revenue by 20-30% with our advanced ROI analysis.</p>
+          <h4 class="text-white mb-3">{{ t('about_roi_calculator') }}</h4>
+          <p class="text-muted mb-0">{{ t('about_roi_calculator_desc') }}</p>
         </div>
       </div>
       
@@ -232,8 +232,8 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
             <i class="bi bi-file-earmark-pdf" style="font-size: 2rem; color: white;"></i>
           </div>
-          <h4 class="text-white mb-3">Professional Reports</h4>
-          <p class="text-muted mb-0">Export beautiful PDF reports with charts and insights to share with your team.</p>
+          <h4 class="text-white mb-3">{{ t('about_professional_reports') }}</h4>
+          <p class="text-muted mb-0">{{ t('about_professional_reports_desc') }}</p>
         </div>
       </div>
       
@@ -242,8 +242,8 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ec4899, #fb7185); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
             <i class="bi bi-shield-check" style="font-size: 2rem; color: white;"></i>
           </div>
-          <h4 class="text-white mb-3">Secure & Private</h4>
-          <p class="text-muted mb-0">Your data is encrypted and stored securely. We never share your information with third parties.</p>
+          <h4 class="text-white mb-3">{{ t('about_secure_private') }}</h4>
+          <p class="text-muted mb-0">{{ t('about_secure_private_desc') }}</p>
         </div>
       </div>
       
@@ -252,8 +252,8 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #3b82f6, #60a5fa); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
             <i class="bi bi-globe" style="font-size: 2rem; color: white;"></i>
           </div>
-          <h4 class="text-white mb-3">Multi-Language Support</h4>
-          <p class="text-muted mb-0">Available in Hebrew, English, and Russian with multi-currency support.</p>
+          <h4 class="text-white mb-3">{{ t('about_multi_language') }}</h4>
+          <p class="text-muted mb-0">{{ t('about_multi_language_desc') }}</p>
         </div>
       </div>
       
@@ -266,16 +266,16 @@
   <div class="container py-5">
     <div class="text-center">
       {% if session.uid %}
-        <h2 class="display-4 fw-bold text-white mb-4">Start Analyzing Your Data</h2>
-        <p class="lead text-muted mb-5">Upload your sales data and get instant insights</p>
+        <h2 class="display-4 fw-bold text-white mb-4">{{ t('about_cta_logged_in_title') }}</h2>
+        <p class="lead text-muted mb-5">{{ t('about_cta_logged_in_desc') }}</p>
         <a href="{{ url_for('upload') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1.25rem 4rem; border-radius: 16px; color: white; font-weight: 600; font-size: 1.25rem; box-shadow: 0 10px 40px rgba(46,160,255,0.4);">
-          Upload Data Now <i class="bi bi-arrow-right ms-2"></i>
+          {{ t('about_cta_logged_in_btn') }} <i class="bi bi-arrow-right ms-2"></i>
         </a>
       {% else %}
-        <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Business?</h2>
-        <p class="lead text-muted mb-5">Join thousands of businesses making smarter decisions with OnePoweb</p>
+        <h2 class="display-4 fw-bold text-white mb-4">{{ t('about_cta_guest_title') }}</h2>
+        <p class="lead text-muted mb-5">{{ t('about_cta_guest_desc') }}</p>
         <a href="{{ url_for('get_started') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 1.25rem 4rem; border-radius: 16px; color: white; font-weight: 600; font-size: 1.25rem; box-shadow: 0 10px 40px rgba(46,160,255,0.4);">
-          Get Started - It's Free <i class="bi bi-arrow-right ms-2"></i>
+          {{ t('about_cta_guest_btn') }} <i class="bi bi-arrow-right ms-2"></i>
         </a>
       {% endif %}
     </div>

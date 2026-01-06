@@ -329,10 +329,10 @@
             </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link {% if active=='about' %}active{% endif %}" href="{{ url_for('about') }}">About</a>
+            <a class="nav-link {% if active=='about' %}active{% endif %}" href="{{ url_for('about') }}">{{ t('nav_about') }}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if active=='contact' %}active{% endif %}" href="{{ url_for('contact') }}">Contact</a>
+            <a class="nav-link {% if active=='contact' %}active{% endif %}" href="{{ url_for('contact') }}">{{ t('nav_contact') }}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {% if active=='pricing' %}active{% endif %}" href="{{ url_for('pricing') }}" style="background: linear-gradient(90deg, rgba(16,185,129,0.15), rgba(46,160,255,0.1)); color: #10b981 !important; border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 6px 12px !important; font-weight: 600;">

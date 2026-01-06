@@ -1588,6 +1588,9 @@ def ensure_subscription_columns():
         db.execute("ALTER TABLE users ADD COLUMN trial_until TEXT NULL")
     if "trial_used" not in cols:
         db.execute("ALTER TABLE users ADD COLUMN trial_used INTEGER DEFAULT 0")
+    # Demo report usage tracking
+    if "demo_used" not in cols:
+        db.execute("ALTER TABLE users ADD COLUMN demo_used INTEGER DEFAULT 0")
     # Email verification columns
     if "email_verified" not in cols:
         db.execute("ALTER TABLE users ADD COLUMN email_verified INTEGER DEFAULT 0")
@@ -5233,6 +5236,37 @@ def upload():
         print(f"✅ Successfully saved {len(plots)} plots, first plot filename: {plots[0].get('filename', 'N/A') if plots else 'N/A'}")
 
     return redirect(url_for("result"))
+
+
+@app.route("/demo-try")
+@login_required
+def demo_try():
+    """
+    Try demo analysis with sample cafe report - limited to one use per user.
+    """
+    u = current_user()
+    if not u:
+        flash("Please sign in to try the demo", "warning")
+        return redirect(url_for("login"))
+    
+    # Check if user already used demo
+    if u.get("demo_used"):
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("כבר השתמשת בדמו. צור קשר אם תרצה לנסות שוב!", "warning")
+        elif current_lang == 'ru':
+            flash("Вы уже использовали демо. Свяжитесь с нами, если хотите попробовать снова!", "warning")
+        else:
+            flash("You've already used the demo. Contact us if you want to try again!", "warning")
+        return redirect(url_for("about"))
+    
+    # Mark demo as used
+    db = get_db()
+    db.execute("UPDATE users SET demo_used = 1 WHERE id = ?", (u["id"],))
+    db.commit()
+    
+    # Redirect to demo analyze
+    return redirect(url_for("demo_analysis"))
 
 
 @app.route("/demo")

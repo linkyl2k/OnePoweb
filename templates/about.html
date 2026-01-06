@@ -97,6 +97,93 @@
   </div>
 </div>
 
+<!-- Examples Section -->
+<div class="py-5" style="background: #1a1f36;">
+  <div class="container py-5">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-white mb-3">See It In Action</h2>
+      <p class="lead text-muted">Real examples of insights and reports from OnePoweb</p>
+    </div>
+    
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;">
+          <img src="{{ url_for('static', filename='img/landing1.png') }}" alt="Dashboard Example" class="card-img-top" style="width: 100%; height: auto;">
+          <div class="card-body">
+            <h5 class="text-white">Visual Analytics</h5>
+            <p class="text-muted mb-0">Beautiful charts showing sales trends, peak hours, and customer behavior patterns</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;">
+          <img src="{{ url_for('static', filename='img/landing2.png') }}" alt="Insights Example" class="card-img-top" style="width: 100%; height: auto;">
+          <div class="card-body">
+            <h5 class="text-white">AI-Powered Insights</h5>
+            <p class="text-muted mb-0">Smart recommendations based on your data to increase revenue and optimize operations</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;">
+          <img src="{{ url_for('static', filename='img/landing3.png') }}" alt="ROI Example" class="card-img-top" style="width: 100%; height: auto;">
+          <div class="card-body">
+            <h5 class="text-white">ROI Estimation</h5>
+            <p class="text-muted mb-0">Calculate potential monthly gains with actionable recommendations</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Try Demo Section -->
+    <div class="text-center">
+      <div class="card mx-auto" style="max-width: 700px; background: linear-gradient(135deg, rgba(46,160,255,0.1), rgba(16,185,129,0.1)); border: 2px solid rgba(46,160,255,0.3); border-radius: 20px; padding: 2rem;">
+        <h3 class="text-white mb-3">Try It With Real Data</h3>
+        <p class="text-muted mb-4">Download our sample cafe report and analyze it instantly. No signup required!</p>
+        
+        {% if session.uid %}
+          {% set u = current_user() %}
+          {% if u and u.get('demo_used') %}
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              {% if current_lang == 'he' %}
+                כבר השתמשת בדמו. צור קשר אם תרצה לנסות שוב!
+              {% elif current_lang == 'ru' %}
+                Вы уже использовали демо. Свяжитесь с нами, если хотите попробовать снова!
+              {% else %}
+                You've already used the demo. Contact us if you want to try again!
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+              <a href="{{ url_for('static', filename='img/cafe_monthly_report.xlsx') }}" download class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 30px;">
+                <i class="bi bi-download me-2"></i>Download Sample Report
+              </a>
+              <a href="{{ url_for('demo_try') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 12px 30px; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(46,160,255,0.4);">
+                <i class="bi bi-play-circle me-2"></i>Analyze Sample Report
+              </a>
+            </div>
+          {% endif %}
+        {% else %}
+          <p class="text-muted mb-3">
+            <i class="bi bi-info-circle me-1"></i>
+            {% if current_lang == 'he' %}
+              התחבר עם Google כדי לנסות את הדמו
+            {% elif current_lang == 'ru' %}
+              Войдите через Google, чтобы попробовать демо
+            {% else %}
+              Sign in with Google to try the demo
+            {% endif %}
+          </p>
+          <a href="{{ url_for('login') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #2ea0ff, #34c3ff); border: none; padding: 12px 40px; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(46,160,255,0.4);">
+            <i class="bi bi-google me-2"></i>Sign In to Try Demo
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Features Section -->
 <div id="features" class="py-5" style="background: #0f1419;">
   <div class="container py-5">

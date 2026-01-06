@@ -7333,7 +7333,16 @@ def paypal_create_subscription_id():
             return jsonify({"error": "User not found"}), 401
         
         # Проверка trial_used для trial подписки
-        if with_trial and u.get("trial_used"):
+        try:
+            if hasattr(u, 'keys') and "trial_used" in u.keys():
+                trial_used = u["trial_used"]
+            else:
+                u_dict = dict(u)
+                trial_used = u_dict.get("trial_used", 0)
+        except (KeyError, TypeError, AttributeError):
+            trial_used = 0
+        
+        if with_trial and trial_used:
             return jsonify({"error": "Trial period already used"}), 400
         
         # Get user ID safely

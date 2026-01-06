@@ -6827,12 +6827,15 @@ def pricing():
     u = current_user()
     current_plan = get_effective_plan(u) if u else 'free'
     trial_active = is_trial_active(u) if u else False
+    # Всегда показываем цены в долларах на странице pricing
+    currency_symbol = "$"
     return render_template("pricing.html", 
                          active="pricing", 
                          title="תוכניות ומחירים",
                          current_plan=current_plan,
                          trial_active=trial_active,
-                         prices=PLAN_PRICES)
+                         prices=PLAN_PRICES,
+                         currency_symbol=currency_symbol)
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():

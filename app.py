@@ -8453,7 +8453,7 @@ def profile_edit():
 @app.route("/logout")
 def logout():
     session.clear()
-    flash("התנתקת בהצלחה", "success")
+    flash_t("msg_logout", "success")
     return redirect(url_for("about"))
 
 

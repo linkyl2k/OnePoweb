@@ -15,6 +15,19 @@
       <br>
       <small>{% if current_lang == 'he' %}לא יחויב במשך 2 ימים. לאחר מכן תתחיל מנוי PRO ב-${{ base_price_usd }}/חודש.{% elif current_lang == 'en' %}You won't be charged for 2 days. Then PRO subscription will start at ${{ base_price_usd }}/month.{% else %}Не будет списано в течение 2 дней. Затем автоматически начнется подписка PRO по ${{ base_price_usd }}/месяц.{% endif %}</small>
     </div>
+    <div class="alert alert-success mb-3" style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(52,211,153,0.1)); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; color: #34d399;">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      {% if current_lang == 'he' %}
+        <strong>ביטול בכל עת:</strong><br>
+        <small>ניתן לבטל את המנוי בכל רגע דרך הפרופיל שלך. אם תבטל לפני סוף תקופת הניסיון (2 ימים), לא יחויב דבר.</small>
+      {% elif current_lang == 'en' %}
+        <strong>Cancel Anytime:</strong><br>
+        <small>You can cancel your subscription at any time through your profile. If you cancel before the trial period ends (2 days), you won't be charged at all.</small>
+      {% else %}
+        <strong>Отмена в любой момент:</strong><br>
+        <small>Вы можете отменить подписку в любой момент через ваш профиль. Если вы отмените до окончания пробного периода (2 дня), с вас не будет списано ни копейки.</small>
+      {% endif %}
+    </div>
     {% else %}
     <p class="text-muted">{% if current_lang == 'he' %}מנוי חודשי ל-OnePoweb{% elif current_lang == 'en' %}Monthly subscription to OnePoweb{% else %}Месячная подписка на OnePoweb{% endif %}</p>
     {% endif %}

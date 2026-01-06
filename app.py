@@ -6979,12 +6979,12 @@ def get_or_create_paypal_plan(plan_name, price_usd, with_trial=False):
     # Создаем billing cycles
     billing_cycles = []
     
-    # Если нужен trial - добавляем trial цикл
+    # Если нужен trial - добавляем trial цикл (2 дня)
     if with_trial:
         billing_cycles.append({
             "frequency": {
                 "interval_unit": "DAY",
-                "interval_count": 7
+                "interval_count": 2
             },
             "tenure_type": "TRIAL",
             "sequence": 1,

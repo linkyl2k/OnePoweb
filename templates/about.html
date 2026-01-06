@@ -168,47 +168,25 @@
             </div>
           {% endif %}
         {% else %}
-          {% if guest_email %}
-            {# Guest authenticated via Google #}
-            <div class="d-flex gap-3 justify-content-center flex-wrap mb-3">
-              <a href="{{ url_for('static', filename='img/cafe_monthly_report.xlsx') }}" download="cafe_monthly_report.xlsx" class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 30px;">
-                <i class="bi bi-download me-2"></i>{% if current_lang == 'he' %}הורד דוח לדוגמה{% elif current_lang == 'ru' %}Скачать пример отчета{% else %}Download Sample Report{% endif %}
-              </a>
-              <a href="{{ url_for('upload') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #10b981, #34d399); border: none; padding: 12px 30px; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
-                <i class="bi bi-upload me-2"></i>{% if current_lang == 'he' %}העלה דוח משלך{% elif current_lang == 'ru' %}Загрузите свой отчет{% else %}Upload Your Own Report{% endif %}
-              </a>
-            </div>
-            <p class="text-muted mb-0">
-              <i class="bi bi-check-circle-fill text-success me-2"></i>
-              {% if current_lang == 'he' %}
-                מחובר כ-{{ guest_email }}. תוכל להעלות דוח אחד בחינם!
-              {% elif current_lang == 'ru' %}
-                Вход выполнен как {{ guest_email }}. Вы можете загрузить один отчет бесплатно!
-              {% else %}
-                Signed in as {{ guest_email }}. You can upload one report for free!
-              {% endif %}
-            </p>
-          {% else %}
-            {# Guest not authenticated #}
-            <div class="d-flex gap-3 justify-content-center flex-wrap mb-3">
-              <a href="{{ url_for('static', filename='img/cafe_monthly_report.xlsx') }}" download="cafe_monthly_report.xlsx" class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 30px;">
-                <i class="bi bi-download me-2"></i>{% if current_lang == 'he' %}הורד דוח לדוגמה{% elif current_lang == 'ru' %}Скачать пример отчета{% else %}Download Sample Report{% endif %}
-              </a>
-            </div>
-            <p class="text-muted mb-3">
-              <i class="bi bi-info-circle me-1"></i>
-              {% if current_lang == 'he' %}
-                התחבר עם Google כדי להעלות דוח משלך (חינם, פעם אחת)
-              {% elif current_lang == 'ru' %}
-                Войдите через Google, чтобы загрузить свой отчет (бесплатно, один раз)
-              {% else %}
-                Sign in with Google to upload your own report (free, one time)
-              {% endif %}
-            </p>
-            <a href="{{ url_for('google_auth', next=url_for('upload')) }}" class="btn btn-lg" style="background: linear-gradient(135deg, #10b981, #34d399); border: none; padding: 12px 40px; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
-              <i class="bi bi-google me-2"></i>{% if current_lang == 'he' %}התחבר עם Google להעלאת דוח{% elif current_lang == 'ru' %}Войти через Google для загрузки{% else %}Sign in with Google to Upload{% endif %}
+          {# Guest - not logged in #}
+          <div class="d-flex gap-3 justify-content-center flex-wrap mb-3">
+            <a href="{{ url_for('static', filename='img/cafe_monthly_report.xlsx') }}" download="cafe_monthly_report.xlsx" class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 30px;">
+              <i class="bi bi-download me-2"></i>{% if current_lang == 'he' %}הורד דוח לדוגמה{% elif current_lang == 'ru' %}Скачать пример отчета{% else %}Download Sample Report{% endif %}
             </a>
-          {% endif %}
+          </div>
+          <p class="text-muted mb-3">
+            <i class="bi bi-info-circle me-1"></i>
+            {% if current_lang == 'he' %}
+              הורד את הדוגמה ואז תוכל לנסות ניתוח חינם (פעם אחת ללא רישום)
+            {% elif current_lang == 'ru' %}
+              Скачайте пример, затем попробуйте бесплатный анализ (один раз без регистрации)
+            {% else %}
+              Download the sample, then try free analysis (one time without signup)
+            {% endif %}
+          </p>
+          <a href="{{ url_for('upload') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #10b981, #34d399); border: none; padding: 12px 40px; border-radius: 12px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
+            <i class="bi bi-play-circle me-2"></i>{% if current_lang == 'he' %}נסה ניתוח חינם{% elif current_lang == 'ru' %}Попробовать анализ{% else %}Try Free Analysis{% endif %}
+          </a>
         {% endif %}
       </div>
     </div>

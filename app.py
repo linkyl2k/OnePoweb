@@ -26,10 +26,6 @@ PAYPAL_SECRET = os.getenv("PAYPAL_SECRET", "")
 PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")  # sandbox or live
 PAYPAL_API_URL = "https://api-m.sandbox.paypal.com" if PAYPAL_MODE == "sandbox" else "https://api-m.paypal.com"
 
-# ====== Google OAuth Configuration ======
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
-GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "")  # Should be set to https://yourdomain.com/auth/google/callback
 
 # Prices in USD
 PLAN_PRICES = {
@@ -3921,15 +3917,6 @@ def ensure_tables():
     -- אינדקס לחיפוש מהיר
     CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id);
     CREATE INDEX IF NOT EXISTS idx_reports_period ON reports(user_id, period_type, period_start, period_end);
-    
-    -- טבלה למעקב אחר משתמשי אורח שהשתמשו בדמו
-    CREATE TABLE IF NOT EXISTS demo_guests (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        google_email TEXT UNIQUE NOT NULL,
-        used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE INDEX IF NOT EXISTS idx_demo_guests_email ON demo_guests(google_email);
     """)
     db.commit()
 
@@ -4574,134 +4561,18 @@ def index():
         # Guests go to about page with explanations and Get Started button
         return redirect(url_for('about'))
 
-@app.route("/auth/google")
-def google_auth():
-    """Initiate Google OAuth for guest upload"""
-    if not GOOGLE_CLIENT_ID or not GOOGLE_REDIRECT_URI:
-        current_lang = get_language()
-        if current_lang == 'he':
-            flash("Google OAuth לא מוגדר. אנא צור קשר.", "danger")
-        elif current_lang == 'ru':
-            flash("Google OAuth не настроен. Пожалуйста, свяжитесь с нами.", "danger")
-        else:
-            flash("Google OAuth not configured. Please contact us.", "danger")
-        return redirect(url_for("about"))
-    
-    # Store redirect URL in session
-    next_url = request.args.get('next', url_for('upload'))
-    session['oauth_next'] = next_url
-    
-    # Google OAuth authorization URL
-    auth_url = (
-        "https://accounts.google.com/o/oauth2/v2/auth?"
-        f"client_id={GOOGLE_CLIENT_ID}&"
-        f"redirect_uri={GOOGLE_REDIRECT_URI}&"
-        "response_type=code&"
-        "scope=openid email profile&"
-        f"state={secrets.token_urlsafe(32)}"
-    )
-    return redirect(auth_url)
-
-
-@app.route("/auth/google/callback")
-def google_auth_callback():
-    """Handle Google OAuth callback"""
-    code = request.args.get('code')
-    if not code:
-        current_lang = get_language()
-        if current_lang == 'he':
-            flash("שגיאה באימות Google", "danger")
-        elif current_lang == 'ru':
-            flash("Ошибка аутентификации Google", "danger")
-        else:
-            flash("Google authentication error", "danger")
-        return redirect(url_for("about"))
-    
-    # Exchange code for access token
-    try:
-        token_response = requests.post(
-            "https://oauth2.googleapis.com/token",
-            data={
-                "client_id": GOOGLE_CLIENT_ID,
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "code": code,
-                "grant_type": "authorization_code",
-                "redirect_uri": GOOGLE_REDIRECT_URI,
-            },
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-        )
-        token_data = token_response.json()
-        access_token = token_data.get("access_token")
-        
-        if not access_token:
-            raise Exception("No access token received")
-        
-        # Get user info from Google
-        user_info_response = requests.get(
-            "https://www.googleapis.com/oauth2/v2/userinfo",
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
-        user_info = user_info_response.json()
-        google_email = user_info.get("email", "").lower()
-        
-        if not google_email:
-            raise Exception("No email received from Google")
-        
-        # Check if this Google account already used guest demo
-        db = get_db()
-        existing = db.execute(
-            "SELECT * FROM demo_guests WHERE google_email = ?",
-            (google_email,)
-        ).fetchone()
-        
-        if existing:
-            current_lang = get_language()
-            if current_lang == 'he':
-                flash("כבר השתמשת בדמו ללא רישום עם Google זה. הירשם לחשבון מלא להעלאת דוחות נוספים!", "warning")
-            elif current_lang == 'ru':
-                flash("Вы уже использовали демо без регистрации с этим Google аккаунтом. Зарегистрируйтесь для полного доступа!", "warning")
-            else:
-                flash("You've already used the guest demo with this Google account. Sign up for full access!", "warning")
-            return redirect(url_for("about"))
-        
-        # Store guest email in session
-        session["guest_google_email"] = google_email
-        session["guest_authenticated"] = True
-        
-        # Redirect to upload page
-        next_url = session.pop('oauth_next', url_for('upload'))
-        current_lang = get_language()
-        if current_lang == 'he':
-            flash("התחברת בהצלחה! תוכל להעלות דוח אחד בחינם.", "success")
-        elif current_lang == 'ru':
-            flash("Вход выполнен! Вы можете загрузить один отчет бесплатно.", "success")
-        else:
-            flash("Signed in successfully! You can upload one report for free.", "success")
-        return redirect(next_url)
-        
-    except Exception as e:
-        print(f"❌ Google OAuth error: {e}")
-        current_lang = get_language()
-        if current_lang == 'he':
-            flash("שגיאה באימות Google. נסה שוב.", "danger")
-        elif current_lang == 'ru':
-            flash("Ошибка аутентификации Google. Попробуйте снова.", "danger")
-        else:
-            flash("Google authentication error. Please try again.", "danger")
-        return redirect(url_for("about"))
 
 
 @app.route("/about")
 def about():
     """About page - different content based on login status"""
     u = current_user()
-    guest_email = session.get("guest_google_email")  # Check if guest is authenticated via Google
     if u:
         # Logged in users: show dashboard/upload focused content
         return render_template("about.html", active="about", title="About OnePoweb", is_logged_in=True)
     else:
         # Guests: show Get Started focused content
-        return render_template("about.html", active="about", title="About OnePoweb", is_logged_in=False, guest_email=guest_email)
+        return render_template("about.html", active="about", title="About OnePoweb", is_logged_in=False)
 
 @app.route("/get-started")
 def get_started():
@@ -4710,31 +4581,20 @@ def get_started():
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
-    """Upload and analyze report - works for both logged in users and guests with Google OAuth"""
+    """Upload and analyze report - works for both logged in users and guests (one-time)"""
     u = current_user()
-    guest_email = session.get("guest_google_email")
+    is_guest = not u
     
-    # Check if user is logged in or is authenticated guest
-    if not u and not guest_email:
-        flash_t("msg_login_required", "warning")
-        return redirect(url_for("login", next=request.path))
-    
-    # If guest, check if they already used their one-time upload
-    if guest_email and not u:
-        db = get_db()
-        existing = db.execute(
-            "SELECT * FROM demo_guests WHERE google_email = ?",
-            (guest_email,)
-        ).fetchone()
-        if existing:
-            current_lang = get_language()
-            if current_lang == 'he':
-                flash("כבר העלאת דוח אחד. הירשם לחשבון מלא להעלאת דוחות נוספים!", "warning")
-            elif current_lang == 'ru':
-                flash("Вы уже загрузили один отчет. Зарегистрируйтесь для полного доступа!", "warning")
-            else:
-                flash("You've already uploaded one report. Sign up for full access!", "warning")
-            return redirect(url_for("about"))
+    # Check if guest already used their one-time upload
+    if is_guest and session.get("guest_upload_used"):
+        current_lang = get_language()
+        if current_lang == 'he':
+            flash("כבר השתמשת בניתוח החינמי. הירשם לחשבון מלא להמשך!", "warning")
+        elif current_lang == 'ru':
+            flash("Вы уже использовали бесплатный анализ. Зарегистрируйтесь для продолжения!", "warning")
+        else:
+            flash("You've already used the free analysis. Sign up to continue!", "warning")
+        return redirect(url_for("signup"))
     
     messages, plots = [], []
     current_lang = get_language()  # Получаем текущий язык
@@ -4744,7 +4604,7 @@ def upload():
         return render_template("index.html",
                                messages=messages, plots=plots,
                                active="home", title="ניתוח דוח",
-                               is_guest=bool(guest_email and not u))
+                               is_guest=is_guest)
 
     # GET – מסך העלאה
     if request.method == "GET":
@@ -5757,23 +5617,10 @@ def upload():
         print(f"✅ Successfully saved {len(plots)} plots, first plot filename: {plots[0].get('filename', 'N/A') if plots else 'N/A'}")
 
     # If guest uploaded successfully, mark them as used
-    if guest_email and not u:
-        try:
-            db = get_db()
-            # Check if not already marked (shouldn't happen, but just in case)
-            existing = db.execute(
-                "SELECT * FROM demo_guests WHERE google_email = ?",
-                (guest_email,)
-            ).fetchone()
-            if not existing:
-                db.execute(
-                    "INSERT INTO demo_guests (google_email) VALUES (?)",
-                    (guest_email,)
-                )
-                db.commit()
-                print(f"✅ Guest {guest_email} marked as having used demo upload")
-        except Exception as e:
-            print(f"⚠️ Error marking guest as used: {e}")
+    if is_guest:
+        session["guest_upload_used"] = True
+        session["is_guest_session"] = True
+        print(f"✅ Guest marked as having used one-time upload")
 
     return redirect(url_for("result"))
 
@@ -9236,6 +9083,9 @@ def result():
             except:
                 pass
 
+    # Check if this is a guest session
+    is_guest_session = session.get("is_guest_session", False)
+    
     return render_template(
         "result.html",
         plots=plots,
@@ -9246,6 +9096,7 @@ def result():
         messages=messages,
         user_plan=user_plan,
         saved_report_id=saved_report_id,
+        is_guest=is_guest_session,
         title="תוצאות הניתוח",
         active="result",
     )

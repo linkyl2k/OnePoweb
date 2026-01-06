@@ -120,11 +120,11 @@
             {% if current_lang == 'he' %}טיפ:{% elif current_lang == 'en' %}Tip:{% else %}Совет:{% endif %}
           </strong>
           {% if current_lang == 'he' %}
-            בדוק גם את ה<a href="{{ url_for('landing') }}#faq">שאלות נפוצות</a> — ייתכן שהתשובה כבר שם!
+            בדוק גם את ה<a href="{{ url_for('about') }}#faq">שאלות נפוצות</a> — ייתכן שהתשובה כבר שם!
           {% elif current_lang == 'en' %}
-            Check the <a href="{{ url_for('landing') }}#faq">FAQ</a> section as well — the answer may already be there!
+            Check the <a href="{{ url_for('about') }}#faq">FAQ</a> section as well — the answer may already be there!
           {% else %}
-            Загляните также в раздел <a href="{{ url_for('landing') }}#faq">Частые вопросы</a> — возможно, нужный ответ уже там!
+            Загляните также в раздел <a href="{{ url_for('about') }}#faq">Частые вопросы</a> — возможно, нужный ответ уже там!
           {% endif %}
         </div>
       </div>

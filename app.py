@@ -4193,8 +4193,8 @@ def set_currency(currency_code):
     return redirect(return_url)
 
 @app.route("/")
-def landing():
-    """Landing page - redirect based on login status"""
+def index():
+    """Home page - redirect based on login status"""
     u = current_user()
     if u:
         # Logged in users go to upload page

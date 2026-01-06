@@ -11,9 +11,9 @@
     {% if with_trial %}
     <div class="alert alert-info mb-3" style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.1)); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; color: #fbbf24;">
       <i class="bi bi-gift-fill me-2"></i>
-      <strong>{% if current_lang == 'he' %}7 ימי ניסיון חינם!{% elif current_lang == 'en' %}7 Days Free Trial!{% else %}7 дней бесплатно!{% endif %}</strong>
+      <strong>{% if current_lang == 'he' %}2 ימי ניסיון חינם!{% elif current_lang == 'en' %}2 Days Free Trial!{% else %}2 дня бесплатно!{% endif %}</strong>
       <br>
-      <small>{% if current_lang == 'he' %}לא יחויב במשך 7 ימים. לאחר מכן ${{ base_price_usd }}/חודש.{% elif current_lang == 'en' %}You won't be charged for 7 days. Then ${{ base_price_usd }}/month.{% else %}Не будет списано в течение 7 дней. Затем ${{ base_price_usd }}/месяц.{% endif %}</small>
+      <small>{% if current_lang == 'he' %}לא יחויב במשך 2 ימים. לאחר מכן תתחיל מנוי PRO ב-${{ base_price_usd }}/חודש.{% elif current_lang == 'en' %}You won't be charged for 2 days. Then PRO subscription will start at ${{ base_price_usd }}/month.{% else %}Не будет списано в течение 2 дней. Затем автоматически начнется подписка PRO по ${{ base_price_usd }}/месяц.{% endif %}</small>
     </div>
     {% else %}
     <p class="text-muted">{% if current_lang == 'he' %}מנוי חודשי ל-OnePoweb{% elif current_lang == 'en' %}Monthly subscription to OnePoweb{% else %}Месячная подписка на OnePoweb{% endif %}</p>

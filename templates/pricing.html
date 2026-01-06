@@ -184,11 +184,11 @@
     <div class="d-flex flex-wrap align-items-center justify-content-center gap-4">
       <div class="text-center text-md-start">
         <h4 class="mb-1"><i class="bi bi-gift me-2"></i>{% if current_lang == 'he' %}לא בטוח/ה? נסה PRO חינם!{% elif current_lang == 'en' %}Not sure? Try PRO for free!{% else %}Не уверены? Попробуйте PRO бесплатно!{% endif %}</h4>
-        <p class="mb-0 text-muted">{% if current_lang == 'he' %}7 ימים של כל הפיצ'רים — בלי כרטיס אשראי{% elif current_lang == 'en' %}7 days of all features — no credit card{% else %}7 дней всех функций — без кредитной карты{% endif %}</p>
+        <p class="mb-0 text-muted">{% if current_lang == 'he' %}2 ימים של כל הפיצ'רים — בלי כרטיס אשראי. אחר כך מנוי PRO{% elif current_lang == 'en' %}2 days of all features — no credit card. Then PRO subscription{% else %}2 дня всех функций — без кредитной карты. Затем подписка PRO{% endif %}</p>
       </div>
       <form method="POST" action="{{ url_for('start_trial') }}">
         <button type="submit" class="btn btn-trial">
-          <i class="bi bi-play-fill me-1"></i>{% if current_lang == 'he' %}נסה 7 ימים חינם{% elif current_lang == 'en' %}Try 7 days free{% else %}Попробовать 7 дней бесплатно{% endif %}
+          <i class="bi bi-play-fill me-1"></i>{% if current_lang == 'he' %}נסה 2 ימים חינם{% elif current_lang == 'en' %}Try 2 days free{% else %}Попробовать 2 дня бесплатно{% endif %}
         </button>
       </form>
     </div>
@@ -234,7 +234,7 @@
         </h2>
         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
           <div class="accordion-body">
-            {% if current_lang == 'he' %}אחרי 7 ימים החשבון חוזר לתוכנית FREE. לא נדרש כרטיס אשראי לניסיון, ואין חיוב אוטומטי.{% elif current_lang == 'en' %}After 7 days, the account returns to the FREE plan. No credit card is required for the trial, and there's no automatic charge.{% else %}После 7 дней аккаунт возвращается к плану FREE. Для пробного периода не требуется кредитная карта, и нет автоматического списания.{% endif %}
+            {% if current_lang == 'he' %}אחרי 2 ימים תתחיל מנוי PRO אוטומטית. לא נדרש כרטיס אשראי לניסיון, ואפשר לבטל בכל עת.{% elif current_lang == 'en' %}After 2 days, PRO subscription will start automatically. No credit card is required for the trial, and you can cancel anytime.{% else %}После 2 дней автоматически начнется подписка PRO. Для пробного периода не требуется кредитная карта, можно отменить в любое время.{% endif %}
           </div>
         </div>
       </div>

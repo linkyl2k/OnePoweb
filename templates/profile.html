@@ -100,7 +100,7 @@
                 <div class="flex-grow-1">
                   <strong style="color: #fbbf24;">{{ t('profile_trial_available') }}</strong>
                   <p class="mb-0 small text-muted">
-                    {% if current_lang == 'he' %}נדרש כרטיס אשראי. לא יחויב במשך 7 ימים.{% elif current_lang == 'en' %}Credit card required. You won't be charged for 7 days.{% else %}Требуется карта. Спишется только через 7 дней.{% endif %}
+                    {% if current_lang == 'he' %}2 ימים חינם - אחר כך מנוי PRO. לא נדרש כרטיס אשראי לניסיון.{% elif current_lang == 'en' %}2 days free - then PRO subscription. No credit card required for trial.{% else %}2 дня бесплатно - затем подписка PRO. Для пробного периода не требуется кредитная карта.{% endif %}
                   </p>
                 </div>
                 <form method="POST" action="{{ url_for('start_trial') }}">

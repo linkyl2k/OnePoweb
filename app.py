@@ -331,6 +331,9 @@ TRANSLATIONS = {
         "profile_active": "פעיל",
         "profile_cancelled": "בוטל",
         "profile_no_subscription": "אין מנוי",
+        "profile_trial_available": "נסה PRO חינם ל-2 ימים!",
+        "profile_trial_desc": "קבל גישה מלאה לכל הפיצ'רים של Pro ל-2 ימים. אחר כך תתחיל מנוי PRO. בלי כרטיס אשראי",
+        "profile_start_trial": "התחל תקופת ניסיון",
         
         # Flash сообщения
         "msg_login_required": "יש להתחבר קודם",
@@ -341,7 +344,7 @@ TRANSLATIONS = {
         "msg_logout": "התנתקת בהצלחה",
         "msg_file_uploaded": "קובץ הועלה בהצלחה",
         "msg_file_error": "שגיאה בהעלאת קובץ",
-        "msg_trial_started": "תקופת ניסיון הופעלה! 7 ימים חינם",
+        "msg_trial_started": "תקופת ניסיון הופעלה! 2 ימים חינם - אחר כך תהיה מנוי PRO",
         "msg_trial_used": "כבר ניצלת את תקופת הניסיון",
         "msg_subscription_active": "המנוי הופעל בהצלחה!",
         "msg_subscription_cancelled": "המנוי בוטל",
@@ -404,7 +407,7 @@ TRANSLATIONS = {
         "about_btn_get_started": "התחל בחינם",
         "about_btn_learn_more": "למד עוד",
         "about_no_card": "ללא כרטיס אשראי",
-        "about_trial": "7 ימים חינם",
+        "about_trial": "2 ימים חינם - אחר כך מנוי PRO",
         "about_smart_analytics": "אנליטיקה חכמה",
         "about_ai_insights": "תובנות AI",
         "about_roi_boost": "עליית ROI",
@@ -548,6 +551,9 @@ TRANSLATIONS = {
         "profile_active": "Active",
         "profile_cancelled": "Cancelled",
         "profile_no_subscription": "No Subscription",
+        "profile_trial_available": "Try PRO free for 2 days!",
+        "profile_trial_desc": "Get full access to all Pro features for 2 days. After that, PRO subscription will start. No credit card",
+        "profile_start_trial": "Start trial period",
         
         # Flash messages
         "msg_login_required": "Please login first",
@@ -558,7 +564,7 @@ TRANSLATIONS = {
         "msg_logout": "Logged out successfully",
         "msg_file_uploaded": "File uploaded successfully",
         "msg_file_error": "File upload error",
-        "msg_trial_started": "Trial period activated! 7 days free",
+        "msg_trial_started": "Trial period activated! 2 days free - then PRO subscription",
         "msg_trial_used": "Trial period already used",
         "msg_subscription_active": "Subscription activated successfully!",
         "msg_subscription_cancelled": "Subscription cancelled",
@@ -586,7 +592,7 @@ TRANSLATIONS = {
         "about_btn_get_started": "Get Started Free",
         "about_btn_learn_more": "Learn More",
         "about_no_card": "No credit card required",
-        "about_trial": "7-day free trial",
+        "about_trial": "2 days free - then PRO subscription",
         "about_smart_analytics": "Smart Analytics",
         "about_ai_insights": "AI Insights",
         "about_roi_boost": "ROI Boost",
@@ -765,7 +771,7 @@ TRANSLATIONS = {
         "msg_logout": "Выход выполнен успешно",
         "msg_file_uploaded": "Файл загружен успешно",
         "msg_file_error": "Ошибка загрузки файла",
-        "msg_trial_started": "Пробный период активирован! 7 дней бесплатно",
+        "msg_trial_started": "Пробный период активирован! 2 дня бесплатно - затем подписка PRO",
         "msg_trial_used": "Пробный период уже использован",
         "msg_subscription_active": "Подписка активирована успешно!",
         "msg_subscription_cancelled": "Подписка отменена",
@@ -805,7 +811,7 @@ TRANSLATIONS = {
         "results_upgrade_desc": "Обновитесь до плана Basic или Pro, чтобы увидеть все графики и данные",
         "results_basic_graphs": "Basic - только графики",
         "results_pro_ai": "Pro - включая AI",
-        "results_try_free": "Попробуйте 7 дней бесплатно",
+        "results_try_free": "Попробуйте 2 дня бесплатно - затем подписка PRO",
         "results_action_plan": "Рекомендуемый план действий",
         "results_action_desc": "Конкретные действия на основе вашего анализа",
         "results_how_to": "Как это сделать?",
@@ -873,7 +879,7 @@ TRANSLATIONS = {
         "pricing_pro_desc": "Графики + AI-инсайты",
         "pricing_pro_price": "$20/месяц",
         "pricing_pro_features": "Все графики + AI-рекомендации",
-        "pricing_try_trial": "Попробуйте 7 дней бесплатно",
+        "pricing_try_trial": "Попробуйте 2 дня бесплатно - затем подписка PRO",
         "pricing_no_credit_card": "Без кредитной карты",
         "pricing_cancel_anytime": "Отмена в любое время",
         "pricing_choose_plan": "Выбрать план",
@@ -885,8 +891,8 @@ TRANSLATIONS = {
         "profile_active": "Активна",
         "profile_cancelled": "Отменена",
         "profile_no_subscription": "Без подписки",
-        "profile_trial_available": "Попробуйте PRO бесплатно на 7 дней!",
-        "profile_trial_desc": "Получите полный доступ ко всем функциям Pro без кредитной карты",
+        "profile_trial_available": "Попробуйте PRO бесплатно на 2 дня!",
+        "profile_trial_desc": "Получите полный доступ ко всем функциям Pro на 2 дня. После этого будет подписка PRO. Без кредитной карты",
         "profile_start_trial": "Начать пробный период",
         "profile_manage_subscription": "Управление подпиской",
         "profile_cancel_subscription": "Отменить подписку",
@@ -941,7 +947,7 @@ TRANSLATIONS = {
         "about_btn_get_started": "Начать бесплатно",
         "about_btn_learn_more": "Узнать больше",
         "about_no_card": "Без кредитной карты",
-        "about_trial": "7 дней бесплатно",
+        "about_trial": "2 дня бесплатно - затем подписка PRO",
         "about_smart_analytics": "Умная аналитика",
         "about_ai_insights": "AI-инсайты",
         "about_roi_boost": "Рост ROI",
@@ -1019,7 +1025,7 @@ TRANSLATIONS = {
         "password_digit": "Цифра (0-9)",
         "password_match": "Пароли совпадают",
         "password_no_match": "Пароли не совпадают",
-        "benefits_trial": "7 дней пробного периода бесплатно",
+        "benefits_trial": "2 дня пробного периода бесплатно - затем подписка PRO",
         "benefits_no_card": "Без кредитной карты",
         "benefits_cancel": "Отмена в любое время",
     }
@@ -7009,7 +7015,7 @@ def get_or_create_paypal_plan(plan_name, price_usd, with_trial=False):
     plan_data = {
         "product_id": product_id,
         "name": plan_name_search,
-        "description": f"Monthly subscription for OnePoweb {plan_name.upper()} plan" + (" with 7-day free trial" if with_trial else ""),
+        "description": f"Monthly subscription for OnePoweb {plan_name.upper()} plan" + (" with 2-day free trial, then PRO subscription" if with_trial else ""),
         "status": "ACTIVE",
         "billing_cycles": billing_cycles,
         "payment_preferences": {
@@ -7113,9 +7119,12 @@ def subscribe():
         return redirect(url_for("login"))
     
     # Проверка trial_used для trial подписки
-    if trial and u.get("trial_used"):
-        flash_t("msg_trial_used", "warning")
-        return redirect(url_for("profile"))
+    if trial:
+        keys = u.keys() if hasattr(u, 'keys') else []
+        trial_used = u["trial_used"] if "trial_used" in keys else 0
+        if trial_used:
+            flash_t("msg_trial_used", "warning")
+            return redirect(url_for("profile"))
     
     try:
         ensure_user_ref_code(u["id"])
@@ -7493,10 +7502,12 @@ def paypal_activate_subscription_api():
         
         # Если это была trial подписка - помечаем trial_used
         if with_trial:
+            from datetime import datetime, timedelta
+            trial_until_date = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
             db = get_db()
-            db.execute("UPDATE users SET trial_used = 1 WHERE id = ?", (user_id,))
+            db.execute("UPDATE users SET trial_used = 1, trial_until = ? WHERE id = ?", (trial_until_date, user_id))
             db.commit()
-            print(f"[PayPal] Marked trial_used for user {user_id}")
+            print(f"[PayPal] Marked trial_used and set trial_until to {trial_until_date} for user {user_id}")
         
         # Clear pending subscription
         session.pop("pending_subscription", None)
@@ -7846,19 +7857,22 @@ def subscribe_success():
 @app.route("/start-trial", methods=["POST"])
 @login_required
 def start_trial():
-    """מפעיל תקופת ניסיון חינמית של 7 ימים - דורש כרטיס אשראי"""
+    """מפעיל תקופת ניסיון חינמית של 2 ימים - אחר כך מנוי PRO"""
     u = current_user()
     if not u:
         flash_t("msg_login_required", "warning")
         return redirect(url_for("login"))
     
     # בדיקה אם כבר ניצל תקופת ניסיון
-    if u.get("trial_used"):
+    keys = u.keys() if hasattr(u, 'keys') else []
+    trial_used = u["trial_used"] if "trial_used" in keys else 0
+    if trial_used:
         flash_t("msg_trial_used", "warning")
         return redirect(url_for("profile"))
     
     # בדיקה אם כבר יש מנוי פעיל
-    if u.get("plan") in ("basic", "pro"):
+    plan = u["plan"] if "plan" in keys else None
+    if plan in ("basic", "pro"):
         flash_t("msg_subscription_active", "info")
         return redirect(url_for("profile"))
     
@@ -9012,13 +9026,8 @@ def not_found(e):
 
 @app.errorhandler(500)
 def server_error(e):
-    lang = session.get("lang", "he")
-    if lang == "en":
-        msg = "Server error"
-    elif lang == "ru":
-        msg = "Ошибка сервера"
-    else:
-        msg = "שגיאה בשרת"
+    current_lang = get_language()
+    msg = t("error_500")
     return render_template("error.html", code=500, msg=msg), 500
 
 @app.route("/_debug/tables")

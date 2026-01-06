@@ -5249,6 +5249,15 @@ def demo_try():
         flash("Please sign in to try the demo", "warning")
         return redirect(url_for("login"))
     
+    # Ensure demo_used column exists
+    db = get_db()
+    cols = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+    if "demo_used" not in cols:
+        db.execute("ALTER TABLE users ADD COLUMN demo_used INTEGER DEFAULT 0")
+        db.commit()
+        # Re-fetch user to get updated schema
+        u = db.execute("SELECT * FROM users WHERE id=?", (u["id"],)).fetchone()
+    
     # Check if user already used demo
     demo_used = u['demo_used'] if 'demo_used' in u.keys() else 0
     if demo_used:
@@ -5262,7 +5271,6 @@ def demo_try():
         return redirect(url_for("about"))
     
     # Mark demo as used
-    db = get_db()
     db.execute("UPDATE users SET demo_used = 1 WHERE id = ?", (u["id"],))
     db.commit()
     

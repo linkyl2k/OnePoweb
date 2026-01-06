@@ -168,6 +168,11 @@
             </div>
           {% endif %}
         {% else %}
+          <div class="d-flex gap-3 justify-content-center flex-wrap mb-3">
+            <a href="{{ url_for('static', filename='img/cafe_monthly_report.xlsx') }}" download="cafe_monthly_report.xlsx" class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 30px;">
+              <i class="bi bi-download me-2"></i>{% if current_lang == 'he' %}הורד דוח לדוגמה{% elif current_lang == 'ru' %}Скачать пример отчета{% else %}Download Sample Report{% endif %}
+            </a>
+          </div>
           <p class="text-muted mb-3">
             <i class="bi bi-info-circle me-1"></i>
             {% if current_lang == 'he' %}

@@ -827,7 +827,7 @@ TRANSLATIONS = {
         "contact_send": "Отправить",
         "contact_sent": "Сообщение отправлено успешно! Мы свяжемся с вами в ближайшее время.",
         
-        # About/Landing
+        # About
         "about_title": "Почему OnePoweb?",
         "about_why": "Почему выбирают нас",
         "about_features": "Функции",

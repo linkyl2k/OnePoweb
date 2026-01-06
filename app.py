@@ -4200,8 +4200,8 @@ def index():
         # Logged in users go to upload page
         return redirect(url_for('upload'))
     else:
-        # Guests go to get-started page with onboarding questions
-        return redirect(url_for('get_started'))
+        # Guests go to about page with explanations and Get Started button
+        return redirect(url_for('about'))
 
 @app.route("/about")
 def about():

@@ -428,6 +428,10 @@ TRANSLATIONS = {
         "get_started_next": "הבא",
         "get_started_continue": "המשך",
         
+        # Contact
+        "contact_sent": "ההודעה נשלחה בהצלחה! נחזור אליך בהקדם. 📧",
+        "contact_sent_received": "ההודעה התקבלה! נחזור אליך בהקדם.",
+        
         # Chart titles (Hebrew - same as original)
         "chart_sales_by_hour": "מכירות לפי שעה",
         "chart_sales_by_weekday": "מכירות לפי יום בשבוע",
@@ -713,6 +717,10 @@ TRANSLATIONS = {
         "get_started_back": "Back",
         "get_started_next": "Next",
         "get_started_continue": "Continue",
+        
+        # Contact
+        "contact_sent": "Message sent successfully! We will get back to you shortly. 📧",
+        "contact_sent_received": "Message received! We will get back to you shortly.",
         
         # About page translations
         "about_ai_badge": "✨ AI-Powered Analytics",
@@ -1095,6 +1103,7 @@ TRANSLATIONS = {
         "contact_message": "Сообщение",
         "contact_send": "Отправить",
         "contact_sent": "Сообщение отправлено успешно! Мы свяжемся с вами в ближайшее время.",
+        "contact_sent_received": "Сообщение получено! Мы свяжемся с вами в ближайшее время.",
         
         # About
         "about_title": "Почему OnePoweb?",
@@ -7035,7 +7044,7 @@ def pricing():
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "GET":
-        return render_template("contact.html", active="contact", title="צור קשר")
+        return render_template("contact.html", active="contact", title=t("nav_contact"))
 
     name = request.form.get("name", "").strip()
     email = request.form.get("email", "").strip()
@@ -7045,11 +7054,11 @@ def contact():
     # שליחת מייל
     try:
         send_contact_email(name, email, message, subject)
-        flash("ההודעה נשלחה בהצלחה! נחזור אליך בהקדם. 📧", "success")
+        flash_t("contact_sent", "success")
     except Exception as e:
         print(f"⚠️ שגיאה בשליחת מייל: {e}")
         # עדיין שומרים את ההודעה לlog
-        flash("ההודעה התקבלה! נחזור אליך בהקדם.", "success")
+        flash_t("contact_sent_received", "success")
     
     return redirect(url_for("contact"))
 

@@ -335,7 +335,7 @@
         <ul class="navbar-nav me-auto">
           {% if session.uid %}
             <li class="nav-item">
-              <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('upload') }}">{{ t('nav_home') }}</a>
+              <a class="nav-link active" href="{{ url_for('upload') }}">{{ t('nav_home') }}</a>
             </li>
           {% endif %}
           <li class="nav-item">

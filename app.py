@@ -8495,11 +8495,34 @@ def site_stats():
         ORDER BY date DESC
     """).fetchall()
     
+    # Общая сумма продаж из всех отчетов
+    total_sales = 0.0
+    reports_with_summary = db.execute("SELECT summary_json FROM reports WHERE summary_json IS NOT NULL").fetchall()
+    for row in reports_with_summary:
+        try:
+            summary = json.loads(row['summary_json'] or '{}')
+            # Пробуем разные варианты ключей для общей суммы
+            if 'total' in summary:
+                total_sales += float(summary.get('total', 0) or 0)
+            elif 'total_sales' in summary:
+                total_sales += float(summary.get('total_sales', 0) or 0)
+        except (json.JSONDecodeError, ValueError, TypeError):
+            continue
+    
+    stats['total_sales'] = total_sales
+    
+    # Среднее количество отчетов на пользователя
+    if stats['total_users'] > 0:
+        stats['avg_reports_per_user'] = round(stats['total_reports'] / stats['total_users'], 2)
+    else:
+        stats['avg_reports_per_user'] = 0
+    
     current_lang = get_language()
     return render_template("stats.html",
                           stats=stats,
                           active="stats",
-                          title=t("stats_title", current_lang))
+                          title=t("stats_title", current_lang),
+                          currency_symbol=get_currency(current_lang)["symbol"])
 
 
 @app.route("/dashboard/compare", methods=["POST"])

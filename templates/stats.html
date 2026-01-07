@@ -6,6 +6,62 @@
   <p class="text-muted">{{ t('stats_subtitle') }}</p>
 </div>
 
+<!-- Сводка -->
+<div class="card mb-4" style="border-radius: 16px; border: 1px solid rgba(46,160,255,0.2); background: linear-gradient(135deg, rgba(46,160,255,0.05), rgba(52,195,255,0.02));">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h4 class="mb-1" style="color: var(--text); font-weight: 600;">
+          {% if current_lang == 'he' %}סיכום{% elif current_lang == 'en' %}Summary{% else %}Сводка{% endif %}
+        </h4>
+        <p class="text-muted mb-0 small">
+          {% if current_lang == 'he' %}ניתוח מקיף של כל המדדים{% elif current_lang == 'en' %}Comprehensive analysis of all metrics{% else %}Комплексный анализ показателей{% endif %}
+        </p>
+      </div>
+      <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #2ea0ff, #34c3ff); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="bi bi-bar-chart" style="font-size: 1.5rem; color: white;"></i>
+      </div>
+    </div>
+    
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="p-3 rounded-3" style="background: rgba(46,160,255,0.1); border: 1px solid rgba(46,160,255,0.2);">
+          <div class="text-muted small mb-1">
+            {% if current_lang == 'he' %}סה"כ מכירות{% elif current_lang == 'en' %}Total Sales{% else %}Общие продажи{% endif %}
+          </div>
+          <div class="h4 mb-0" style="color: #2ea0ff; font-weight: 700;">
+            {{ currency_symbol }}{{ "{:,.0f}".format(stats.total_sales|default(0)) }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded-3" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);">
+          <div class="text-muted small mb-1">
+            {% if current_lang == 'he' %}ממוצע דוחות למשתמש{% elif current_lang == 'en' %}Avg Reports per User{% else %}Среднее отчетов на пользователя{% endif %}
+          </div>
+          <div class="h4 mb-0" style="color: #10b981; font-weight: 700;">
+            {{ stats.avg_reports_per_user|default(0) }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded-3" style="background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2);">
+          <div class="text-muted small mb-1">
+            {% if current_lang == 'he' %}שיעור מנויים{% elif current_lang == 'en' %}Subscription Rate{% else %}Доля подписок{% endif %}
+          </div>
+          <div class="h4 mb-0" style="color: #fbbf24; font-weight: 700;">
+            {% if stats.total_users > 0 %}
+              {{ "{:.1f}".format((stats.active_subscriptions / stats.total_users * 100)|default(0)) }}%
+            {% else %}
+              0%
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Основные метрики -->
 <div class="row g-4 mb-4">
   <div class="col-md-3">

@@ -459,7 +459,7 @@
             </li>
 
             <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">📊 {{ t('nav_dashboard') }}</a></li>
-            {% if current_user and current_user.email|lower == ADMIN_EMAIL|lower %}
+            {% if current_user() and current_user().email|lower == ADMIN_EMAIL|lower %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('site_stats') }}">📈 Статистика</a></li>
             {% endif %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">{{ t('nav_profile') }}</a></li>

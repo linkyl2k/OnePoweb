@@ -422,6 +422,12 @@ TRANSLATIONS = {
         # Checkout
         "checkout_order_summary": "סיכום ההזמנה",
         
+        # Upgrade Required
+        "upgrade_title": "נדרש שדרוג",
+        "upgrade_feature": "תכונה זו זמינה רק לתוכניות",
+        "upgrade_upgrade_now": "שדרג עכשיו",
+        "upgrade_dashboard_pro_only": "לוח הבקרה זמין רק למנויי Pro",
+        
         # Get Started / Onboarding
         "nav_get_started": "התחל",
         "get_started_title": "להכיר אותך...",
@@ -731,6 +737,12 @@ TRANSLATIONS = {
         
         # Checkout
         "checkout_order_summary": "Order Summary",
+        
+        # Upgrade Required
+        "upgrade_title": "Upgrade Required",
+        "upgrade_feature": "This feature is available only for plans",
+        "upgrade_upgrade_now": "Upgrade Now",
+        "upgrade_dashboard_pro_only": "Dashboard is available only to Pro subscribers",
         
         # Get Started / Onboarding
         "nav_get_started": "Get Started",
@@ -1257,6 +1269,7 @@ TRANSLATIONS = {
         "upgrade_title": "Требуется обновление",
         "upgrade_feature": "Эта функция доступна только для планов",
         "upgrade_upgrade_now": "Обновить сейчас",
+        "upgrade_dashboard_pro_only": "Панель управления доступна только для подписчиков Pro",
         
         # Thanks pages
         "thanks_title": "Спасибо!",
@@ -2120,6 +2133,16 @@ def get_effective_plan(user) -> str:
     """מחזיר את התוכנית הפעילה (כולל התחשבות בתקופת ניסיון)"""
     if not user:
         return "free"
+    
+    # Администратор всегда имеет PRO доступ
+    try:
+        keys = user.keys() if hasattr(user, 'keys') else []
+        if "email" in keys and user["email"]:
+            if user["email"].lower() == ADMIN_EMAIL.lower():
+                return "pro"
+    except:
+        pass
+    
     # אם יש תקופת ניסיון פעילה - מחזיר pro
     if is_trial_active(user):
         return "pro"
@@ -8210,7 +8233,7 @@ def dashboard():
     # Pro only feature (כולל תקופת ניסיון)
     effective_plan = get_effective_plan(u)
     if effective_plan not in ("pro", "premium", "admin"):
-        flash("לוח הבקרה זמין רק למנויי Pro", "warning")
+        flash_t("upgrade_dashboard_pro_only", "warning")
         return redirect(url_for("subscribe", plan="pro"))
     
     # סינון לפי סוג תקופה (מה-URL)

@@ -8354,7 +8354,15 @@ def site_stats():
     u = current_user()
     
     # Проверка доступа - только администратор
-    if not u or u.get("email", "").lower() != ADMIN_EMAIL.lower():
+    if not u:
+        flash("Доступ запрещен. Эта страница доступна только администратору.", "error")
+        return redirect(url_for("dashboard"))
+    
+    # Правильный доступ к email из sqlite3.Row
+    keys = u.keys() if hasattr(u, 'keys') else []
+    user_email = u["email"] if "email" in keys else ""
+    
+    if user_email.lower() != ADMIN_EMAIL.lower():
         flash("Доступ запрещен. Эта страница доступна только администратору.", "error")
         return redirect(url_for("dashboard"))
     

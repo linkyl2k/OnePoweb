@@ -8409,7 +8409,7 @@ def site_stats():
     # Пользователи с активными подписками
     stats['active_subscriptions'] = db.execute("""
         SELECT COUNT(*) FROM users 
-        WHERE plan IN ('basic', 'pro') OR paypal_subscription_id IS NOT NULL
+        WHERE plan IN ('basic', 'pro')
     """).fetchone()[0]
     
     # Пользователи на trial

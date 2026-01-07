@@ -40,11 +40,15 @@
   <!-- Classic favicon.ico for browsers / Google -->
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/onepoweb_icon_only_32.png') }}">
-  <link rel="icon" type="image/png" sizes="48x48" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16x16.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="48x48" href="{{ url_for('static', filename='img/favicon-48x48.png') }}">
   
   <!-- Apple Touch Icon -->
-  <link rel="apple-touch-icon" sizes="48x48" href="{{ url_for('static', filename='img/onepoweb_icon_only_48.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+  
+  <!-- Android Chrome Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/android-chrome-192x192.png') }}">
   
   <!-- Additional meta for search engines -->
   <link rel="canonical" href="{{ request.url }}">

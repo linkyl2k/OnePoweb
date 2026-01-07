@@ -4590,6 +4590,11 @@ def set_currency(currency_code):
     return_url = request.args.get("return_url") or request.referrer or url_for("about")
     return redirect(return_url)
 
+@app.route("/landing")
+def landing_redirect():
+    """Redirect old landing page to home - for SEO cleanup"""
+    return redirect(url_for('index'), code=301)
+
 @app.route("/")
 def index():
     """Home page - redirect based on login status"""

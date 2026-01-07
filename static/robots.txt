@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /uploads/
 Disallow: /api/
+Disallow: /landing
 Disallow: /cancel-subscription
 Disallow: /renew-subscription
 

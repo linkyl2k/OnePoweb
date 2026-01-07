@@ -20,6 +20,9 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER = os.getenv("SMTP_USER", "")  # Gmail address
 SMTP_PASS = os.getenv("SMTP_PASS", "")  # App password (not regular password!)
 
+# Admin email for site statistics access
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "onepoweb@gmail.com")  # Default admin email
+
 # ====== PayPal Configuration ======
 PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "")
 PAYPAL_SECRET = os.getenv("PAYPAL_SECRET", "")
@@ -1344,7 +1347,8 @@ def inject_translations():
             "he": "עברית",
             "en": "English", 
             "ru": "Русский"
-        }
+        },
+        "ADMIN_EMAIL": ADMIN_EMAIL
     }
 
 # Функция для перевода flash сообщений
@@ -8318,6 +8322,92 @@ def dashboard():
                           comparison_currency=comparison_currency,
                           active="dashboard",
                           title="לוח בקרה")
+
+
+@app.route("/stats")
+@login_required
+def site_stats():
+    """Статистика сайта - количество пользователей, отчетов, подписок (только для администратора)"""
+    u = current_user()
+    
+    # Проверка доступа - только администратор
+    if not u or u.get("email", "").lower() != ADMIN_EMAIL.lower():
+        flash("Доступ запрещен. Эта страница доступна только администратору.", "error")
+        return redirect(url_for("dashboard"))
+    
+    db = get_db()
+    
+    # Собираем статистику
+    stats = {}
+    
+    # Общее количество пользователей
+    stats['total_users'] = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    
+    # Пользователи по планам
+    stats['users_by_plan'] = {}
+    plans = db.execute("SELECT plan, COUNT(*) as count FROM users GROUP BY plan").fetchall()
+    for plan_row in plans:
+        plan = plan_row['plan'] or 'free'
+        stats['users_by_plan'][plan] = plan_row['count']
+    
+    # Общее количество отчетов
+    stats['total_reports'] = db.execute("SELECT COUNT(*) FROM reports").fetchone()[0]
+    
+    # Отчеты по пользователям (топ 10)
+    stats['reports_by_user'] = db.execute("""
+        SELECT u.email, COUNT(r.id) as report_count 
+        FROM users u 
+        LEFT JOIN reports r ON u.id = r.user_id 
+        GROUP BY u.id, u.email 
+        ORDER BY report_count DESC 
+        LIMIT 10
+    """).fetchall()
+    
+    # Новые пользователи за последние 30 дней
+    stats['new_users_30d'] = db.execute("""
+        SELECT COUNT(*) FROM users 
+        WHERE created_at >= datetime('now', '-30 days')
+    """).fetchone()[0]
+    
+    # Новые отчеты за последние 30 дней
+    stats['new_reports_30d'] = db.execute("""
+        SELECT COUNT(*) FROM reports 
+        WHERE created_at >= datetime('now', '-30 days')
+    """).fetchone()[0]
+    
+    # Пользователи с активными подписками
+    stats['active_subscriptions'] = db.execute("""
+        SELECT COUNT(*) FROM users 
+        WHERE plan IN ('basic', 'pro') OR paypal_subscription_id IS NOT NULL
+    """).fetchone()[0]
+    
+    # Пользователи на trial
+    stats['trial_users'] = db.execute("""
+        SELECT COUNT(*) FROM users 
+        WHERE trial_until IS NOT NULL AND trial_until >= date('now')
+    """).fetchone()[0]
+    
+    # Статистика по дням (последние 30 дней)
+    stats['users_by_day'] = db.execute("""
+        SELECT DATE(created_at) as date, COUNT(*) as count 
+        FROM users 
+        WHERE created_at >= datetime('now', '-30 days')
+        GROUP BY DATE(created_at)
+        ORDER BY date DESC
+    """).fetchall()
+    
+    stats['reports_by_day'] = db.execute("""
+        SELECT DATE(created_at) as date, COUNT(*) as count 
+        FROM reports 
+        WHERE created_at >= datetime('now', '-30 days')
+        GROUP BY DATE(created_at)
+        ORDER BY date DESC
+    """).fetchall()
+    
+    return render_template("stats.html",
+                          stats=stats,
+                          active="stats",
+                          title="Статистика сайта")
 
 
 @app.route("/dashboard/compare", methods=["POST"])

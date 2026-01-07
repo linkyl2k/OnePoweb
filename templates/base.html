@@ -459,6 +459,9 @@
             </li>
 
             <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">📊 {{ t('nav_dashboard') }}</a></li>
+            {% if current_user and current_user.email|lower == ADMIN_EMAIL|lower %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('site_stats') }}">📈 Статистика</a></li>
+            {% endif %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">{{ t('nav_profile') }}</a></li>
             <li class="nav-item ms-3 ms-md-4" style="position: relative;">
               <span class="d-none d-md-inline" style="position: absolute; left: -12px; top: 50%; transform: translateY(-50%); width: 1px; height: 20px; background: rgba(255,255,255,0.2);"></span>

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="mb-4">
+  <h2 class="mb-0">{{ t('stats_title') }}</h2>
+  <p class="text-muted">{{ t('stats_subtitle') }}</p>
+</div>
+
+<!-- Основные метрики -->
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="text-muted mb-0">{{ t('stats_total_users') }}</h6>
+          <i class="bi bi-people" style="font-size: 1.5rem; color: #2ea0ff;"></i>
+        </div>
+        <h3 class="mb-0">{{ stats.total_users }}</h3>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="text-muted mb-0">{{ t('stats_total_reports') }}</h6>
+          <i class="bi bi-file-earmark-text" style="font-size: 1.5rem; color: #10b981;"></i>
+        </div>
+        <h3 class="mb-0">{{ stats.total_reports }}</h3>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="text-muted mb-0">{{ t('stats_active_subscriptions') }}</h6>
+          <i class="bi bi-star-fill" style="font-size: 1.5rem; color: #fbbf24;"></i>
+        </div>
+        <h3 class="mb-0">{{ stats.active_subscriptions }}</h3>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="text-muted mb-0">{{ t('stats_trial_users') }}</h6>
+          <i class="bi bi-gift" style="font-size: 1.5rem; color: #34d399;"></i>
+        </div>
+        <h3 class="mb-0">{{ stats.trial_users }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Статистика за 30 дней -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="mb-3">{{ t('stats_new_users_30d') }}</h5>
+        <h2 class="mb-0">{{ stats.new_users_30d }}</h2>
+        <small class="text-muted">{{ t('stats_last_30_days') }}</small>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="mb-3">{{ t('stats_new_reports_30d') }}</h5>
+        <h2 class="mb-0">{{ stats.new_reports_30d }}</h2>
+        <small class="text-muted">{{ t('stats_last_30_days') }}</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Пользователи по планам -->
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="mb-3">{{ t('stats_users_by_plan') }}</h5>
+    <div class="row g-3">
+      {% for plan, count in stats.users_by_plan.items() %}
+      <div class="col-md-3">
+        <div class="p-3" style="background: rgba(46,160,255,0.1); border-radius: 10px; border: 1px solid rgba(46,160,255,0.2);">
+          <div class="text-muted small mb-1">{{ plan.upper() }}</div>
+          <div class="h4 mb-0">{{ count }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Топ пользователей по отчетам -->
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="mb-3">{{ t('stats_top_users') }}</h5>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ t('stats_email') }}</th>
+            <th class="text-end">{{ t('stats_report_count') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in stats.reports_by_user %}
+          <tr>
+            <td>{{ user.email }}</td>
+            <td class="text-end"><strong>{{ user.report_count }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- График регистраций по дням -->
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="mb-3">{{ t('stats_registrations_by_day') }}</h5>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>{{ t('stats_date') }}</th>
+            <th class="text-end">{{ t('stats_users') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for day in stats.users_by_day %}
+          <tr>
+            <td>{{ day.date }}</td>
+            <td class="text-end">{{ day.count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- График отчетов по дням -->
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="mb-3">{{ t('stats_reports_by_day') }}</h5>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>{{ t('stats_date') }}</th>
+            <th class="text-end">{{ t('stats_reports') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for day in stats.reports_by_day %}
+          <tr>
+            <td>{{ day.date }}</td>
+            <td class="text-end">{{ day.count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+

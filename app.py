@@ -545,6 +545,26 @@ TRANSLATIONS = {
         "about_cta_guest_title": "מוכן להפוך את העסק שלך?",
         "about_cta_guest_desc": "הצטרף לאלפי עסקים המקבלים החלטות חכמות יותר עם OnePoweb",
         "about_cta_guest_btn": "התחל - זה בחינם",
+        
+        # Statistics page
+        "stats_title": "📊 סטטיסטיקת האתר",
+        "stats_subtitle": "סטטיסטיקה כללית של OnePoweb",
+        "stats_total_users": "סה\"כ משתמשים",
+        "stats_total_reports": "סה\"כ דוחות",
+        "stats_active_subscriptions": "מנויים פעילים",
+        "stats_trial_users": "במבחן",
+        "stats_new_users_30d": "משתמשים חדשים (30 יום)",
+        "stats_new_reports_30d": "דוחות חדשים (30 יום)",
+        "stats_last_30_days": "במשך 30 הימים האחרונים",
+        "stats_users_by_plan": "משתמשים לפי תוכנית",
+        "stats_top_users": "משתמשים מובילים לפי מספר דוחות",
+        "stats_email": "אימייל",
+        "stats_report_count": "מספר דוחות",
+        "stats_registrations_by_day": "רישומים לפי יום (30 הימים האחרונים)",
+        "stats_reports_by_day": "דוחות לפי יום (30 הימים האחרונים)",
+        "stats_date": "תאריך",
+        "stats_users": "משתמשים",
+        "stats_reports": "דוחות",
     },
     "en": {  # English
         # Navigation
@@ -826,6 +846,26 @@ TRANSLATIONS = {
         "about_cta_guest_title": "Ready to Transform Your Business?",
         "about_cta_guest_desc": "Join thousands of businesses making smarter decisions with OnePoweb",
         "about_cta_guest_btn": "Get Started - It's Free",
+        
+        # Statistics page
+        "stats_title": "📊 Site Statistics",
+        "stats_subtitle": "OnePoweb Overall Statistics",
+        "stats_total_users": "Total Users",
+        "stats_total_reports": "Total Reports",
+        "stats_active_subscriptions": "Active Subscriptions",
+        "stats_trial_users": "On Trial",
+        "stats_new_users_30d": "New Users (30 days)",
+        "stats_new_reports_30d": "New Reports (30 days)",
+        "stats_last_30_days": "In the last 30 days",
+        "stats_users_by_plan": "Users by Plan",
+        "stats_top_users": "Top Users by Report Count",
+        "stats_email": "Email",
+        "stats_report_count": "Report Count",
+        "stats_registrations_by_day": "Registrations by Day (Last 30 days)",
+        "stats_reports_by_day": "Reports by Day (Last 30 days)",
+        "stats_date": "Date",
+        "stats_users": "Users",
+        "stats_reports": "Reports",
         
         # Chart titles
         "chart_sales_by_hour": "Sales by Hour",
@@ -1289,6 +1329,26 @@ TRANSLATIONS = {
         "benefits_trial": "2 дня пробного периода бесплатно - затем подписка PRO",
         "benefits_no_card": "Без кредитной карты",
         "benefits_cancel": "Отмена в любое время",
+        
+        # Statistics page
+        "stats_title": "📊 Статистика сайта",
+        "stats_subtitle": "Общая статистика OnePoweb",
+        "stats_total_users": "Всего пользователей",
+        "stats_total_reports": "Всего отчетов",
+        "stats_active_subscriptions": "Активные подписки",
+        "stats_trial_users": "На trial",
+        "stats_new_users_30d": "Новые пользователи (30 дней)",
+        "stats_new_reports_30d": "Новые отчеты (30 дней)",
+        "stats_last_30_days": "За последние 30 дней",
+        "stats_users_by_plan": "Пользователи по планам",
+        "stats_top_users": "Топ пользователей по количеству отчетов",
+        "stats_email": "Email",
+        "stats_report_count": "Количество отчетов",
+        "stats_registrations_by_day": "Регистрации по дням (последние 30 дней)",
+        "stats_reports_by_day": "Отчеты по дням (последние 30 дней)",
+        "stats_date": "Дата",
+        "stats_users": "Пользователей",
+        "stats_reports": "Отчетов",
     }
 }
 
@@ -8435,10 +8495,11 @@ def site_stats():
         ORDER BY date DESC
     """).fetchall()
     
+    current_lang = get_language()
     return render_template("stats.html",
                           stats=stats,
                           active="stats",
-                          title="Статистика сайта")
+                          title=t("stats_title", current_lang))
 
 
 @app.route("/dashboard/compare", methods=["POST"])

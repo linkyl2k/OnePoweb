@@ -9324,14 +9324,8 @@ def result():
     if u:
         user_plan = u["plan"] if u["plan"] else "free"
         # בדיקה אם יש trial פעיל
-        if u["trial_until"]:
-            from datetime import datetime
-            try:
-                trial_end = datetime.strptime(u["trial_until"], "%Y-%m-%d")
-                if trial_end >= datetime.now():
-                    user_plan = "pro"  # trial פעיל = גישה לPRO
-            except:
-                pass
+        if is_trial_active(u):
+            user_plan = "pro"  # trial פעיל = גישה לPRO
 
     # Check if this is a guest session
     is_guest_session = session.get("is_guest_session", False)

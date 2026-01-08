@@ -338,6 +338,7 @@ TRANSLATIONS = {
         "profile_trial_available": "נסה PRO חינם ל-2 ימים!",
         "profile_trial_desc": "קבל גישה מלאה לכל הפיצ'רים של Pro ל-2 ימים. אחר כך תתחיל מנוי PRO. בלי כרטיס אשראי",
         "profile_start_trial": "התחל תקופת ניסיון",
+        "trial_expired": "נגמר!",
         
         # Profile Edit
         "profile_edit_title": "עריכת פרופיל",
@@ -674,6 +675,7 @@ TRANSLATIONS = {
         "profile_trial_available": "Try PRO free for 2 days!",
         "profile_trial_desc": "Get full access to all Pro features for 2 days. After that, PRO subscription will start. No credit card",
         "profile_start_trial": "Start trial period",
+        "trial_expired": "Expired!",
         
         # Profile Edit
         "profile_edit_title": "Edit Profile",
@@ -1163,6 +1165,7 @@ TRANSLATIONS = {
         "profile_trial_available": "Попробуйте PRO бесплатно на 2 дня!",
         "profile_trial_desc": "Получите полный доступ ко всем функциям Pro на 2 дня. После этого будет подписка PRO. Без кредитной карты",
         "profile_start_trial": "Начать пробный период",
+        "trial_expired": "Истёк!",
         "profile_manage_subscription": "Управление подпиской",
         "profile_cancel_subscription": "Отменить подписку",
         "profile_cancel_warning": "Ваша подписка будет отменена в конце текущего периода",

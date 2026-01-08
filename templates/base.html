@@ -388,7 +388,7 @@
                     <i class="bi bi-rocket-takeoff-fill me-1"></i>PRO
                   </span>
                   {% if is_trial_active(u) %}
-                    <span class="trial-countdown" data-end="{{ get_trial_end_timestamp(u) }}">
+                    <span class="trial-countdown" data-end="{{ get_trial_end_timestamp(u) }}" data-expired-text="{{ t('trial_expired') }}">
                       <i class="bi bi-clock-history"></i>
                       <span class="countdown-text"></span>
                     </span>
@@ -639,7 +639,7 @@
         const diff = endDate - now;
         
         if (diff <= 0) {
-          textEl.textContent = 'נגמר!';
+          textEl.textContent = countdown.dataset.expiredText || 'Expired!';
           countdown.classList.add('urgent');
           return;
         }
